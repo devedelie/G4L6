@@ -1,18 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- MAIN CONTAINER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:background="@drawable/ic_back_1280X1920">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- IMAGE VIEW FIREBASE OC -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_logo"
+            android:layout_marginBottom="@dimen/default_large_margin"
+            android:layout_marginEnd="@dimen/default_large_margin"
+            android:layout_marginStart="@dimen/default_large_margin"
+
+            />
+
+        <!-- TITLE FIREBASE OC -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="@dimen/default_title_size"
+            android:textStyle="bold"
+            android:layout_margin="@dimen/default_margin"/>
+
+        <!-- DESCRIPTION FIREBASE OC -->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="@dimen/default_text_size"-->
+<!--            android:text="@string/main_activity_description"-->
+<!--            android:layout_margin="@dimen/default_margin"/>-->
+
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome! Please connect"
+            android:layout_gravity="center"
+            android:layout_margin="10dip"/>
+
+        <!-- BUTTONS CONTAINER -->
+        <LinearLayout
+            android:id="@+id/all_login_buttons_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:layout_margin="@dimen/default_large_margin">
+
+<!--            &lt;!&ndash; BUTTON LOGIN &ndash;&gt;-->
+<!--            <Button-->
+<!--                android:id="@+id/main_activity_button_login"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/login"-->
+<!--                android:textColor="#fff"-->
+<!--                android:textSize="@dimen/default_text_size"-->
+<!--                android:background="@drawable/button_radius_primary_color"-->
+<!--                style="?android:attr/borderlessButtonStyle"-->
+<!--                android:layout_margin="@dimen/default_large_margin"-->
+<!--                android:padding="@dimen/default_large_margin"/>-->
+
+<!--            &lt;!&ndash; BUTTON CHAT &ndash;&gt;-->
+<!--            <Button-->
+<!--                android:id="@+id/main_activity_button_chat"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/chat_with_mentor"-->
+<!--                android:textColor="#fff"-->
+<!--                android:textSize="@dimen/default_text_size"-->
+<!--                android:background="@drawable/button_radius_accent_color"-->
+<!--                style="?android:attr/borderlessButtonStyle"-->
+<!--                android:layout_margin="@dimen/default_large_margin"-->
+<!--                android:padding="@dimen/default_large_margin"/>-->
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
