@@ -51,10 +51,10 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:5.1.0'
     implementation 'com.firebaseui:firebase-ui-firestore:5.1.0'
     // Required only if Facebook login support is required!  Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
-    implementation 'com.facebook.android:facebook-android-sdk:4.41.0'
+    implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
 
     // Facebook login support
-    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
 
     //Dex limit
 //    implementation 'androidx.multidex:multidex:2.0.1'   // androidX
