@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/main_activity_coordinator_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -58,18 +59,17 @@
             android:orientation="vertical"
             android:layout_margin="@dimen/default_large_margin">
 
-<!--            &lt;!&ndash; BUTTON LOGIN &ndash;&gt;-->
-<!--            <Button-->
-<!--                android:id="@+id/main_activity_button_login"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/login"-->
-<!--                android:textColor="#fff"-->
-<!--                android:textSize="@dimen/default_text_size"-->
-<!--                android:background="@drawable/button_radius_primary_color"-->
-<!--                style="?android:attr/borderlessButtonStyle"-->
-<!--                android:layout_margin="@dimen/default_large_margin"-->
-<!--                android:padding="@dimen/default_large_margin"/>-->
+            <!-- BUTTON LOGIN -->
+            <Button
+                android:id="@+id/main_activity_button_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_primary_color"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="@dimen/default_large_margin" />
 
 <!--            &lt;!&ndash; BUTTON CHAT &ndash;&gt;-->
 <!--            <Button-->
