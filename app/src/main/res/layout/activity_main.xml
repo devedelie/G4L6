@@ -13,27 +13,25 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:background="@drawable/ic_back_1280X1920">
+        android:background="@drawable/ic_back_1280x1920">
 
         <!-- IMAGE VIEW FIREBASE OC -->
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
             android:background="@drawable/ic_logo"
-            android:layout_marginBottom="@dimen/default_large_margin"
             android:layout_marginEnd="@dimen/default_large_margin"
-            android:layout_marginStart="@dimen/default_large_margin"
-
-            />
+            android:layout_marginStart="@dimen/default_large_margin" />
 
         <!-- TITLE FIREBASE OC -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="@dimen/default_title_size"
+            android:text="@string/secondary_logo_text"
+            android:textSize="@dimen/default_text_size"
             android:textStyle="bold"
-            android:layout_margin="@dimen/default_margin"/>
+            android:layout_margin="@dimen/default_margin"
+            android:textColor="@color/whiteText"/>
 
         <!-- DESCRIPTION FIREBASE OC -->
 <!--        <TextView-->
