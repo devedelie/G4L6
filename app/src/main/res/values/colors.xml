@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#E7234C</color>
     <color name="colorAccent">#D81B60</color>
     <color name="whiteText">#FFFFFF</color>
+    <color name="facebook_btn_color">#5C73DD</color>
+    <color name="gmail_btn_color">#D87777</color>
 </resources>

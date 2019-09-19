@@ -1,5 +1,18 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
+
+    <!-- FACEBOOK PURPOSE -->
+    <string name="facebook_application_id" translatable="false">420763051691337</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb2652307744815274</string>
+
+    <!-- MAIN ACTIVITY -->
     <string name="secondary_logo_text">Find a nice restaurant for lunch with your co-workers!</string>
-    <string name="login">Login</string>
+    <string name="login_gmail">Login with Gmail</string>
+    <string name="login_facebook">Login with Facebook</string>
+    <string name="welcome_text">Welcome! Please connect</string>
+    <string name="error_not_connected">You have to connect!</string>
+    <string name="error_authentication_canceled">Sign-in attempt was canceled!</string>
+    <string name="error_no_internet">No Internet access! The device is offline.</string>
+    <string name="error_unknown_error">An unknown error has occurred</string>
+    <string name="connection_succeed">Signed-in</string>
 </resources>

@@ -46,9 +46,10 @@
             android:id="@+id/welcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome! Please connect"
+            android:text="@string/welcome_text"
             android:layout_gravity="center"
-            android:layout_margin="10dip"/>
+            android:layout_margin="10dip"
+            android:textColor="@android:color/background_light"/>
 
         <!-- BUTTONS CONTAINER -->
         <LinearLayout
@@ -61,28 +62,29 @@
 
             <!-- BUTTON LOGIN -->
             <Button
-                android:id="@+id/main_activity_button_login"
+                android:id="@+id/main_activity_button_gmail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login"
+                android:layout_height="40dp"
+                android:text="@string/login_gmail"
                 android:textColor="#fff"
                 android:textSize="@dimen/default_text_size"
                 android:background="@drawable/button_radius_primary_color"
                 style="?android:attr/borderlessButtonStyle"
-                android:layout_margin="@dimen/default_large_margin" />
+                android:layout_marginBottom="@dimen/default_buttons_margin_bottom"
+                 />
 
-<!--            &lt;!&ndash; BUTTON CHAT &ndash;&gt;-->
-<!--            <Button-->
-<!--                android:id="@+id/main_activity_button_chat"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/chat_with_mentor"-->
-<!--                android:textColor="#fff"-->
-<!--                android:textSize="@dimen/default_text_size"-->
-<!--                android:background="@drawable/button_radius_accent_color"-->
-<!--                style="?android:attr/borderlessButtonStyle"-->
-<!--                android:layout_margin="@dimen/default_large_margin"-->
-<!--                android:padding="@dimen/default_large_margin"/>-->
+            <!-- BUTTON Facebook -->
+            <Button
+                android:id="@+id/main_activity_button_facebook"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="@string/login_facebook"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_accent_color"
+                style="?android:attr/borderlessButtonStyle"
+
+                />
 
         </LinearLayout>
 
