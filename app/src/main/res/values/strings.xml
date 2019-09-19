@@ -7,7 +7,7 @@
 
     <!-- MAIN ACTIVITY -->
     <string name="secondary_logo_text">Find a nice restaurant for lunch with your co-workers!</string>
-    <string name="login_gmail">Login with Gmail</string>
+    <string name="login_gmail">Login with Google</string>
     <string name="login_facebook">Login with Facebook</string>
     <string name="welcome_text">Welcome! Please connect</string>
     <string name="error_not_connected">You have to connect!</string>
