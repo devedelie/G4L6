@@ -8,4 +8,14 @@ public class RestaurantsActivity extends BaseActivity {
     public int getFragmentLayout() {
         return R.layout.activity_restaurants;
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Setup the toolbar
+        this.configureToolbarWithDrawer();
+        // setup the drawer
+        this.configureDrawerLayoutAndNavigationView();
+    }
+
 }

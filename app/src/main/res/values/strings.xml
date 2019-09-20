@@ -15,4 +15,8 @@
     <string name="error_no_internet">No Internet access! The device is offline.</string>
     <string name="error_unknown_error">An unknown error has occurred</string>
     <string name="connection_succeed">Signed-in</string>
+
+    <!--Used in navigation drawer-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

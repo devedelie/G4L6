@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+
+                <item
+                    android:id="@+id/activity_main_drawer_1"
+                    android:icon="@drawable/ic_facebook_icon"
+                    android:title="bla"
+                    android:orderInCategory="0" />
+                <item
+                    android:id="@+id/activity_main_drawer_2"
+                    android:icon="@drawable/ic_google_icon"
+                    android:title="bhyt"
+                    android:orderInCategory="1"/>
+                <item
+                    android:id="@+id/activity_main_drawer_3"
+                    android:icon="@drawable/ic_facebook_icon"
+                    android:title="asdasd"
+                    android:orderInCategory="2"/>
+
+
+</menu>
