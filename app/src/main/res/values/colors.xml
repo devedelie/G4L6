@@ -6,4 +6,5 @@
     <color name="whiteText">#FFFFFF</color>
     <color name="facebook_btn_color">#5C73DD</color>
     <color name="gmail_btn_color">#D87777</color>
+    <color name="bottom_buttons">#AD9191</color>
 </resources>

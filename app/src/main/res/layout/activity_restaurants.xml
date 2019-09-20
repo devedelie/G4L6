@@ -15,11 +15,61 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".RestaurantsActivity" />
+
             <!--Import of toolbar-->
             <include
                 layout="@layout/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
+
+            <!-- 3 BUTTONS AT BOTTOM OF SCREEN -->
+            <LinearLayout
+                android:id="@+id/activity_mentor_chat_buttons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom">
+
+                <!-- BUTTON MAP VIEW -->
+                <ImageButton
+                    android:id="@+id/activity_restaurants_mapView_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:background="@color/bottom_buttons"
+                    android:src="@drawable/ic_mapview_icon"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:tag="10"/>
+
+                <!-- BUTTON LIST VIEW -->
+                <ImageButton
+                    android:id="@+id/activity_restaurants_listView_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:background="@color/bottom_buttons"
+                    android:src="@drawable/ic_listview_icon"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:tag="20"/>
+
+                <!-- BUTTON WORKMATES -->
+                <ImageButton
+                    android:id="@+id/activity_restaurants_workmates_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:background="@color/bottom_buttons"
+                    android:src="@drawable/ic_workmates_icon"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:tag="30"/>
+
+            </LinearLayout>
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
