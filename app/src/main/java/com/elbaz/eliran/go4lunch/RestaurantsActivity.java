@@ -1,5 +1,8 @@
 package com.elbaz.eliran.go4lunch;
 
+import android.Manifest;
+import android.widget.Toast;
+
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -8,8 +11,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallback{
-    private GoogleMap mMap;
+    protected GoogleMap mMap;
+    // Permission Data
+    public static final String PERMS_COARSE = Manifest.permission.ACCESS_COARSE_LOCATION;
+    public static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
+    public static final int RC_PERMISSION_CODE = 100;
 
     @Override
     public int getFragmentLayout() {
@@ -25,6 +34,26 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
         this.configureToolbarWithDrawer();
         // setup the drawer
         this.configureDrawerLayoutAndNavigationView();
+        // Ask for permissions
+        this.askPermission();
+    }
+
+    /**
+     * Method to ask the user for location authorization (with EasyPermissions support)
+     */
+    private void askPermission() {
+        if (!EasyPermissions.hasPermissions(this, PERMS_COARSE, PERMS_FINE)) {
+            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_COARSE, PERMS_FINE);
+            return;
+        }
+        Toast.makeText(this, "Location access authorized!", Toast.LENGTH_SHORT).show();
+    }
+    // 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // 2 - Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     // Initialise Google Map

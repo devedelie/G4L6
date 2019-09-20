@@ -16,6 +16,9 @@
     <string name="error_unknown_error">An unknown error has occurred</string>
     <string name="connection_succeed">Signed-in</string>
 
+    <!-- Restaurant Activity-->
+    <string name="popup_title_permission_files_access">This application needs permissions of location to function correctly.</string>
+
     <!--Used in navigation drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
