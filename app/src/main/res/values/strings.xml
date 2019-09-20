@@ -23,4 +23,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--ERRORS-->
+    <string name="location_is_null">Couldn\'t find your location! Please restart the app</string>
 </resources>
