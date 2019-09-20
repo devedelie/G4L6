@@ -1,7 +1,12 @@
 package com.elbaz.eliran.go4lunch;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,12 +24,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallback{
 
@@ -47,7 +54,9 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Ask for permissions
-        this.askPermission();
+        this.isGpsEnabled();
+        // Location service
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Get RootView for snackBarMessage
         rootView = getWindow().getDecorView().getRootView();
         // Initialise map
@@ -58,12 +67,41 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
         this.configureDrawerLayoutAndNavigationView();
     }
 
+    //--------------------
+    // Permissions
+    //--------------------
+
+    public void isGpsEnabled(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+        }else {
+            askPermission();
+        }
+
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
+                        askPermission();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
     /**
      * Method to ask the user for location authorization (with EasyPermissions support)
      */
     private void askPermission() {
-        if (!EasyPermissions.hasPermissions(this, PERMS_FINE , PERMS_COARSE )) {
-            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_FINE, PERMS_COARSE);
+        if (!EasyPermissions.hasPermissions(this, PERMS_FINE )) {
+            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_FINE);
             return;
         }
         mLocationPermissionGranted = true;
@@ -76,6 +114,9 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
         // 2 - Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
+
+    //-----------------End-------------------------
 
     // Initialise Google Map
     private void initMap(){
@@ -105,7 +146,6 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
 
     // Get Device location
     private void getDeviceLocation(){
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try{
                 final Task<Location> location = mFusedLocationProviderClient.getLastLocation();
@@ -132,6 +172,7 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
     protected void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + "lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
 
 }
