@@ -18,6 +18,13 @@
 
     <!-- Restaurant Activity-->
     <string name="popup_title_permission_files_access">This application needs permissions of location to function correctly.</string>
+    <string name="map_loading_text">Waiting for your location</string>
+
+    <!--Restaurant Main Activity-->
+    <!--Tab name-->
+    <string name="tab_name_1">Map View</string>
+    <string name="tab_name_2">List View</string>
+    <string name="tab_name_3">Workmates</string>
 
     <!--Used in navigation drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -26,4 +33,7 @@
 
     <!--ERRORS-->
     <string name="location_is_null">Couldn\'t find your location! Please restart the app</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
