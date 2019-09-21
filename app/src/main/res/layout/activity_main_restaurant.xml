@@ -28,6 +28,10 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
+        <!--DropShadow-->
+        <View android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@drawable/tabs_upper_dropshadow"/>
         <!-- 1 | Add TabLayout to handle tabs -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/activity_main_restaurant_tabs"

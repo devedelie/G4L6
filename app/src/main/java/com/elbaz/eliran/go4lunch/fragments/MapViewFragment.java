@@ -39,15 +39,14 @@ import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENA
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
-    protected GoogleMap mMap;
-    protected FusedLocationProviderClient mFusedLocationProviderClient;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionGranted = false;
     private static final float DEFAULT_ZOOM = 15f ;
-    View rootView;
+    protected View rootView;
     // Permission Data
-    public static final String PERMS_COARSE = Manifest.permission.ACCESS_COARSE_LOCATION;
-    public static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
-    public static final int RC_PERMISSION_CODE = 100;
+    private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final int RC_PERMISSION_CODE = 100;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
