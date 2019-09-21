@@ -1,5 +1,6 @@
 package com.elbaz.eliran.go4lunch.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -10,9 +11,12 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 
 import butterknife.ButterKnife;
 
@@ -23,6 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     public Toolbar toolbar;
     public DrawerLayout drawerLayout;
     public NavigationView navigationView;
+    public Context mContext;
 
     // --------------------
     // LIFE CYCLE
@@ -74,6 +79,25 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         return true;
+    }
+
+    /**
+     * 2 - ViewPager configuration + Tab Layout
+     */
+    protected void configureViewPagerAndTabs(){
+        //Get ViewPager from layout
+        ViewPager pager = findViewById(R.id.activity_main_restaurant_viewpager);
+        //Set Adapter PageAdapter and glue it together
+        pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
+        // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
+        pager.setOffscreenPageLimit(2);
+
+        //Get TabLayout from layout
+        TabLayout tabs= findViewById(R.id.activity_main_restaurant_tabs);
+        //Glue TabLayout and ViewPager together
+        tabs.setupWithViewPager(pager);
+        //Design purpose. Tabs have the same width
+        tabs.setTabMode(TabLayout.MODE_FIXED);
     }
 
 }

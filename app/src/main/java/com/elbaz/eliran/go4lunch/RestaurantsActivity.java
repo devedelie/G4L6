@@ -10,13 +10,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
-import com.elbaz.eliran.go4lunch.utils.SnackbarAndVibrations;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,16 +25,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 
+import butterknife.BindView;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallback{
-
+    @BindView(R.id.map_loading_animation) ProgressBar mapProgressBarAnimation;
+    @BindView(R.id.map_loading_text) TextView mapLoadingText;
     protected GoogleMap mMap;
     protected FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionGranted = false;
@@ -55,7 +56,7 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         // Ask for permissions
         this.isGpsEnabled();
-        // Location service
+        // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Get RootView for snackBarMessage
         rootView = getWindow().getDecorView().getRootView();
@@ -90,7 +91,9 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
+                        //
                         askPermission();
+                        initMap();
                     }
                 });
         final AlertDialog alert = builder.create();
@@ -114,9 +117,8 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
         // 2 - Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+    //-----------------End Of User's Permissions -------------------------
 
-
-    //-----------------End-------------------------
 
     // Initialise Google Map
     private void initMap(){
@@ -146,26 +148,23 @@ public class RestaurantsActivity extends BaseActivity implements OnMapReadyCallb
 
     // Get Device location
     private void getDeviceLocation(){
-
-        try{
-                final Task<Location> location = mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+        mFusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
-                    public void onComplete(@NonNull Task task) {
-                        if(task.isSuccessful()){
-                            Log.d(TAG, "onComplete: found location");
-                            Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            Log.d(TAG, "onComplete: found location:" + location.getLatitude() + " & " + location.getLongitude());
+                            mapLoadingText.setVisibility(View.GONE);
+                            mapProgressBarAnimation.setVisibility(View.GONE);
+                            moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
-                            SnackbarAndVibrations.showSnakbarMessage(rootView.findViewById(R.id.drawer_restaurant_activity),getString(R.string.location_is_null));
-                       }
+                            // Call the method until location is synchronised
+                            getDeviceLocation();
+                        }
                     }
                 });
-
-        }catch(SecurityException e){
-            Log.e(TAG, "getDeviceLocation: SecurityException" + e.getMessage() );
-        }
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
