@@ -26,7 +26,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import butterknife.BindView;
@@ -82,7 +84,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity().getApplicationContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
                 .setCancelable(false)
                 .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
@@ -131,6 +133,19 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         // Map-Zoom limitations
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(18.0f);
+        // Show building on map
+        mMap.setBuildingsEnabled(true);
+
+        mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(PointOfInterest pointOfInterest) {
+                Marker poiMarker = mMap.addMarker(new MarkerOptions()
+                        .position(pointOfInterest.latLng)
+                        .title(pointOfInterest.name));
+                poiMarker.showInfoWindow();
+                poiMarker.setTag("POI Tag");
+            }
+        });
 
         if(mLocationPermissionGranted){
             mMap.setMyLocationEnabled(true);
@@ -143,6 +158,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 //        mMap.addMarker(new MarkerOptions().position(paris).title("Your Location"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(paris));
     }
+
 
     // Get Device location
     private void getDeviceLocation(){
@@ -166,7 +182,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
-    protected void moveCamera(LatLng latLng, float zoom){
+    private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + "lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
