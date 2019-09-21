@@ -7,7 +7,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.fragments.ListViewFragment;
 import com.elbaz.eliran.go4lunch.fragments.MapViewFragment;
+import com.elbaz.eliran.go4lunch.fragments.WorkmatesFragment;
 
 /**
  * Created by Eliran Elbaz on 21-Sep-19.
@@ -32,9 +34,9 @@ public class PageAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return new MapViewFragment();
             case 1:
-                return new MapViewFragment();
+                return new ListViewFragment();
             case 2:
-                return new MapViewFragment();
+                return new WorkmatesFragment();
             default:
                 return null;
         }

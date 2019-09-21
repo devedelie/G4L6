@@ -42,7 +42,7 @@ public class MainActivity extends BaseActivity {
         super.onResume();
         // Avoid login-screen if the user is already authenticated
         if (this.isCurrentUserLogged()) {
-            this.startRestaurantsActivity();
+            this.startMainRestaurantsActivity();
         }
     }
 
@@ -162,8 +162,8 @@ public class MainActivity extends BaseActivity {
     }
 
     // Launching Restaurants Activity
-    private void startRestaurantsActivity(){
-        Intent intent = new Intent(this, RestaurantsActivity.class);
+    private void startMainRestaurantsActivity(){
+        Intent intent = new Intent(this, MainRestaurantActivity.class);
         startActivity(intent);
     }
 
