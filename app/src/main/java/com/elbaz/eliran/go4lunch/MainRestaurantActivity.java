@@ -17,9 +17,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
+import com.elbaz.eliran.go4lunch.utils.SnackbarAndVibrations;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -28,7 +30,6 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
@@ -56,7 +57,10 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
         this.configureDrawerLayoutAndNavigationView();
         // Initialize Places SDK
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), BuildConfig.GOOGLE_API_KEY, Locale.FRANCE);
+            // Initialize Places.
+            Places.initialize(getApplicationContext(), BuildConfig.GOOGLE_API_KEY);
+            // Create a new Places client instance.
+            PlacesClient placesClient = Places.createClient(this);
         }
     }
 
@@ -149,7 +153,7 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
                     AutocompleteActivityMode.OVERLAY, fields)
                     .build(this);
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-
+            Log.d(TAG, "onOptionsItemSelected: check");
         }
 
         return super.onOptionsItemSelected(item);
@@ -159,9 +163,11 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i(TAG, "onActivityResult Place: " + place.getName() + ", " + place.getId());
+                Log.i(TAG, "onActivityResult Place: " + place.getName() + ", " + place.getId() + " " + place.getPhoneNumber()+ " " + place.getOpeningHours()+ " " + place.getPhotoMetadatas()+ " " + place.getPriceLevel()+ " " + place.getRating());
+                SnackbarAndVibrations.showSnakbarMessage(getCurrentFocus(),place.getName() + ", " + place.getId() + " " + place.getPhoneNumber()+ " " + place.getOpeningHours()+ " " + place.getPhotoMetadatas()+ " " + place.getPriceLevel()+ " " + place.getRating());
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
