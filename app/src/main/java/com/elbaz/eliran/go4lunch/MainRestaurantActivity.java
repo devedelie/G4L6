@@ -1,7 +1,10 @@
 package com.elbaz.eliran.go4lunch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -14,8 +17,20 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import static android.content.ContentValues.TAG;
 
 public class MainRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     protected DrawerLayout drawerLayout;
@@ -25,6 +40,7 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
     protected Context mContext;
     View rootView;
     private int[] tabIcons = {R.drawable.ic_mapview_icon, R.drawable.ic_listview_icon, R.drawable.ic_workmates_icon};
+    int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +54,10 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
+        // Initialize Places SDK
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), BuildConfig.GOOGLE_API_KEY, Locale.FRANCE);
+        }
     }
 
     @Override
@@ -71,7 +91,7 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     /**
-     * 2 - ViewPager configuration + Tab Layout
+     *  ViewPager configuration + Tab Layout
      */
     protected void configureViewPagerAndTabs(){
         //Get ViewPager from layout
@@ -90,6 +110,16 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
         setupTabIcons();
     }
 
+    /**
+     * Inflate the top-menu (menu with search and parameters icons)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //2 - Inflate the menu and add it to the Toolbar
+        getMenuInflater().inflate(R.menu.menu_activity_main_restaurant, menu);
+        return true;
+    }
+
     // Set Icons for tabs
     private void setupTabIcons() {
         tabs.getTabAt(0).setIcon(tabIcons[0]);
@@ -97,8 +127,49 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
         tabs.getTabAt(2).setIcon(tabIcons[2]);
     }
 
+    // Drawer item selection
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
+
+
+        return true;
+    }
+
+    // OptionMenu item selection (Search places auto-complete)
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int order = item.getOrder();
+        if (order == 0){
+            // Set the fields to specify which types of place data to
+            // return after the user has made a selection.
+            List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+
+            // Start the autocomplete intent.
+            Intent intent = new Autocomplete.IntentBuilder(
+                    AutocompleteActivityMode.OVERLAY, fields)
+                    .build(this);
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.i(TAG, "onActivityResult Place: " + place.getName() + ", " + place.getId());
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                // TODO: Handle the error.
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+
     }
 }

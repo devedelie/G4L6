@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,14 +42,17 @@ import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENA
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
-    private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionGranted = false;
     private static final float DEFAULT_ZOOM = 15f ;
     protected View rootView;
     // Permission Data
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int RC_PERMISSION_CODE = 100;
+    // Google API
+    private GoogleApiClient mGoogleApiClient;
+    private Marker mMarker;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,11 +143,19 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
             @Override
             public void onPoiClick(PointOfInterest pointOfInterest) {
+                // add marker
                 Marker poiMarker = mMap.addMarker(new MarkerOptions()
                         .position(pointOfInterest.latLng)
                         .title(pointOfInterest.name));
                 poiMarker.showInfoWindow();
                 poiMarker.setTag("POI Tag");
+
+                // Show detailed Toast
+                Toast.makeText(getActivity().getApplicationContext(), "Clicked: " +
+                                pointOfInterest.name + "\nPlace ID:" + pointOfInterest.placeId +
+                                "\nLatitude:" + pointOfInterest.latLng.latitude +
+                                " Longitude:" + pointOfInterest.latLng.longitude,
+                        Toast.LENGTH_LONG).show();
             }
         });
 
