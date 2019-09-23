@@ -13,14 +13,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
-import com.elbaz.eliran.go4lunch.utils.SnackbarAndVibrations;
+import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
+import com.elbaz.eliran.go4lunch.fragments.MapViewFragment;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
@@ -42,6 +49,8 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
     View rootView;
     private int[] tabIcons = {R.drawable.ic_mapview_icon, R.drawable.ic_listview_icon, R.drawable.ic_workmates_icon};
     int AUTOCOMPLETE_REQUEST_CODE = 1;
+    // Identify each Http Request
+    private static final int SIGN_OUT_TASK = 10;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,9 +143,26 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
     // Drawer item selection
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-
-
+        int order = menuItem.getOrder();
+        switch (order){
+            case 0:
+                // Your lunch action
+                break;
+            case 1:
+                // settings
+                this.goToProfileSettings();
+            case 2:
+                // logout
+                this.signOutUserFromFirebase();
+        }
+        this.drawerLayout.closeDrawer(GravityCompat.START);
+        goToProfileSettings();
         return true;
+    }
+
+    private void goToProfileSettings(){
+        Intent intent = new Intent(this, ProfileSettingsActivity.class);
+        startActivity(intent);
     }
 
     // OptionMenu item selection (Search places auto-complete)
@@ -146,16 +172,33 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
         if (order == 0){
             // Set the fields to specify which types of place data to
             // return after the user has made a selection.
-            List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+            List<Place.Field> fields = Arrays.asList(
+                    Place.Field.ID,
+                    Place.Field.NAME,
+                    Place.Field.ADDRESS,
+                    Place.Field.PHONE_NUMBER,
+                    Place.Field.OPENING_HOURS,
+                    Place.Field.WEBSITE_URI,
+                    Place.Field.PHOTO_METADATAS,
+                    Place.Field.PRICE_LEVEL,
+                    Place.Field.RATING,
+                    Place.Field.LAT_LNG);
 
-            // Start the autocomplete intent.
+            // Bias results to Paris region (use 'bounds' variable in below filter)
+            RectangularBounds bounds = RectangularBounds.newInstance(
+                    new LatLng(48.832304, 2.239726),
+                    new LatLng(48.900962, 2.42124));
+
+            // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
             Intent intent = new Autocomplete.IntentBuilder(
                     AutocompleteActivityMode.OVERLAY, fields)
+                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                    .setCountry("FR")
+                    .setLocationBias(bounds)
                     .build(this);
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
             Log.d(TAG, "onOptionsItemSelected: check");
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -166,8 +209,9 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
             Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i(TAG, "onActivityResult Place: " + place.getName() + ", " + place.getId() + " " + place.getPhoneNumber()+ " " + place.getOpeningHours()+ " " + place.getPhotoMetadatas()+ " " + place.getPriceLevel()+ " " + place.getRating());
-                SnackbarAndVibrations.showSnakbarMessage(getCurrentFocus(),place.getName() + ", " + place.getId() + " " + place.getPhoneNumber()+ " " + place.getOpeningHours()+ " " + place.getPhotoMetadatas()+ " " + place.getPriceLevel()+ " " + place.getRating());
+                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
+                moveCamera(place.getLatLng(), 15f);
+
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -176,6 +220,34 @@ public class MainRestaurantActivity extends AppCompatActivity implements Navigat
                 // The user canceled the operation.
             }
         }
-
     }
+
+    private void moveCamera (LatLng latLng, float zoom){
+        // Call method in fragment - Move to location after selection
+        MapViewFragment mapViewFragment = new MapViewFragment();
+        (mapViewFragment).moveCamera(new LatLng(latLng.latitude, latLng.longitude), zoom);
+    }
+
+
+    // --------------------
+    // REST REQUESTS
+    // --------------------
+    // 1 - Create http requests (SignOut & Delete)
+
+    private void signOutUserFromFirebase(){
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+    }
+
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
+        return new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                if(origin == SIGN_OUT_TASK)
+                    finish();
+            }
+        };
+    }
+
 }

@@ -107,7 +107,6 @@ public class MainActivity extends BaseActivity {
 
     //  Method that handles response after SignIn Activity close
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
         if (requestCode == RC_SIGN_IN) {
@@ -164,6 +163,7 @@ public class MainActivity extends BaseActivity {
     // Launching Restaurants Activity
     private void startMainRestaurantsActivity(){
         Intent intent = new Intent(this, MainRestaurantActivity.class);
+//        finish();
         startActivity(intent);
     }
 

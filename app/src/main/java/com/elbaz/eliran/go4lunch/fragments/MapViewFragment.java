@@ -139,6 +139,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMaxZoomPreference(18.0f);
         // Show building on map
         mMap.setBuildingsEnabled(true);
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
         mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
             @Override
@@ -160,17 +164,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         });
 
         if(mLocationPermissionGranted){
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
             getDeviceLocation();
         }
-
-//        // Add a marker in Sydney and move the camera
-//        LatLng paris = new LatLng(48.864716, 2.349014);
-//        mMap.addMarker(new MarkerOptions().position(paris).title("Your Location"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(paris));
     }
-
 
     // Get Device location
     private void getDeviceLocation(){
@@ -194,11 +190,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
-    private void moveCamera(LatLng latLng, float zoom){
-        Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + "lng: " + latLng.longitude );
+    public void moveCamera(LatLng latLng, float zoom){
+        Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + " lng: " + latLng.longitude + " " + zoom + " " + latLng );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
-
 
 }
