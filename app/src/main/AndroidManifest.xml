@@ -9,12 +9,35 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+<!--MainActivity-->
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle"> <!-- DISABLE TOOLBAR IN MAIN ACTIVITY -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+<!--MainRestaurantActivity-->
         <activity
             android:name=".MainRestaurantActivity"
-            android:screenOrientation="portrait" /> <!-- RestaurantActivity -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop">
+        </activity>
+
+<!--ProfileSettingsActivity-->
+        <activity
+            android:name=".auth.ProfileSettingsActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainRestaurantActivity"
+            android:launchMode="singleTop">
+        </activity>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -23,30 +46,20 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoTitle"> <!-- DISABLE TOOLBAR IN MAIN ACTIVITY -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> <!-- MainActivity -->
-        <activity
-            android:name=".RestaurantsActivity"
-            android:screenOrientation="portrait" /> <!-- RestaurantActivity -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" /> <!-- RestaurantActivity -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
     </application>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

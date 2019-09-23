@@ -55,6 +55,8 @@ public abstract class BaseActivity extends AppCompatActivity implements Navigati
 
     // General Toolbar for side activities with back arrow only
     protected void configureToolbarWithBackArrow(){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
     }

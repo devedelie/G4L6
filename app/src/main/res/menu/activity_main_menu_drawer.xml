@@ -8,19 +8,19 @@
 
 
                 <item
-                    android:id="@+id/activity_main_drawer_1"
-                    android:icon="@drawable/ic_facebook_icon"
-                    android:title="bla"
+                    android:id="@+id/activity_main_drawer_your_lunch"
+                    android:icon="@drawable/ic_food"
+                    android:title="@string/drawer_category_your_lunch"
                     android:orderInCategory="0" />
                 <item
-                    android:id="@+id/activity_main_drawer_2"
-                    android:icon="@drawable/ic_google_icon"
-                    android:title="bhyt"
+                    android:id="@+id/activity_main_drawer_settings"
+                    android:icon="@drawable/ic_settings"
+                    android:title="@string/drawer_category_settings"
                     android:orderInCategory="1"/>
                 <item
-                    android:id="@+id/activity_main_drawer_3"
-                    android:icon="@drawable/ic_facebook_icon"
-                    android:title="asdasd"
+                    android:id="@+id/activity_main_drawer_logout"
+                    android:icon="@drawable/ic_logout"
+                    android:title="@string/drawer_category_logout"
                     android:orderInCategory="2"/>
 
 

@@ -8,15 +8,13 @@
 
 <!--Toolbar declaration + defined theme (for white icons)-->
 <androidx.appcompat.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:minHeight="?attr/actionBarSize"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:titleTextColor="@android:color/white"
     android:background="?attr/colorPrimary"
-    app:theme="@style/AppTheme.Toolbar" />
+    android:theme="@style/AppTheme.Toolbar" />
 
 <FrameLayout android:layout_width="match_parent"
 android:layout_height="match_parent">

@@ -25,11 +25,26 @@
     <string name="tab_name_1">Map View</string>
     <string name="tab_name_2">List View</string>
     <string name="tab_name_3">Workmates</string>
+    <!--Drawer-->
+    <string name="drawer_category_your_lunch">YOUR LUNCH</string>
+    <string name="drawer_category_settings">SETTINGS</string>
+    <string name="drawer_category_logout">LOGOUT</string>
 
     <!--Used in navigation drawer-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--ProfileSettings Activity-->
+    <string name="profileSettings_activity_username">User name: </string>
+    <string name="profileSettings_activity_email">Email: </string>
+    <string name="profileSettings_delete_account_btn">Delete my account</string>
+    <string name="profileSettings_logout_account_btn">Logout</string>
+    <string name="popup_message_confirmation_delete_account">Are you sure you want to delete your account?</string>
+    <string name="popup_message_choice_yes">Yes!</string>
+    <string name="popup_message_choice_no">Cancel</string>
+    <string name="info_no_username_found">Empty user name</string>
+    <string name="info_no_email_found">Empty email address</string>
 
     <!--ERRORS-->
     <string name="location_is_null">Couldn\'t find your location! Please restart the app</string>
