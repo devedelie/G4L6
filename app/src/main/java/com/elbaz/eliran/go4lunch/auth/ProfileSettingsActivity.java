@@ -2,6 +2,8 @@ package com.elbaz.eliran.go4lunch.auth;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -9,23 +11,20 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.elbaz.eliran.go4lunch.MainActivity;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import butterknife.BindView;
@@ -40,6 +39,7 @@ public class ProfileSettingsActivity extends BaseActivity {
     @BindView(R.id.profile_activity_button_delete) Button deleteBtn;
     @BindView(R.id.profile_activity_check_btn_update_name) ImageButton checkBtn;
     @BindView(R.id.profile_activity_user_image) ImageView imageViewProfile;
+    @BindView(R.id.toolbar) Toolbar toolbar;
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
@@ -51,10 +51,19 @@ public class ProfileSettingsActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         this.configureToolbarWithBackArrow();
         this.updateUIOncreate();
+    }
+
+    // General Toolbar for side activities with back arrow only
+    protected void configureToolbarWithBackArrow(){
+        this.toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void updateUIOncreate(){
@@ -66,11 +75,14 @@ public class ProfileSettingsActivity extends BaseActivity {
                         .apply(RequestOptions.circleCropTransform())
                         .into(imageViewProfile);
             }
-            // get email
+            // Get email
             String email = TextUtils.isEmpty(this.getCurrentUser().getEmail()) ? getString(R.string.info_no_email_found) : this.getCurrentUser().getEmail();
             this.emailText.setText(email);
-            // get user
-            UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+           // Get username from Firebase
+//            String name = TextUtils.isEmpty(this.getCurrentUser().getDisplayName()) ? getString(R.string.info_no_username_found) : getCurrentUser().getDisplayName();
+//            this.userNameEditText.setText(name);
+            // Get username from Firestore
+            UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     User currentUser = documentSnapshot.toObject(User.class);
@@ -144,11 +156,9 @@ public class ProfileSettingsActivity extends BaseActivity {
 
             AuthUI.getInstance()
                     .delete(this)
-                    .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
+                    .addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
         }
     }
-
-
 
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
         return new OnSuccessListener<Void>() {
@@ -163,6 +173,7 @@ public class ProfileSettingsActivity extends BaseActivity {
                         break;
                     case DELETE_USER_TASK:
                         finish();
+                        clearActivityBackStack();
                         break;
                     default:
                         break;
@@ -171,27 +182,12 @@ public class ProfileSettingsActivity extends BaseActivity {
         };
     }
 
-    // --------------------
-    // UTILS
-    // --------------------
-
-    @Nullable
-    protected FirebaseUser getCurrentUser(){
-        Log.d(TAG, "getCurrentUser: "+ FirebaseAuth.getInstance().getCurrentUser());
-        return FirebaseAuth.getInstance().getCurrentUser(); }
-
-    // --------------------
-    // ERROR HANDLER
-    // --------------------
-
-    protected OnFailureListener onFailureListener(){
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-            }
-        };
+    public void clearActivityBackStack(){
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
+
 }
 
 
