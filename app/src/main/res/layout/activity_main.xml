@@ -16,7 +16,7 @@
         android:orientation="vertical"
         android:background="@drawable/ic_back_1280x1920">
 
-        <!-- IMAGE VIEW FIREBASE OC -->
+        <!-- IMAGE VIEW GO4LUNCH -->
         <ImageView
             android:layout_width="170dp"
             android:layout_height="170dp"
@@ -24,7 +24,7 @@
             android:layout_marginEnd="@dimen/default_large_margin"
             android:layout_marginStart="@dimen/default_large_margin" />
 
-        <!-- TITLE FIREBASE OC -->
+        <!-- TITLE GO4LUNCH -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,14 +33,6 @@
             android:textStyle="bold"
             android:layout_margin="@dimen/default_margin"
             android:textColor="@color/whiteText"/>
-
-        <!-- DESCRIPTION FIREBASE OC -->
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="@dimen/default_text_size"-->
-<!--            android:text="@string/main_activity_description"-->
-<!--            android:layout_margin="@dimen/default_margin"/>-->
 
         <TextView
             android:id="@+id/welcomeText"

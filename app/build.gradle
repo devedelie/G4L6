@@ -60,10 +60,6 @@ dependencies {
     // Facebook login support
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
 
-    //Dex limit
-//    implementation 'androidx.multidex:multidex:2.0.1'   // androidX
-    implementation 'androidx.multidex:multidex:2.0.1'
-
     // CardView
     implementation 'androidx.cardview:cardview:1.0.0'
 
