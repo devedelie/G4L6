@@ -1,12 +1,12 @@
 package com.elbaz.eliran.go4lunch;
 
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.elbaz.eliran.go4lunch.api.UserHelper;
@@ -16,13 +16,13 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends BaseActivity {
 
@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "isCurrentUser: " + getCurrentUser() + " Logged? " + this.isCurrentUserLogged());
         // Avoid login-screen if the user is already authenticated
         if (this.isCurrentUserLogged()) {
             this.startMainRestaurantsActivity();
@@ -94,15 +95,6 @@ public class MainActivity extends BaseActivity {
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
-
-    // --------------------
-    // UTILS
-    // --------------------
-
-    @Nullable
-    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-
-    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
 
 
     //  Method that handles response after SignIn Activity close
@@ -163,7 +155,6 @@ public class MainActivity extends BaseActivity {
     // Launching Restaurants Activity
     private void startMainRestaurantsActivity(){
         Intent intent = new Intent(this, MainRestaurantActivity.class);
-//        finish();
         startActivity(intent);
     }
 
