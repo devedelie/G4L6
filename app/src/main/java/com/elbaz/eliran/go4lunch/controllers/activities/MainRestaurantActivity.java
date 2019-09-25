@@ -1,4 +1,4 @@
-package com.elbaz.eliran.go4lunch;
+package com.elbaz.eliran.go4lunch.controllers.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.elbaz.eliran.go4lunch.BuildConfig;
+import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
 import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
@@ -116,9 +118,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                         break;
                     case R.id.action_listView:
                         pager.setCurrentItem(1);
+                        // Fragment.updateUIForListView();
                         break;
                     case R.id.action_workmates:
                         pager.setCurrentItem(2);
+                        // Fragment.updateUIForWorkmates();
                         break;
                 }
                 return true;

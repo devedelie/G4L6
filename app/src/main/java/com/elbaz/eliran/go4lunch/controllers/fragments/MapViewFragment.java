@@ -1,4 +1,4 @@
-package com.elbaz.eliran.go4lunch.fragments;
+package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -214,6 +214,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
 
+    // Event Subscriber
     @Subscribe
     public void onPlaceEvent(PlaceEvent placeEvent){
         moveCamera(placeEvent.getPlace().getLatLng(), DEFAULT_ZOOM);

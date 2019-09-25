@@ -7,9 +7,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.elbaz.eliran.go4lunch.R;
-import com.elbaz.eliran.go4lunch.fragments.ListViewFragment;
-import com.elbaz.eliran.go4lunch.fragments.MapViewFragment;
-import com.elbaz.eliran.go4lunch.fragments.WorkmatesFragment;
+import com.elbaz.eliran.go4lunch.controllers.fragments.ListViewFragment;
+import com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment;
+import com.elbaz.eliran.go4lunch.controllers.fragments.WorkmatesFragment;
 
 /**
  * Created by Eliran Elbaz on 21-Sep-19.

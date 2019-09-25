@@ -12,7 +12,7 @@
 
 <!--MainActivity-->
         <activity
-            android:name=".MainActivity"
+            android:name=".controllers.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle"> <!-- DISABLE TOOLBAR IN MAIN ACTIVITY -->
             <intent-filter>
@@ -24,9 +24,9 @@
 
 <!--MainRestaurantActivity-->
         <activity
-            android:name=".MainRestaurantActivity"
+            android:name=".controllers.activities.MainRestaurantActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".controllers.activities.MainActivity"
             android:launchMode="singleTop">
         </activity>
 
@@ -34,7 +34,7 @@
         <activity
             android:name=".auth.ProfileSettingsActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".MainRestaurantActivity"
+            android:parentActivityName=".controllers.activities.MainRestaurantActivity"
             android:launchMode="singleTop">
         </activity>
 

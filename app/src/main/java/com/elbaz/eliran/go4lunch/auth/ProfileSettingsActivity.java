@@ -17,7 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.elbaz.eliran.go4lunch.MainActivity;
+import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;

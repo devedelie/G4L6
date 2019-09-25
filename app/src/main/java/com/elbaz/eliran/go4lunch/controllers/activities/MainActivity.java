@@ -1,4 +1,4 @@
-package com.elbaz.eliran.go4lunch;
+package com.elbaz.eliran.go4lunch.controllers.activities;
 
 import android.content.Intent;
 import android.util.Log;
@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.firebase.ui.auth.AuthUI;
