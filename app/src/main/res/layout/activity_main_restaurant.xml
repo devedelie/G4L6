@@ -29,19 +29,20 @@
             android:layout_weight="1"/>
 
         <!--DropShadow for TabLayout-->
-        <View android:layout_width="match_parent"
+        <View
+            android:layout_width="match_parent"
             android:layout_height="5dp"
             android:background="@drawable/tabs_upper_dropshadow"/>
-        <!-- 1 | Add TabLayout to handle tabs -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/activity_main_restaurant_tabs"
+        <!--BottomNavigationView-->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/activity_main_bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:tabIndicatorColor="@color/colorPrimary"
-            app:tabTextColor="@color/browser_actions_text_color"
-            app:tabSelectedTextColor="#fff"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom"
+            android:background="@color/gmail_btn_color"
+            app:itemIconTint="@drawable/bottom_navigation_colors"
+            app:itemTextColor="@drawable/bottom_navigation_colors"
+            app:menu="@menu/bottom_navigation_menu" />
 
     </LinearLayout>
 

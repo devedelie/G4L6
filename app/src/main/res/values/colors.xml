@@ -7,4 +7,6 @@
     <color name="facebook_btn_color">#5C73DD</color>
     <color name="gmail_btn_color">#D87777</color>
     <color name="bottom_buttons">#AD9191</color>
+    <color name="colorAccentDark">#E7234C</color>
+    <color name="background_light">#97575E</color>
 </resources>

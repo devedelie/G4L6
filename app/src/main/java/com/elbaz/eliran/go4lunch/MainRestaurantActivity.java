@@ -23,7 +23,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
 import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
-import com.elbaz.eliran.go4lunch.fragments.MapViewFragment;
+import com.elbaz.eliran.go4lunch.events.PlaceEvent;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
@@ -36,26 +36,32 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.BindView;
+
 import static android.content.ContentValues.TAG;
 
 public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+    @BindView(R.id.activity_main_bottom_navigation) BottomNavigationView bottomNavigationView;
+    @BindView(R.id.activity_main_restaurant_viewpager) ViewPager pager;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.main_restaurant_activity_drawerLayout) DrawerLayout drawerLayout;
+    @BindView(R.id.drawer_restaurant_main_activity) NavigationView navigationView;
     View rootView;
     int AUTOCOMPLETE_REQUEST_CODE = 1;
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
-    private int[] tabIcons = {R.drawable.ic_mapview_icon, R.drawable.ic_listview_icon, R.drawable.ic_workmates_icon};
-
-    public DrawerLayout drawerLayout;
-    public NavigationView navigationView;
     public Context mContext;
     public TabLayout tabs;
-    public Toolbar toolbar;
+
 
 
     @Override
@@ -69,7 +75,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
-//        this.setupTabIcons();
         this.verifyPlacesSDK();
     }
 
@@ -86,10 +91,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         }
     }
 
-    // Multifunction Toolbar with drawer and search
+    // Toolbar for Navigation Drawer and search icon
     protected void configureToolbarWithDrawer(){
-        // Get the toolbar view inside the activity layout
-        this.toolbar = findViewById(R.id.toolbar);
         // Sets the Toolbar
         setSupportActionBar(toolbar);
     }
@@ -98,27 +101,30 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
      * ViewPager configuration + Tab Layout
      */
     protected void configureViewPagerAndTabs(){
-        //Get ViewPager from layout
-        ViewPager pager = findViewById(R.id.activity_main_restaurant_viewpager);
         //Set Adapter PageAdapter and glue it together
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
         pager.setOffscreenPageLimit(2);
 
-        //Get TabLayout from layout
-        TabLayout tabs= findViewById(R.id.activity_main_restaurant_tabs);
-        //Glue TabLayout and ViewPager together
-        tabs.setupWithViewPager(pager);
-        //Design purpose. Tabs have the same width
-        tabs.setTabMode(TabLayout.MODE_FIXED);
+        // Configure BottomView Listener
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_mapView:
+                        pager.setCurrentItem(0);
+                        break;
+                    case R.id.action_listView:
+                        pager.setCurrentItem(1);
+                        break;
+                    case R.id.action_workmates:
+                        pager.setCurrentItem(2);
+                        break;
+                }
+                return true;
+            }
+        });
     }
-
-//    // Set Icons for tabs
-//    protected void setupTabIcons() {
-//        this.tabs.getTabAt(0).setIcon(tabIcons[0]);
-//        this.tabs.getTabAt(1).setIcon(tabIcons[1]);
-//        this.tabs.getTabAt(2).setIcon(tabIcons[2]);
-//    }
 
     /**
      * Inflate the top-menu (menu with search and parameters icons)
@@ -135,12 +141,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
      */
     protected void configureDrawerLayoutAndNavigationView(){
         // Configure drawer layout
-        this.drawerLayout = findViewById(R.id.main_restaurant_activity_drawerLayout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
         // Configure NavigationView & set item selection listener
-        this.navigationView = findViewById(R.id.drawer_restaurant_main_activity);
         View headerView = this.navigationView.getHeaderView(0);
         TextView userName = headerView.findViewById(R.id.navigation_header_name);
         TextView userEmail = headerView.findViewById(R.id.navigation_header_email);
@@ -184,7 +189,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     private void goToProfileSettings(){
-        Log.d(TAG, "goToProfileSettings: ");
         Intent intent = new Intent(this, ProfileSettingsActivity.class);
         startActivity(intent);
     }
@@ -227,14 +231,14 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
-                moveCamera(place.getLatLng(), 15f);
+                moveCamera(place);
 
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
@@ -246,10 +250,9 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         }
     }
 
-    private void moveCamera (LatLng latLng, float zoom){
-        // Call method in fragment - Move to location after selection
-        MapViewFragment mapViewFragment = new MapViewFragment();
-        (mapViewFragment).moveCamera(new LatLng(latLng.latitude, latLng.longitude), zoom);
+    private void moveCamera(Place place){
+        // EventBus
+        EventBus.getDefault().post(new PlaceEvent(place));
     }
 
 

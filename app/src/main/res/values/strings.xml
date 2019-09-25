@@ -21,7 +21,7 @@
     <string name="map_loading_text">Waiting for your location</string>
 
     <!--Restaurant Main Activity-->
-    <!--Tab name-->
+    <!--BottomNavigation-->
     <string name="tab_name_1">Map View</string>
     <string name="tab_name_2">List View</string>
     <string name="tab_name_3">Workmates</string>
