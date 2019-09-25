@@ -16,10 +16,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.elbaz.eliran.go4lunch.R;
-import com.elbaz.eliran.go4lunch.events.PlaceEvent;
+import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,9 +35,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import com.google.android.libraries.places.api.model.Place;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,28 +49,31 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
     private Boolean mLocationPermissionGranted = false;
     private static final float DEFAULT_ZOOM = 15f ;
-    protected View rootView;
+    private View rootView;
     // Permission Data
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int RC_PERMISSION_CODE = 100;
-    private int AUTOCOMPLETE_REQUEST_CODE = 1;
     // Google API
     protected GoogleApiClient mGoogleApiClient;
     protected Marker mMarker;
-    protected GoogleMap mMap;
-    protected FusedLocationProviderClient mFusedLocationProviderClient;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
     protected Context mContext;
+    // ViewModel
+    private SharedViewModel mSharedViewModel;
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
+        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        mSharedViewModel.getPlace().observe(getViewLifecycleOwner(), new Observer<Place>() {
+            @Override
+            public void onChanged(Place place) {
+                Log.d(TAG, "onChanged: " + place.getLatLng().latitude + " " + place.getLatLng().longitude);
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
+            }
+        });
     }
 
     @Override
@@ -213,15 +217,5 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
-
-    // Event Subscriber
-    @Subscribe
-    public void onPlaceEvent(PlaceEvent placeEvent){
-        moveCamera(placeEvent.getPlace().getLatLng(), DEFAULT_ZOOM);
-    }
-
-
-
-
 
 }

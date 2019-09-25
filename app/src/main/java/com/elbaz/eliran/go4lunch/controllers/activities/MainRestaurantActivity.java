@@ -16,6 +16,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -25,7 +26,7 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
 import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
-import com.elbaz.eliran.go4lunch.events.PlaceEvent;
+import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,9 +41,6 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,13 +60,12 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
     public Context mContext;
-    public TabLayout tabs;
-
-
+    SharedViewModel mSharedViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.verifyPlacesSDK();
         // Context for the fragments
         mContext = this;
         // Get RootView for snackBarMessage
@@ -77,7 +74,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
-        this.verifyPlacesSDK();
+        // Assign a ViewModel
+        mSharedViewModel = ViewModelProviders.of(this).get(SharedViewModel.class);
     }
 
     @Override
@@ -200,8 +198,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // OptionMenu item selection (Search places auto-complete)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int order = item.getOrder();
-        if (order == 0){
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_search_icon){
             // Set the fields to specify which types of place data to
             // return after the user has made a selection.
             List<Place.Field> fields = Arrays.asList(
@@ -242,6 +240,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
+                // Share data - ViewModel + LiveData
                 moveCamera(place);
 
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
@@ -256,7 +255,9 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 
     private void moveCamera(Place place){
         // EventBus
-        EventBus.getDefault().post(new PlaceEvent(place));
+//        EventBus.getDefault().post(new PlaceEvent(place));
+        // LiveData
+        mSharedViewModel.setPlace(place);
     }
 
 
