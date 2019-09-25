@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.events.PlaceEvent;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -31,6 +32,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,11 +52,25 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     // Permission Data
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int RC_PERMISSION_CODE = 100;
+    private int AUTOCOMPLETE_REQUEST_CODE = 1;
     // Google API
-    private GoogleApiClient mGoogleApiClient;
-    private Marker mMarker;
-    private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
+    protected GoogleApiClient mGoogleApiClient;
+    protected Marker mMarker;
+    protected GoogleMap mMap;
+    protected FusedLocationProviderClient mFusedLocationProviderClient;
+    protected Context mContext;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -183,7 +201,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
                             // Call the method until location is synchronised
-                            getDeviceLocation();
+//                            getDeviceLocation();
                         }
                     }
                 });
@@ -195,5 +213,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
+
+    @Subscribe
+    public void onPlaceEvent(PlaceEvent placeEvent){
+        moveCamera(placeEvent.getPlace().getLatLng(), DEFAULT_ZOOM);
+    }
+
+
+
+
 
 }
