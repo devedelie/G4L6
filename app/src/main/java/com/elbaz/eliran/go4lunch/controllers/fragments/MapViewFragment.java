@@ -1,12 +1,8 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,13 +13,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.base.BaseFragment;
+import com.elbaz.eliran.go4lunch.controllers.activities.MainRestaurantActivity;
+import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,115 +34,70 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import pub.devrel.easypermissions.EasyPermissions;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
-import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
-public class MapViewFragment extends Fragment implements OnMapReadyCallback {
+public class MapViewFragment extends BaseFragment implements OnMapReadyCallback {
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
-    private Boolean mLocationPermissionGranted = false;
     private static final float DEFAULT_ZOOM = 15f ;
-    private View rootView;
-    // Permission Data
-    private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final int RC_PERMISSION_CODE = 100;
-    // Google API
-    protected GoogleApiClient mGoogleApiClient;
     protected Marker mMarker;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     protected Context mContext;
-    // ViewModel
     private SharedViewModel mSharedViewModel;
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        mSharedViewModel.getPlace().observe(getViewLifecycleOwner(), new Observer<Place>() {
-            @Override
-            public void onChanged(Place place) {
-                Log.d(TAG, "onChanged: " + place.getLatLng().latitude + " " + place.getLatLng().longitude);
-                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
-            }
-        });
-    }
+    private int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_map_view, container, false);
-
+        View view = inflater.inflate(getFragmentLayout(), container, false);
         ButterKnife.bind(this, view); //Configure Butterknife
-        // Ask for permissions
-        this.isGpsEnabled();
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
-        // Get RootView for snackBarMessage
-        rootView = getActivity().getWindow().getDecorView().getRootView();
         // Initialise map
         this.initMap();
 
         return view;
     }
 
-    //--------------------
-    // Permissions
-    //--------------------
 
-    public void isGpsEnabled(){
-        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            buildAlertMessageNoGps();
-        }else {
-            askPermission();
-        }
-
-    }
-
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
-                        //
-                        askPermission();
-                        initMap();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-    /**
-     * Method to ask the user for location authorization (with EasyPermissions support)
-     */
-    private void askPermission() {
-        if (!EasyPermissions.hasPermissions(getActivity().getApplicationContext(), PERMS_FINE )) {
-            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_FINE);
-            return;
-        }
-        mLocationPermissionGranted = true;
-        Toast.makeText(getActivity().getApplicationContext(), "Location access authorized!", Toast.LENGTH_SHORT).show();
-    }
-    //
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // 2 - Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-    //-----------------End Of User's Permissions -------------------------
+    protected int getFragmentLayout() { return R.layout.fragment_map_view; }
 
+    @Override
+    protected void updateData() {
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
+        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        // Get currentPagerItem for Auto-Complete-SearchBar
+        mSharedViewModel.getPagerCurrentItem().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer == Constants.MAP_VIEW_FRAGMENT){
+                    autoCompleteSearchBar();
+                }
+            }
+        });
+    }
 
     // Initialise Google Map
     private void initMap(){
@@ -185,7 +138,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        if(mLocationPermissionGranted){
+        if(MainRestaurantActivity.mLocationPermissionGranted){
             getDeviceLocation();
         }
     }
@@ -209,6 +162,58 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }
                 });
+    }
+
+    private void autoCompleteSearchBar(){
+        // Set the fields to specify which types of place data to
+        // return after the user has made a selection.
+        List<Place.Field> fields = Arrays.asList(
+                Place.Field.ID,
+                Place.Field.NAME,
+                Place.Field.ADDRESS,
+                Place.Field.PHONE_NUMBER,
+                Place.Field.OPENING_HOURS,
+                Place.Field.WEBSITE_URI,
+                Place.Field.PHOTO_METADATAS,
+                Place.Field.PRICE_LEVEL,
+                Place.Field.RATING,
+                Place.Field.LAT_LNG);
+
+        // Bias results to Paris region (use 'bounds' variable in below filter)
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(48.832304, 2.239726),
+                new LatLng(48.900962, 2.42124));
+
+        // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
+        Intent intent = new Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.OVERLAY, fields)
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setCountry("FR")
+                .setLocationBias(bounds)
+                .build(getActivity());
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+        Log.d(TAG, "onOptionsItemSelected: check");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
+                // Share data - ViewModel + LiveData
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
+
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                // TODO: Handle the error.
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom

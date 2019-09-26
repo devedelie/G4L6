@@ -1,7 +1,11 @@
 package com.elbaz.eliran.go4lunch.controllers.activities;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -9,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,26 +33,17 @@ import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.Arrays;
-import java.util.List;
-
 import butterknife.BindView;
+import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
     @BindView(R.id.activity_main_bottom_navigation) BottomNavigationView bottomNavigationView;
@@ -56,16 +52,20 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @BindView(R.id.main_restaurant_activity_drawerLayout) DrawerLayout drawerLayout;
     @BindView(R.id.drawer_restaurant_main_activity) NavigationView navigationView;
     View rootView;
-    int AUTOCOMPLETE_REQUEST_CODE = 1;
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
+    private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final int RC_PERMISSION_CODE = 100;
+    public static Boolean mLocationPermissionGranted = false;
     public Context mContext;
     SharedViewModel mSharedViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Verify all permissions and setups
         this.verifyPlacesSDK();
+        this.isGpsEnabled();
         // Context for the fragments
         mContext = this;
         // Get RootView for snackBarMessage
@@ -81,6 +81,10 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @Override
     public int getFragmentLayout() { return R.layout.activity_main_restaurant; }
 
+    //----------------------------
+    // Permissions & device setup
+    //----------------------------
+
     public void verifyPlacesSDK(){
         // Verify OR Initialize "Places SDK" on the device
         if (!Places.isInitialized()) {
@@ -90,6 +94,57 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             PlacesClient placesClient = Places.createClient(this);
         }
     }
+
+    public void isGpsEnabled(){
+        final LocationManager manager = (LocationManager) this.getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+        }else {
+            askPermission();
+        }
+
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
+                        //
+                        askPermission();
+//                        initMap();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Method to ask the user for location authorization (with EasyPermissions support)
+     */
+    private void askPermission() {
+        if (!EasyPermissions.hasPermissions(this, PERMS_FINE )) {
+            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_FINE);
+            return;
+        }
+        mLocationPermissionGranted = true;
+        Toast.makeText(this, "Location access authorized!", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // 2 - Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+    //-----------------End Of User's Permissions -------------------------
+
+    //-------------------
+    // UI Configuration
+    //-------------------
 
     // Toolbar for Navigation Drawer and search icon
     protected void configureToolbarWithDrawer(){
@@ -105,6 +160,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
         pager.setOffscreenPageLimit(2);
+        // Disable ViewPager horizontal switch
+        pager.beginFakeDrag();
 
         // Configure BottomView Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -178,11 +235,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                 // Your lunch action
                 break;
             case 1:
-                // settings
+                // settings action
                 this.goToProfileSettings();
                 break;
             case 2:
-                // logout
+                // logout action
                 this.signOutUserFromFirebase();
                 break;
         }
@@ -200,66 +257,20 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_search_icon){
-            // Set the fields to specify which types of place data to
-            // return after the user has made a selection.
-            List<Place.Field> fields = Arrays.asList(
-                    Place.Field.ID,
-                    Place.Field.NAME,
-                    Place.Field.ADDRESS,
-                    Place.Field.PHONE_NUMBER,
-                    Place.Field.OPENING_HOURS,
-                    Place.Field.WEBSITE_URI,
-                    Place.Field.PHOTO_METADATAS,
-                    Place.Field.PRICE_LEVEL,
-                    Place.Field.RATING,
-                    Place.Field.LAT_LNG);
-
-            // Bias results to Paris region (use 'bounds' variable in below filter)
-            RectangularBounds bounds = RectangularBounds.newInstance(
-                    new LatLng(48.832304, 2.239726),
-                    new LatLng(48.900962, 2.42124));
-
-            // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
-            Intent intent = new Autocomplete.IntentBuilder(
-                    AutocompleteActivityMode.OVERLAY, fields)
-                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                    .setCountry("FR")
-                    .setLocationBias(bounds)
-                    .build(this);
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            Log.d(TAG, "onOptionsItemSelected: check");
+            viewModelAction(pager.getCurrentItem());
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
-            if (resultCode == RESULT_OK) {
-                Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
-                // Share data - ViewModel + LiveData
-                moveCamera(place);
-
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // TODO: Handle the error.
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-            }
-        }
+    // Send data to ViewModel - LiveData
+    private void viewModelAction(Integer pagerCurrentItem){
+        mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
     }
 
-    private void moveCamera(Place place){
-        // EventBus
-//        EventBus.getDefault().post(new PlaceEvent(place));
-        // LiveData
-        mSharedViewModel.setPlace(place);
-    }
-
+//    private void moveCamera(Place place){
+//        // Send data to LiveData
+//        mSharedViewModel.setLocationOnMap(place);
+//    }
 
     // --------------------
     // REST REQUESTS
