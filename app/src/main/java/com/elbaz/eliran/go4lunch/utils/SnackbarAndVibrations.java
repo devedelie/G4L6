@@ -10,8 +10,8 @@ import com.google.android.material.snackbar.Snackbar;
  * Created by Eliran Elbaz on 20-Sep-19.
  */
 public class SnackbarAndVibrations {
-    public static void showSnakbarMessage(View rootView, String mMessage) {
-        Snackbar.make(rootView, mMessage, Snackbar.LENGTH_LONG)
+    public static void showSnakbarMessage(View view, String mMessage) {
+        Snackbar.make(view, mMessage, Snackbar.LENGTH_LONG)
                 .show();
     }
 
