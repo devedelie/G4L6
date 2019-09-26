@@ -40,6 +40,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.ContentValues.TAG;
@@ -63,6 +64,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
         // Verify all permissions and setups
         this.verifyPlacesSDK();
         this.isGpsEnabled();

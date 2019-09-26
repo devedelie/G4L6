@@ -29,8 +29,9 @@ public class WorkmatesFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(getFragmentLayout(), container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_workmates, container, false);
+        return view;
     }
 
 }

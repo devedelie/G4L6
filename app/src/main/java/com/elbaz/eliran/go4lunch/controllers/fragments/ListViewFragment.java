@@ -38,6 +38,7 @@ public class ListViewFragment extends BaseFragment {
         });
     }
 
+
     @Override
     protected int getFragmentLayout() { return R.layout.fragment_list_view; }
 
