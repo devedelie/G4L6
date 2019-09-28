@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
@@ -34,7 +33,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
@@ -71,6 +69,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
     private Disposable mDisposable;
     private String deviceLocationVariable;
     private List<Result> mResults;
+    private Marker poiMarker;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -138,29 +137,30 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
-            @Override
-            public void onPoiClick(PointOfInterest pointOfInterest) {
-                // add marker
-                Marker poiMarker = mMap.addMarker(new MarkerOptions()
-                        .position(pointOfInterest.latLng)
-                        .title(pointOfInterest.name));
-                poiMarker.showInfoWindow();
-                poiMarker.setTag("POI Tag");
-
-                // Show detailed Toast
-                Toast.makeText(getActivity().getApplicationContext(), "Clicked: " +
-                                pointOfInterest.name + "\nPlace ID:" + pointOfInterest.placeId +
-                                "\nLatitude:" + pointOfInterest.latLng.latitude +
-                                " Longitude:" + pointOfInterest.latLng.longitude,
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-
+        // Show current location
         if(MainRestaurantActivity.mLocationPermissionGranted){
             getDeviceLocation();
         }
+
+//        mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+//            @Override
+//            public void onPoiClick(PointOfInterest pointOfInterest) {
+//                // add marker
+//                poiMarker = mMap.addMarker(new MarkerOptions()
+//                        .position(pointOfInterest.latLng)
+//                        .title(pointOfInterest.name));
+//                poiMarker.showInfoWindow();
+//                poiMarker.setTag("POI Tag");
+//
+//                // Show detailed Toast
+//                Toast.makeText(getActivity().getApplicationContext(), "Clicked: " +
+//                                pointOfInterest.name + "\nPlace ID:" + pointOfInterest.placeId +
+//                                "\nLatitude:" + pointOfInterest.latLng.latitude +
+//                                " Longitude:" + pointOfInterest.latLng.longitude,
+//                        Toast.LENGTH_LONG).show();
+//            }
+//        });
+
     }
 
     // Get Device location
@@ -286,10 +286,24 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         mResults = new ArrayList<>();
         mResults.clear();
         mResults.addAll(results);
-        Log.d(TAG, "updateUI: " + mResults.get(1).getGeometry().getLocation().getLat().toString());
-        // setNearbyMarkers();
+        setNearbyRestaurantsWithMarkers();
 
 
+    }
+
+    private void setNearbyRestaurantsWithMarkers(){
+        Log.d(TAG, "setNearbyRestaurantsWithMarkers: " + mResults.get(1).getGeometry().getLocation().getLat().toString() + "  " + mResults.get(1).getGeometry().getLocation().getLng().toString() + " size= "+ mResults.size());
+
+        for (int i=mResults.size(); i>0 ; i-- ){
+            Log.d(TAG, "updateUI: " + i);
+            LatLng latLng = new LatLng(mResults.get(i-1).getGeometry().getLocation().getLat(), mResults.get(i-1).getGeometry().getLocation().getLng());
+            poiMarker = mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(mResults.get(i-1).getName()));
+            poiMarker.showInfoWindow();
+            poiMarker.setTag("POI Tag");
+
+        }
     }
 
 
