@@ -9,5 +9,11 @@ public class Constants {
     public static final Integer MAP_VIEW_FRAGMENT = 0;
     public static final Integer LIST_VIEW_FRAGMENT = 1;
     public static final Integer WORKMATES_FRAGMENT = 2;
+    public static final String GOOGLE_MAPS_API_BASE_URL = "https://maps.googleapis.com/";
+    public static final String NEARBY_TYPE="restaurant";
+    public static final int NEARBY_RADIUS= 1500;
+
+
+
 
 }

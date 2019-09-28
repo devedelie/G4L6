@@ -11,6 +11,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         buildConfigField("String", "GOOGLE_API_KEY", GOOGLE_API_KEY)
+        buildConfigField("String", "GOOGLE_BROWSER_API_KEY", GOOGLE_BROWSER_API_KEY)
     }
 
     compileOptions {
@@ -81,6 +82,17 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
     // alternatively - just ViewModel
 //    implementation "androidx.lifecycle:lifecycle-viewmodel:2.1.0"
+
+    //Retrofit2 & Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+    // RXJava
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.12'
+// RXJava Adapter for Retrofit2
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

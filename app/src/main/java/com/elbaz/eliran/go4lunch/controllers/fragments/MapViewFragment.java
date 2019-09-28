@@ -20,6 +20,9 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.controllers.activities.MainRestaurantActivity;
 import com.elbaz.eliran.go4lunch.models.Constants;
+import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
+import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.elbaz.eliran.go4lunch.utils.PlacesStream;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,15 +43,20 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_RADIUS;
+import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_TYPE;
 
 public class MapViewFragment extends BaseFragment implements OnMapReadyCallback {
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
@@ -60,6 +68,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
     protected Context mContext;
     private SharedViewModel mSharedViewModel;
     private int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private Disposable mDisposable;
+    private String deviceLocationVariable;
+    private List<Result> mResults;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,7 +90,17 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
 
     @Override
     protected void updateData() {
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.disposeWhenDestroy();
+    }
+
+    // This method will be called onDestroy to avoid any risk of memory leaks.
+    private void disposeWhenDestroy(){
+        if (this.mDisposable != null && !this.mDisposable.isDisposed()) this.mDisposable.dispose();
     }
 
     @Override
@@ -153,7 +174,14 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
                             Log.d(TAG, "onComplete: found location:" + location.getLatitude() + " & " + location.getLongitude());
                             mapLoadingText.setVisibility(View.GONE);
                             mapProgressBarAnimation.setVisibility(View.GONE);
+                            // create a location string for retrofit (LatLng toString())
+                            deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
+                            deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
+                            deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
+                            Log.d(TAG, "myReplace: " + "-"+deviceLocationVariable+"-");
+                            // move camera to location
                             moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
+                            executeHttpRequestWithRetrofit();
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
                             // Call the method until location is synchronised
@@ -221,5 +249,48 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
     }
+
+    //-----------------
+    // HTTP (RxJAVA)
+    //-----------------
+
+    // Execute the stream to fetch nearby locations
+    private void executeHttpRequestWithRetrofit(){
+//        RxJavaPlugins.setErrorHandler(Functions.<Throwable>emptyConsumer());
+        Log.d(TAG, "executeHttpRequestWithRetrofit: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
+        // 1.2 - Execute the stream subscribing to Observable defined inside NYTStream
+        this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
+                .subscribeWith(new DisposableObserver<PlacesResults>(){
+
+                    @Override
+                    public void onNext(PlacesResults placesResults) {
+                        Log.d(TAG, "onNext: HTTP");
+                        // Update UI with results
+                        updateUI(placesResults.getResults());
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "onErrorHTTP: "+ e );
+                    }
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onCompleteHTTP");
+                    }
+                });
+    }
+
+
+
+
+    private void updateUI(List<Result> results){
+        mResults = new ArrayList<>();
+        mResults.clear();
+        mResults.addAll(results);
+        Log.d(TAG, "updateUI: " + mResults.get(1).getGeometry().getLocation().getLat().toString());
+        // setNearbyMarkers();
+
+
+    }
+
 
 }
