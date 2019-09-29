@@ -1,9 +1,13 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -30,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -131,7 +137,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         // Map-Zoom limitations
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(18.0f);
-        // Show building on map
+        // Map configurations
         mMap.setBuildingsEnabled(true);
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -280,30 +286,41 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
     }
 
 
-
-
     private void updateUI(List<Result> results){
         mResults = new ArrayList<>();
         mResults.clear();
         mResults.addAll(results);
         setNearbyRestaurantsWithMarkers();
-
-
     }
 
     private void setNearbyRestaurantsWithMarkers(){
         Log.d(TAG, "setNearbyRestaurantsWithMarkers: " + mResults.get(1).getGeometry().getLocation().getLat().toString() + "  " + mResults.get(1).getGeometry().getLocation().getLng().toString() + " size= "+ mResults.size());
 
-        for (int i=mResults.size(); i>0 ; i-- ){
+        for (int i=mResults.size()-1; i>=0 ; i-- ){
             Log.d(TAG, "updateUI: " + i);
-            LatLng latLng = new LatLng(mResults.get(i-1).getGeometry().getLocation().getLat(), mResults.get(i-1).getGeometry().getLocation().getLng());
-            poiMarker = mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title(mResults.get(i-1).getName()));
-            poiMarker.showInfoWindow();
-            poiMarker.setTag("POI Tag");
-
+            LatLng latLng = new LatLng(mResults.get(i).getGeometry().getLocation().getLat(), mResults.get(i).getGeometry().getLocation().getLng());
+            // set custom marker
+            mMap.addMarker(new MarkerOptions().position(latLng)
+                    .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(getActivity(), R.drawable.amu_bubble_mask,"Title"))))
+                    .setTitle(mResults.get(i).getName());
         }
+    }
+
+    public static Bitmap createCustomMarker(Context context, @DrawableRes int resource, String _name) {
+
+        View marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        marker.setLayoutParams(new ViewGroup.LayoutParams(52, ViewGroup.LayoutParams.WRAP_CONTENT));
+        marker.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        marker.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        marker.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(marker.getMeasuredWidth(), marker.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        marker.draw(canvas);
+
+        return bitmap;
     }
 
 
