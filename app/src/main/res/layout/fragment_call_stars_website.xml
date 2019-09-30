@@ -1,0 +1,84 @@
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1">
+
+    
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+    <!-- Call Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_phone_icon"/>
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/social_view_views"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fontName="Roboto_Light"/>
+
+    </LinearLayout>
+
+    <!-- Stars Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_star_icon"/>
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/social_view_likes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fontName="Roboto_Light"/>
+
+    </LinearLayout>
+
+    <!-- Website Row -->
+    <LinearLayout
+        android:id="@+id/social_view_comments_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_website_icon"/>
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/social_view_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fontName="Roboto_Light"/>
+
+    </LinearLayout>
+
+   </LinearLayout>
+
+</LinearLayout>

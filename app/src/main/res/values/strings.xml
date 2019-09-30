@@ -49,6 +49,17 @@
     <!--ERRORS-->
     <string name="location_is_null">Couldn\'t find your location! Please restart the app</string>
 
+    <!-- FONT ID -->
+    <string name="Roboto_Bold" translatable="false">Roboto-Bold</string>
+    <string name="Roboto_Medium" translatable="false">Roboto-Medium</string>
+    <string name="Roboto_Light" translatable="false">Roboto-Light</string>
+    <string name="Roboto_Thin" translatable="false">Roboto-Thin</string>
+
+    <!-- ANIMATION -->
+    <string name="animation_main_to_detail" translatable="false">AnimationMainToDetail</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
 </resources>
