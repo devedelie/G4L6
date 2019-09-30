@@ -43,6 +43,8 @@
                 android:maxLines="3"
                 android:layout_weight="0.2"
                 android:ellipsize="end"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="15dp"
                 app:fontName="Roboto_Medium"/>
 
             <include

@@ -26,9 +26,10 @@
             android:background="@drawable/ic_phone_icon"/>
 
         <com.elbaz.eliran.go4lunch.views.G4LTextView
-            android:id="@+id/social_view_views"
+            android:id="@+id/detail_restaurant_call_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/restaurant_detail_call"
             app:fontName="Roboto_Light"/>
 
     </LinearLayout>
@@ -47,7 +48,7 @@
             android:background="@drawable/ic_star_icon"/>
 
         <com.elbaz.eliran.go4lunch.views.G4LTextView
-            android:id="@+id/social_view_likes"
+            android:id="@+id/detail_restaurant_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fontName="Roboto_Light"/>
@@ -72,9 +73,10 @@
             android:background="@drawable/ic_website_icon"/>
 
         <com.elbaz.eliran.go4lunch.views.G4LTextView
-            android:id="@+id/social_view_comments"
+            android:id="@+id/detail_restaurant_website_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/restaurant_detail_website"
             app:fontName="Roboto_Light"/>
 
     </LinearLayout>
