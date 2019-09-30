@@ -6,6 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+
+import java.util.List;
+
 /**
  * Created by Eliran Elbaz on 25-Sep-19.
  */
@@ -28,6 +32,24 @@ public class SharedViewModel extends ViewModel {
         return mPagerCurrentItem;
     }
 
+    /**
+     * Get/Set fetched results
+     */
+    private MutableLiveData<List<Result>> mResults = new MutableLiveData<>();
+
+    public void setResults(List<Result> results){
+        mResults.setValue(results);
+        Log.d(TAG, "LiveDataTest setResults: "+ results);
+    }
+
+    public LiveData<List<Result>> getResults(){
+        Log.d(TAG, "LiveDataTest getResults: "+ mResults);
+        return mResults;
+    }
+
+
+
+    //------------------------------------------------------------------
 
 //    /**
 //     * Get/Set Location on MapFragment

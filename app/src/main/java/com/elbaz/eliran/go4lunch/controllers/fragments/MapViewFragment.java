@@ -64,7 +64,7 @@ import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_RADIUS;
 import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_TYPE;
 
-public class MapViewFragment extends BaseFragment implements OnMapReadyCallback {
+public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
     private static final float DEFAULT_ZOOM = 15f ;
@@ -125,6 +125,14 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
                 }
             }
         });
+
+        // get fetched Results
+        mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
+            @Override
+            public void onChanged(List<Result> results) {
+                mResults = results;
+            }
+        });
     }
 
     // Initialise Google Map
@@ -137,6 +145,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        // Marker click listener
+        mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
         // Map-Zoom limitations
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(18.0f);
@@ -153,11 +163,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
-        // Show current location
+
+        // Show current device's location
         if(MainRestaurantActivity.mLocationPermissionGranted){
             getDeviceLocation();
         }
-
+        // POI click action
         mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
             @Override
             public void onPoiClick(PointOfInterest pointOfInterest) {
@@ -166,22 +177,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
                 bottomSheetMainImageURL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAAcDV4HqKigr5g-sbx2TKqua1W_n4Z_z6J4EREdifKwY9N3zu-GgjwGV-oT3fjoO3Hv5sRt3AcKShCAbHHyT5You9UHsVvV8wsW8ZnEX4WvQrWZjeg3tMpn7GtyjYw_4RvEhDrzRlft23jUMx3_OgXWyXQGhRchfjmPyCh1dU3XHyht2t5qJTJdg&key=AIzaSyAFi9SMndxVfBk4sG3QAz-g_QOh4AjQQ74";
 
                 RestaurantBottomSheetFragment.newInstance(1).show(getActivity().getSupportFragmentManager(), "MODAL");
-
-
-
-//                // add marker
-//                poiMarker = mMap.addMarker(new MarkerOptions()
-//                        .position(pointOfInterest.latLng)
-//                        .title(pointOfInterest.name));
-//                poiMarker.showInfoWindow();
-//                poiMarker.setTag("POI Tag");
-//
-//                // Show detailed Toast
-//                Toast.makeText(getActivity().getApplicationContext(), "Clicked: " +
-//                                pointOfInterest.name + "\nPlace ID:" + pointOfInterest.placeId +
-//                                "\nLatitude:" + pointOfInterest.latLng.latitude +
-//                                " Longitude:" + pointOfInterest.latLng.longitude,
-//                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -290,6 +285,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
                         Log.d(TAG, "onNext: HTTP");
                         // Update UI with results
                         updateUI(placesResults.getResults());
+                        viewModelAction(placesResults.getResults());
+
                     }
                     @Override
                     public void onError(Throwable e) {
@@ -310,6 +307,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         setNearbyRestaurantsWithMarkers();
     }
 
+    // Send data to ViewModel - LiveData
+    private void viewModelAction(List<Result> results){
+        mSharedViewModel.setResults(results);
+    }
+
     private void setNearbyRestaurantsWithMarkers(){
         Log.d(TAG, "setNearbyRestaurantsWithMarkers: " + mResults.get(1).getGeometry().getLocation().getLat().toString() + "  " + mResults.get(1).getGeometry().getLocation().getLng().toString() + " size= "+ mResults.size());
 
@@ -323,8 +325,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         }
     }
 
+    // CustomMarker
     public static Bitmap createCustomMarker(Context context, @DrawableRes int resource, String _name) {
-
         View marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -338,6 +340,19 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         marker.draw(canvas);
 
         return bitmap;
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        Log.d(TAG, "onMarkerClick: ");
+        bottomSheetMainImageURL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAAcDV4HqKigr5g-sbx2TKqua1W_n4Z_z6J4EREdifKwY9N3zu-GgjwGV-oT3fjoO3Hv5sRt3AcKShCAbHHyT5You9UHsVvV8wsW8ZnEX4WvQrWZjeg3tMpn7GtyjYw_4RvEhDrzRlft23jUMx3_OgXWyXQGhRchfjmPyCh1dU3XHyht2t5qJTJdg&key=AIzaSyAFi9SMndxVfBk4sG3QAz-g_QOh4AjQQ74";
+
+        RestaurantBottomSheetFragment.newInstance(1).show(getActivity().getSupportFragmentManager(), "MODAL");
+//        if (marker.equals(myMarker))
+//        {
+//            //handle click here
+//        }
+        return true;
     }
 
 
