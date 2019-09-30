@@ -37,8 +37,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
@@ -76,6 +78,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
     private String deviceLocationVariable;
     private List<Result> mResults;
     private Marker poiMarker;
+    public static String bottomSheetMainImageURL;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -143,14 +146,29 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // Hiding Map Features (settings inside style_strings.xml)
+        boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources()
+                .getString(R.string.style_json)));
+        if (!success) {
+            Log.e(TAG, "Style parsing failed.");
+        }
         // Show current location
         if(MainRestaurantActivity.mLocationPermissionGranted){
             getDeviceLocation();
         }
 
-//        mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
-//            @Override
-//            public void onPoiClick(PointOfInterest pointOfInterest) {
+        mMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(PointOfInterest pointOfInterest) {
+
+                // https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=CmRaAAAAcDV4HqKigr5g-sbx2TKqua1W_n4Z_z6J4EREdifKwY9N3zu-GgjwGV-oT3fjoO3Hv5sRt3AcKShCAbHHyT5You9UHsVvV8wsW8ZnEX4WvQrWZjeg3tMpn7GtyjYw_4RvEhDrzRlft23jUMx3_OgXWyXQGhRchfjmPyCh1dU3XHyht2t5qJTJdg&key=YOUR_API_KEY
+                bottomSheetMainImageURL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAAcDV4HqKigr5g-sbx2TKqua1W_n4Z_z6J4EREdifKwY9N3zu-GgjwGV-oT3fjoO3Hv5sRt3AcKShCAbHHyT5You9UHsVvV8wsW8ZnEX4WvQrWZjeg3tMpn7GtyjYw_4RvEhDrzRlft23jUMx3_OgXWyXQGhRchfjmPyCh1dU3XHyht2t5qJTJdg&key=AIzaSyAFi9SMndxVfBk4sG3QAz-g_QOh4AjQQ74";
+
+                RestaurantBottomSheetFragment.newInstance(1).show(getActivity().getSupportFragmentManager(), "MODAL");
+
+
+
 //                // add marker
 //                poiMarker = mMap.addMarker(new MarkerOptions()
 //                        .position(pointOfInterest.latLng)
@@ -164,8 +182,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
 //                                "\nLatitude:" + pointOfInterest.latLng.latitude +
 //                                " Longitude:" + pointOfInterest.latLng.longitude,
 //                        Toast.LENGTH_LONG).show();
-//            }
-//        });
+            }
+        });
 
     }
 
@@ -262,9 +280,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback 
 
     // Execute the stream to fetch nearby locations
     private void executeHttpRequestWithRetrofit(){
-//        RxJavaPlugins.setErrorHandler(Functions.<Throwable>emptyConsumer());
         Log.d(TAG, "executeHttpRequestWithRetrofit: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
-        // 1.2 - Execute the stream subscribing to Observable defined inside NYTStream
+        // Execute the stream subscribing to Observable defined inside PlacesResults
         this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
                 .subscribeWith(new DisposableObserver<PlacesResults>(){
 
