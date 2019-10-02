@@ -135,26 +135,23 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void setViewElementsForAutoCompleteSheet(int index){
-        Log.d(TAG, "IndexOfSetViewElementsForAutoCompleteSheet: " + (index-100));
-//        // Create a FetchPhotoRequest.
-//        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(MapViewFragment.searchAuto.getPhotoMeta().get(0))
-//                .setMaxWidth(500) // Optional.
-//                .setMaxHeight(300) // Optional.
-//                .build();
-
-
-            // Set Image referance string and set image with Glide
-//        String imageUrl = MapViewFragment.searchAuto.getPhotoMeta();
-//        Pattern p = Pattern.compile("\"([^\"]*)\"");
-//        Matcher m = p.matcher(imageUrl);
-//        while (m.find()) {
-//            // regex result
-//            imageUrl = m.group(1);
-//            Log.d(TAG, "setViewElementsForAutoCompleteSheet: " + m.group(1));
-//        }
-//        Glide.with(this).load(imageUrl).into(this.fragmentDetailMainImage);
-
+        // match the index with the Array index
+        int i = index-100;
         // get the correct object from the list
-        restaurantDetailTitle.setText(mSearchAutosArray.get(index-100).getName());
+        restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
+        restaurantDetailAddress.setText(mResults.get(i).getVicinity());
+        // Set OpenNow Status (try & catch for null cases)
+        try {
+            if(mResults.get(i).getOpeningHours().getOpenNow()){
+                restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow));
+            } else{
+                restaurantDetailDescription.setText(getString(R.string.restaurant_detail_closed));
+            }
+        }
+        catch(Exception e) {
+            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow_notAvailable));
+        }
+        // set rating
+        restaurantDetailLikes.setText(mResults.get(i).getRating().toString());
     }
 }
