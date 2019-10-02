@@ -48,6 +48,7 @@
 
     <!--BottomSheet -->
     <string name="restaurant_detail_openNow">Status: Open now</string>
+    <string name="restaurant_detail_openNow_notAvailable">Status: Unknown opening times</string>
     <string name="restaurant_detail_closed">Status: Closed</string>
     <string name="restaurant_detail_call">Call</string>
     <string name="restaurant_detail_website">Website</string>

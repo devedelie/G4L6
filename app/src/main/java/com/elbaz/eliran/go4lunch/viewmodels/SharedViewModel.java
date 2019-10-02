@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 
 import java.util.List;
@@ -47,6 +48,21 @@ public class SharedViewModel extends ViewModel {
         return mResults;
     }
 
+
+    /**
+     * Get/Set Search_Auto-complete Array of objects
+     */
+    private MutableLiveData<List<SearchAuto>> mSearchAutoObjects = new MutableLiveData<>();
+
+    public void setSearchArray (List<SearchAuto> searchArray){
+        mSearchAutoObjects.setValue(searchArray);
+        Log.d(TAG, "setSearchArray: " + searchArray);
+    }
+
+    public LiveData<List<SearchAuto>> getSearchArray(){
+        Log.d(TAG, "getSearchArray: " + mSearchAutoObjects);
+        return mSearchAutoObjects;
+    }
 
 
     //------------------------------------------------------------------

@@ -25,4 +25,12 @@ public class PlacesStream {
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
     }
+
+    public static Observable<PlacesResults> streamFetchNextPageToken(String token){
+        GoogleMapApiService googleMapApiService = GoogleMapApiService.retrofit.create(GoogleMapApiService.class);
+        return googleMapApiService.getNextPageToken(token, BuildConfig.GOOGLE_BROWSER_API_KEY)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .timeout(10, TimeUnit.SECONDS);
+    }
 }
