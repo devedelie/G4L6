@@ -1,5 +1,6 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,9 +20,14 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -48,6 +54,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     public SearchAuto searchAuto;
     private List<SearchAuto> mSearchAutosArray;
     private static final String MARKER_TAG = "MARKER_TAG";
+    PlacesClient mPlacesClient;
 
     public static RestaurantBottomSheetFragment newInstance(int markerTag) {
         RestaurantBottomSheetFragment restaurantBottomSheetFragment;
@@ -64,6 +71,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.fragment_restaurant_details
                 , container, false);
         ButterKnife.bind(this, view);
+        mPlacesClient = Places.createClient(getActivity());
         return view;
     }
 
@@ -137,21 +145,71 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     private void setViewElementsForAutoCompleteSheet(int index){
         // match the index with the Array index
         int i = index-100;
-        // get the correct object from the list
-        restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
-        restaurantDetailAddress.setText(mResults.get(i).getVicinity());
-        // Set OpenNow Status (try & catch for null cases)
         try {
-            if(mResults.get(i).getOpeningHours().getOpenNow()){
-                restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow));
+            // get the correct object from the list into TextViews
+            restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
+            restaurantDetailAddress.setText(mSearchAutosArray.get(i).getAddress());
+            // set rating
+            restaurantDetailLikes.setText(mSearchAutosArray.get(i).getRating());
+            // get image
+            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mSearchAutosArray.get(i).getPhotoMeta().get(0))
+                    .setMaxWidth(400).build();
+            mPlacesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                fragmentDetailMainImage.setImageBitmap(bitmap);
+            }).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    ApiException apiException = (ApiException) exception;
+                    int statusCode = apiException.getStatusCode();
+                    // Handle error with given status code.
+                    Log.e(TAG, "Place not found: " + exception.getMessage());
+                }
+            });
+
+            // Set Opening-Hours Status (try & catch for null cases)
+            int day = dayToInteger();
+            Log.d(TAG, "setViewElementsForAutoCompleteSheet: DAY TODAY  "+ day);
+            String openingList = mSearchAutosArray.get(i).getOpeningHours().get(day);
+            Log.d(TAG, "Opening times: " + openingList);
+            if(openingList != null){
+                restaurantDetailDescription.setText(openingList);
             } else{
-                restaurantDetailDescription.setText(getString(R.string.restaurant_detail_closed));
+                restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow_notAvailable));
             }
         }
         catch(Exception e) {
-            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow_notAvailable));
+            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_not_available));
         }
-        // set rating
-        restaurantDetailLikes.setText(mResults.get(i).getRating().toString());
+    }
+
+    private int dayToInteger (){
+        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
+        int newDayInteger=-1;
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.DAY_OF_WEEK);
+        switch (today){
+            case Calendar.SUNDAY:
+                newDayInteger = 6;
+                break;
+            case Calendar.MONDAY:
+                newDayInteger = 0;
+                break;
+            case Calendar.TUESDAY:
+                newDayInteger = 1;
+                break;
+            case Calendar.WEDNESDAY:
+                newDayInteger = 2;
+                break;
+            case Calendar.THURSDAY:
+                newDayInteger = 3;
+                break;
+            case Calendar.FRIDAY:
+                newDayInteger = 4;
+                break;
+            case Calendar.SATURDAY:
+                newDayInteger = 5;
+                break;
+        }
+        return newDayInteger;
     }
 }
