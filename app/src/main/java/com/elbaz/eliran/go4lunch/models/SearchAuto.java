@@ -23,12 +23,12 @@ public class SearchAuto {
     @Nullable private Uri websiteUri;
     private List<PhotoMetadata> photoMeta;
     private Integer pricing;
-    private double rating;
+    private String rating;
     private LatLng locationLatLng;
 
     public SearchAuto (){}
 
-    public SearchAuto(int objectId, String id, String name, String address, String phone, List<String> openingHours, Uri websiteUri, List<PhotoMetadata> photoMeta, double rating, LatLng locationLatLng) {
+    public SearchAuto(int objectId, String id, String name, String address, String phone, List<String> openingHours, Uri websiteUri, List<PhotoMetadata> photoMeta, String rating, LatLng locationLatLng) {
         this.objectId = objectId;
         this.id = id;
         this.name = name;
@@ -113,11 +113,11 @@ public class SearchAuto {
         this.pricing = pricing;
     }
 
-    public double getRating() {
+    public String getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(String rating) {
         this.rating = rating;
     }
 

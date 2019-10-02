@@ -255,7 +255,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE);
                 // Create an object
                 searchAuto = null;
-                searchAuto = new SearchAuto(AUTO_COMPLETE_INDEX_CODE,place.getId(),place.getName(),place.getAddress(),place.getPhoneNumber(),place.getOpeningHours().getWeekdayText(),place.getWebsiteUri(),place.getPhotoMetadatas(),place.getRating(),place.getLatLng());
+                searchAuto = new SearchAuto(AUTO_COMPLETE_INDEX_CODE,place.getId(),place.getName(),place.getAddress(),place.getPhoneNumber(),place.getOpeningHours().getWeekdayText(),place.getWebsiteUri(),place.getPhotoMetadatas(),place.getRating().toString(),place.getLatLng());
                 // add the object into Array and set in ViewModel
                 sSearchAutoList.add(searchAuto);
                 Log.d(TAG, "Array onActivityResult: " + sSearchAutoList.get(0));
