@@ -19,7 +19,7 @@ public class SearchAuto {
     private String name;
     private String address;
     private String phone;
-    private List<String> openingHours;
+    @Nullable private List<String> openingHours;
     @Nullable private Uri websiteUri;
     private List<PhotoMetadata> photoMeta;
     private Integer pricing;
