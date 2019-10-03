@@ -157,8 +157,14 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        if(pager.getCurrentItem() == 1){
         MenuItem item = menu.findItem(R.id.menu_sort_icon);
         item.setVisible(true);
+        }
+        if(pager.getCurrentItem() ==  2){
+            MenuItem item = menu.findItem(R.id.menu_search_icon);
+            item.setVisible(false);
+        }
         return true;
     }
 
@@ -179,12 +185,15 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_mapView:
+                        configureToolbarWithDrawer();
                         pager.setCurrentItem(0);
                         break;
                     case R.id.action_listView:
+                        configureToolbarWithDrawer(); // Add 'sort' icon in ListViewFragment
                         pager.setCurrentItem(1);
                         break;
                     case R.id.action_workmates:
+                        configureToolbarWithDrawer(); // Hide 'Search' icon in Workmates fragment
                         pager.setCurrentItem(2);
                         break;
                 }
