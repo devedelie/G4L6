@@ -8,25 +8,86 @@
     android:layout_marginTop="@dimen/margin_small"
     android:layout_marginRight="@dimen/margin_small"
     android:layout_gravity="center_vertical"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:weightSum="5">
+
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/restaurant_detail_recyclerView_workmateImage"
-            android:layout_width="70dip"
-            android:layout_height="70dip"
-            android:padding="@dimen/padding_normal"/>
+        android:id="@+id/textContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="3">
 
         <com.elbaz.eliran.go4lunch.views.G4LTextView
-            android:id="@+id/restaurant_detail_recyclerView_text_view"
+            android:id="@+id/restaurantList_recyclerView_restaurantName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Name"
+            app:fontName="Roboto_Medium"
+            android:layout_gravity="top"/>
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/restaurantList_recyclerView_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Address"
             app:fontName="Roboto_Medium"
             android:layout_gravity="center_vertical"/>
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/restaurantList_recyclerView_openingTimes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opening Times"
+            app:fontName="Roboto_Medium"
+            android:layout_gravity="bottom"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.elbaz.eliran.go4lunch.views.G4LTextView
+            android:id="@+id/restaurantList_recyclerView_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance"
+            app:fontName="Roboto_Medium"
+            android:layout_gravity="center_horizontal"
+            android:gravity="start"/>
+
+        <ImageView
+            android:id="@+id/restaurantList_recyclerView_person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="start"/>
+
+        <ImageView
+            android:id="@+id/restaurantList_recyclerView_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/restaurant_detail_recyclerView_image"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:padding="@dimen/padding_normal" />
 
     </LinearLayout>
 
 </LinearLayout>
+
+
