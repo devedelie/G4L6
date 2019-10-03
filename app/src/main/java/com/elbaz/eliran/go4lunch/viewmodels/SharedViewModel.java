@@ -17,6 +17,7 @@ import java.util.List;
 public class SharedViewModel extends ViewModel {
     private static final String TAG = "MapViewFragmentViewMode";
 
+
     /**
      * Get/Set current pager (visible fragment)
      */

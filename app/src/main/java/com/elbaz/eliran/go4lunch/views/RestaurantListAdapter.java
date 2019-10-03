@@ -1,6 +1,7 @@
 package com.elbaz.eliran.go4lunch.views;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Eliran Elbaz on 02-Oct-19.
@@ -42,6 +45,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListVi
 
     @Override
     public void onBindViewHolder (@NonNull RestaurantListViewHolder restaurantListViewHolder, int i){
+        Log.d(TAG, "ListView onBindViewHolder: ");
         restaurantListViewHolder.updateRestaurantsList(this.mResults.get(i), this.glide);
     }
 

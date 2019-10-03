@@ -88,6 +88,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 mResults = new ArrayList<>();
                 mResults.clear();
                 mResults.addAll(results);
+                Log.d(TAG, "BottomSheet onChanged: " + results.get(0).getName());
             }
         });
         // Observe Search ArrayList
@@ -119,7 +120,6 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void setViewElementsForNearbyPlacesSheet(int index){
-        Log.d(TAG, "TagNumber check "+index + "photo ref: "+ mResults.get(index).getPhotos().get(0).getPhotoReference());
         // Set Image referance string and set image with Glide
         String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResults.get(index).getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
         Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
@@ -146,11 +146,6 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
         // match the index with the Array index
         int i = index-100;
         try {
-            // get the correct object from the list into TextViews
-            restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
-            restaurantDetailAddress.setText(mSearchAutosArray.get(i).getAddress());
-            // set rating
-            restaurantDetailLikes.setText(mSearchAutosArray.get(i).getRating());
             // get image
             FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mSearchAutosArray.get(i).getPhotoMeta().get(0))
                     .setMaxWidth(400).build();
@@ -165,7 +160,11 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                     Log.e(TAG, "Place not found: " + exception.getMessage());
                 }
             });
-
+            // get the correct object from the list into TextViews
+            restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
+            restaurantDetailAddress.setText(mSearchAutosArray.get(i).getAddress());
+            // set rating
+            restaurantDetailLikes.setText(mSearchAutosArray.get(i).getRating());
             // Set Opening-Hours Status (try & catch for null cases)
             int day = dayToInteger();
             Log.d(TAG, "setViewElementsForAutoCompleteSheet: DAY TODAY  "+ day);
