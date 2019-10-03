@@ -154,6 +154,14 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         setSupportActionBar(toolbar);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.menu_sort_icon);
+        item.setVisible(true);
+        return true;
+    }
+
     /**
      * ViewPager configuration + Tab Layout
      */
@@ -266,11 +274,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     private void setCurrentPagerToViewModel(Integer pagerCurrentItem){
         mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
     }
-
-//    private void moveCamera(Place place){
-//        // Send data to LiveData
-//        mSharedViewModel.setLocationOnMap(place);
-//    }
 
     // --------------------
     // REST REQUESTS
