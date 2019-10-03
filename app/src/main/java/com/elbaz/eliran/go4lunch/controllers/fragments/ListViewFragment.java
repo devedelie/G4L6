@@ -2,6 +2,7 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -41,6 +44,8 @@ public class ListViewFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(getFragmentLayout(), container, false);
         ButterKnife.bind(this, view); //Configure Butterknife
+        this.configureRecyclerView();
+
         return view;
     }
 
@@ -63,11 +68,11 @@ public class ListViewFragment extends BaseFragment {
         mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                mResults = results;
+                Log.d(TAG, "ListView onChanged: ");
+                updateUI(results);
             }
         });
 
-        this.configureRecyclerView();
     }
 
 
@@ -81,10 +86,24 @@ public class ListViewFragment extends BaseFragment {
     // RecyclerView Config
     //-----------------
     protected void configureRecyclerView(){
+        Log.d(TAG, "ListView configureRecyclerView: ");
         mResults = new ArrayList<>();
-        mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getContext(), Glide.with(this));
+        mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext(), Glide.with(this));
         listViewRecyclerView.setAdapter(this.mRestaurantListAdapter);
         listViewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    //-----------------
+    // Update UI
+    //-----------------
+    // Update UI showing news titles
+    private void updateUI(List<Result> results){
+        // completely erase the previous list of results each time
+        // in order to avoid duplicating it due to  .addAll()
+        mResults.clear();
+        mResults.addAll(results);
+        mRestaurantListAdapter.notifyDataSetChanged();
+        Log.d(TAG, "ListView updateUI: ");
     }
 
 
