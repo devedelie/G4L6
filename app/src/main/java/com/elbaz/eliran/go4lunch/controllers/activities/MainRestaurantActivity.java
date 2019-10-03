@@ -175,11 +175,9 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                         break;
                     case R.id.action_listView:
                         pager.setCurrentItem(1);
-                        // Fragment.updateUIForListView();
                         break;
                     case R.id.action_workmates:
                         pager.setCurrentItem(2);
-                        // Fragment.updateUIForWorkmates();
                         break;
                 }
                 return true;
@@ -259,13 +257,13 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_search_icon){
-            viewModelAction(pager.getCurrentItem());
+            setCurrentPagerToViewModel(pager.getCurrentItem());
         }
         return super.onOptionsItemSelected(item);
     }
 
     // Send data to ViewModel - LiveData
-    private void viewModelAction(Integer pagerCurrentItem){
+    private void setCurrentPagerToViewModel(Integer pagerCurrentItem){
         mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
     }
 
