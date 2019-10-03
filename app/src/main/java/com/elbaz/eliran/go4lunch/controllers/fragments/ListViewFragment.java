@@ -24,6 +24,8 @@ import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,6 +39,7 @@ import static android.content.ContentValues.TAG;
 public class ListViewFragment extends BaseFragment {
     private SharedViewModel mSharedViewModel;
     private List<Result> mResults;
+    private List<Result> mResultsSorted;
     private RestaurantListAdapter mRestaurantListAdapter;
     @BindView(R.id.listView_recyclerView) RecyclerView listViewRecyclerView;
 
@@ -87,6 +90,8 @@ public class ListViewFragment extends BaseFragment {
     //-----------------
     protected void configureRecyclerView(){
         Log.d(TAG, "ListView configureRecyclerView: ");
+        // Set the recyclerView to fixed size in order to increase performances
+        listViewRecyclerView.setHasFixedSize(true);
         mResults = new ArrayList<>();
         mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext(), Glide.with(this));
         listViewRecyclerView.setAdapter(this.mRestaurantListAdapter);
@@ -100,6 +105,17 @@ public class ListViewFragment extends BaseFragment {
     private void updateUI(List<Result> results){
         // completely erase the previous list of results each time
         // in order to avoid duplicating it due to  .addAll()
+
+        // sort the data
+        if(results.size() > 0){
+            Collections.sort(results, new Comparator<Result>() {
+                @Override
+                public int compare(Result o1, Result o2) {
+                    return o2.getRating().compareTo(o1.getRating());
+                }
+            });
+        }
+        // Notify changes
         mResults.clear();
         mResults.addAll(results);
         mRestaurantListAdapter.notifyDataSetChanged();
