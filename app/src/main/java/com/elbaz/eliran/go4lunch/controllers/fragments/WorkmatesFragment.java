@@ -54,7 +54,7 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
                              Bundle savedInstanceState) {
         View view = inflater.inflate(getFragmentLayout(), container, false);
         ButterKnife.bind(this, view);
-//        this.configureRecyclerView();
+        this.configureRecyclerView();
         // Inflate the layout for this fragment
         return view;
     }
