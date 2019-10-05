@@ -36,14 +36,19 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
+
     // --- UPDATE ---
 
     public static Task<Void> updateUsername(String username, String uid) {
         return UserHelper.getUsersCollection().document(uid).update("username", username);
     }
 
-    public static Task<Void> updateIsMentor(String uid, Boolean isMentor) {
-        return UserHelper.getUsersCollection().document(uid).update("isMentor", isMentor);
+    public static Task<Void> updateTodaysRestaurant(String uid, String todaysRestaurant) {
+        return UserHelper.getUsersCollection().document(uid).update("selectedRestaurantName", todaysRestaurant);
+    }
+
+    public static Task<Void> updateIsGoing (String uid, boolean isGoing){
+        return UserHelper.getUsersCollection().document(uid).update("isGoing", isGoing);
     }
 
     // --- DELETE ---
