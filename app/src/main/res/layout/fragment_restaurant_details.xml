@@ -82,14 +82,14 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fragment_detail_fab"
+        android:id="@+id/addRestaurantFloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
         app:backgroundTint="@color/gmail_btn_color"
-        android:src="@drawable/ic_check"
+        android:src="@drawable/ic_add_icon"
         app:layout_anchor="@id/fragment_detail_image"
         app:layout_anchorGravity="bottom|right|end"/>
 

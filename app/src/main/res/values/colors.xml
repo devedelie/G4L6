@@ -9,4 +9,5 @@
     <color name="bottom_buttons">#AD9191</color>
     <color name="colorAccentDark">#E7234C</color>
     <color name="background_light">#97575E</color>
+    <color name="floating_btn_green">#8BBB62</color>
 </resources>

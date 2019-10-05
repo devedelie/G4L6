@@ -49,6 +49,9 @@
     <string name="info_no_username_found">Empty user name</string>
     <string name="info_no_email_found">Empty email address</string>
 
+<!--    YourLaunchActivity-->
+    <string name="you_are_going_to">You are going to eat at: </string>
+
     <!--BottomSheet -->
     <string name="restaurant_detail_openNow">Status: Open now</string>
     <string name="restaurant_detail_openNow_notAvailable">Status: Unknown opening times</string>
@@ -77,7 +80,6 @@
         <item>Type</item>
         <item>Rating</item>
     </string-array>
-
 
 
 </resources>
