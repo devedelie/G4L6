@@ -264,7 +264,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     @OnClick(R.id.addRestaurantFloatingActionButton)
     public void addTodaysRestaurant (){
         // Change mIsGoing status & button color + icon
-        if (mIsGoing){
+        if (mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
             floatingActionButton.setImageResource(R.drawable.ic_add_icon);
             floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
             mIsGoing = false;
