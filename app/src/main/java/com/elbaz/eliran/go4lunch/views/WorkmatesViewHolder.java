@@ -34,7 +34,7 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
     public void updateWorkmatesList (User user, String currentUserId, RequestManager glide){
         try{
             //set images
-            glide.load(user.getUsername()).apply(RequestOptions.centerCropTransform()).into(workmateImage);
+            glide.load(user.getUrlPicture()).apply(RequestOptions.circleCropTransform()).into(workmateImage);
             // set texts
             workmateText.setText(user.getUsername());
         }catch (Exception e){
