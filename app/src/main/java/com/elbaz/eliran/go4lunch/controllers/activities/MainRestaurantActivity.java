@@ -250,6 +250,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         switch (order){
             case 0:
                 // Your lunch action
+                this.goToYourLunchActivity();
                 break;
             case 1:
                 // settings action
@@ -266,6 +267,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 
     private void goToProfileSettings(){
         Intent intent = new Intent(this, ProfileSettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void goToYourLunchActivity(){
+        Intent intent = new Intent(this, YourLunchActivity.class);
         startActivity(intent);
     }
 

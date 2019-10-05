@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
  * Created by Eliran Elbaz on 25-Sep-19.
  */
 public abstract class BaseFragment extends Fragment {
+    public static boolean isGoing = false;
     public BaseFragment() { }
 
     @Override
@@ -31,12 +32,14 @@ public abstract class BaseFragment extends Fragment {
     protected abstract void updateData();
 
 
+
+
     // --------------------
     // UTILS
     // --------------------
 
-    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
-
     @Nullable
-    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+    public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
+
 }
