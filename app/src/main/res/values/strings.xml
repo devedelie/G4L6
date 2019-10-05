@@ -35,6 +35,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_maps">Map</string>
 
+    <!--WorkMates Fragment-->
+    <string name="workmates_recycler_view_empty">The list is empty</string>
+
     <!--ProfileSettings Activity-->
     <string name="profileSettings_activity_username">User name: </string>
     <string name="profileSettings_activity_email">Email: </string>

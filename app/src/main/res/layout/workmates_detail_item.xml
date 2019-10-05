@@ -22,7 +22,7 @@
 
         <com.elbaz.eliran.go4lunch.views.G4LTextView
             android:id="@+id/workmate_detail_recyclerView_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:fontName="Roboto_Medium"
             android:layout_gravity="center_vertical"/>
