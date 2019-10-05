@@ -26,6 +26,7 @@ import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
  * Created by Eliran Elbaz on 02-Oct-19.
  */
 public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
+    // Restaurant ListView items
     @BindView(R.id.restaurantList_recyclerView_restaurantName) TextView restaurantNameTextView;
     @BindView(R.id.restaurantList_recyclerView_address) TextView addressTextView;
     @BindView(R.id.restaurantList_recyclerView_openingTimes) TextView openingTextView;
@@ -55,9 +56,6 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
         }catch (Exception e){
             Log.d(TAG, "updateRestaurantsList: Error " + e);
         }
-
-
     }
-
 
 }
