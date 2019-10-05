@@ -24,8 +24,6 @@ import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -106,15 +104,15 @@ public class ListViewFragment extends BaseFragment {
         // completely erase the previous list of results each time
         // in order to avoid duplicating it due to  .addAll()
 
-        // sort the data
-        if(results.size() > 0){
-            Collections.sort(results, new Comparator<Result>() {
-                @Override
-                public int compare(Result o1, Result o2) {
-                    return o2.getRating().compareTo(o1.getRating());
-                }
-            });
-        }
+//        // sort the data
+//        if(results.size() > 0){
+//            Collections.sort(results, new Comparator<Result>() {
+//                @Override
+//                public int compare(Result o1, Result o2) {
+//                    return o2.getRating().compareTo(o1.getRating());
+//                }
+//            });
+//        }
         // Notify changes
         mResults.clear();
         mResults.addAll(results);
