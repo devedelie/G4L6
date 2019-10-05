@@ -1,5 +1,6 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -17,14 +20,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
+import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +43,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
@@ -49,12 +61,18 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     @BindView(R.id.fragment_restaurant_detail_address) TextView restaurantDetailAddress;
     @BindView(R.id.fragment_restaurant_detail_description) TextView restaurantDetailDescription;
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
+    @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
     private SharedViewModel mSharedViewModel;
     private List<Result> mResults;
     public SearchAuto searchAuto;
     private List<SearchAuto> mSearchAutosArray;
     private static final String MARKER_TAG = "MARKER_TAG";
     PlacesClient mPlacesClient;
+    private int mIndex;
+    // Variables for Firestore
+    private boolean mIsGoing = false;
+    private String mRestaurantName;
+
 
     public static RestaurantBottomSheetFragment newInstance(int markerTag) {
         RestaurantBottomSheetFragment restaurantBottomSheetFragment;
@@ -72,6 +90,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 , container, false);
         ButterKnife.bind(this, view);
         mPlacesClient = Places.createClient(getActivity());
+
         return view;
     }
 
@@ -107,20 +126,52 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     @Override
     public void onResume() {
         super.onResume();
+        getDataFromFireStore();
         setViewElements();
+
+    }
+
+    private void getDataFromFireStore(){
+        //  Get additional data from Firestore (restaurant name)
+        UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d(TAG, "getDataFromFireStore onSuccess: ");
+                User currentUser = documentSnapshot.toObject(User.class);
+                mRestaurantName = currentUser.getSelectedRestaurantName();
+                mIsGoing = currentUser.getIsGoing();
+                configureFloatingButton();
+            }
+        });
+
     }
 
     private void setViewElements(){
         int i = getArguments().getInt(MARKER_TAG);
         if (i >=0 && i<20){
-            setViewElementsForNearbyPlacesSheet(i);
+            mIndex = i;
+            setViewElementsForNearbyPlacesSheet(mIndex);
         }else if (i>= 100){
-            setViewElementsForAutoCompleteSheet(i);
+            mIndex = i-100;
+            setViewElementsForAutoCompleteSheet(mIndex);
+        }
+        Log.d(TAG, "setViewElements: "+ mIndex);
+    }
+
+    private void configureFloatingButton(){
+        Log.d(TAG, "configureFloatingButton: "+mRestaurantName + " " + mResults.get(mIndex).getName());
+        // Compare the selected restaurant with the one from Firestore
+        if(mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
+            floatingActionButton.setImageResource(R.drawable.ic_check);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.floating_btn_green)));
+        }else{
+            floatingActionButton.setImageResource(R.drawable.ic_add_icon);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
         }
     }
 
     private void setViewElementsForNearbyPlacesSheet(int index){
-        // Set Image referance string and set image with Glide
+        // Set Image reference string and set image with Glide
         String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResults.get(index).getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
         Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
         Glide.with(this).load(imageUrl).into(this.fragmentDetailMainImage);
@@ -143,11 +194,9 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void setViewElementsForAutoCompleteSheet(int index){
-        // match the index with the Array index
-        int i = index-100;
         try {
             // get image
-            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mSearchAutosArray.get(i).getPhotoMeta().get(0))
+            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mSearchAutosArray.get(index).getPhotoMeta().get(0))
                     .setMaxWidth(400).build();
             mPlacesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
                 Bitmap bitmap = fetchPhotoResponse.getBitmap();
@@ -161,14 +210,14 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 }
             });
             // get the correct object from the list into TextViews
-            restaurantDetailTitle.setText(mSearchAutosArray.get(i).getName());
-            restaurantDetailAddress.setText(mSearchAutosArray.get(i).getAddress());
+            restaurantDetailTitle.setText(mSearchAutosArray.get(index).getName());
+            restaurantDetailAddress.setText(mSearchAutosArray.get(index).getAddress());
             // set rating
-            restaurantDetailLikes.setText(mSearchAutosArray.get(i).getRating());
+            restaurantDetailLikes.setText(mSearchAutosArray.get(index).getRating());
             // Set Opening-Hours Status (try & catch for null cases)
             int day = dayToInteger();
             Log.d(TAG, "setViewElementsForAutoCompleteSheet: DAY TODAY  "+ day);
-            String openingList = mSearchAutosArray.get(i).getOpeningHours().get(day);
+            String openingList = mSearchAutosArray.get(index).getOpeningHours().get(day);
             Log.d(TAG, "Opening times: " + openingList);
             if(openingList != null){
                 restaurantDetailDescription.setText(openingList);
@@ -210,5 +259,53 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 break;
         }
         return newDayInteger;
+    }
+
+    @OnClick(R.id.addRestaurantFloatingActionButton)
+    public void addTodaysRestaurant (){
+        // Change mIsGoing status & button color + icon
+        if (mIsGoing){
+            floatingActionButton.setImageResource(R.drawable.ic_add_icon);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
+            mIsGoing = false;
+//            mSharedViewModel.setIsGoing(false);
+        }else{
+            floatingActionButton.setImageResource(R.drawable.ic_check);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.floating_btn_green)));
+            mIsGoing = true;
+//            mSharedViewModel.setIsGoing(true);
+        }
+        Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
+
+        // update Firestore DB with the current data
+        if (this.getCurrentUser() != null){
+            if(mIsGoing){
+                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
+            }else{
+                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
+            }
+                UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
+        }
+    }
+
+    // --------------------
+    // UTILS
+    // --------------------
+    @Nullable
+    private FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
+
+    // --------------------
+    // ERROR HANDLER
+    // --------------------
+
+    protected OnFailureListener onFailureListener(){
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onFailure: ");
+            }
+        };
     }
 }

@@ -37,7 +37,6 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     private WorkmatesListAdapter mWorkmatesListAdapter;
     @Nullable
     private User modelCurrentUser;
-    private String currentChatName;
 
     @Override
     protected int getFragmentLayout() {
@@ -78,7 +77,7 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
         emptyListText.setVisibility(this.mWorkmatesListAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    // 6 - Create options for RecyclerView from a Query
+    //  Create options for RecyclerView from a Query
     private FirestoreRecyclerOptions<User> generateOptionsForAdapter(Query query){
         return new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query, User.class)
