@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
+import com.elbaz.eliran.go4lunch.api.google.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -72,6 +73,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     // Variables for Firestore
     private boolean mIsGoing = false;
     private String mRestaurantName;
+    private User modelCurrentUser;
 
 
     public static RestaurantBottomSheetFragment newInstance(int markerTag) {
@@ -128,6 +130,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
         super.onResume();
         getDataFromFireStore();
         setViewElements();
+        getCurrentUserFromFirestore();
 
     }
 
@@ -276,15 +279,35 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
 //            mSharedViewModel.setIsGoing(true);
         }
         Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
+        updateUserOnFireStore();
+    }
 
+    private void updateUserOnFireStore(){
         // update Firestore DB with the current data
         if (this.getCurrentUser() != null){
+            // set/remove restaurant name from DB
             if(mIsGoing){
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
             }
-                UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
+            // set the current isGoing status in DB
+            UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
+            // create/update user document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
+            updateRestaurantCollection();
+        }
+    }
+
+    private void updateRestaurantCollection(){
+        if ( modelCurrentUser != null){
+            if(mIsGoing){
+                // Create a new "going-user" document to restaurant collection on Firestore
+                GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+
+            }else{
+                // Delete document from going-user collection
+                GoingUserHelper.deleteUserFromGoingList(mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+            }
         }
     }
 
@@ -293,6 +316,20 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     // --------------------
     @Nullable
     private FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
+    // --------------------
+    // REST REQUESTS
+    // --------------------
+    // 4 - Get Current User from Firestore
+    private void getCurrentUserFromFirestore(){
+        UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                modelCurrentUser = documentSnapshot.toObject(User.class);
+                Log.d(TAG, "onSuccess: getCurrentUserFromFirestore" + modelCurrentUser);
+            }
+        });
+    }
 
 
     // --------------------
@@ -304,7 +341,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(getActivity(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-                Log.d(TAG, "onFailure: ");
+                Log.d(TAG, "onFailure: " +e);
             }
         };
     }
