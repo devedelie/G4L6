@@ -1,4 +1,4 @@
-package com.elbaz.eliran.go4lunch.api.google;
+package com.elbaz.eliran.go4lunch.api;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
