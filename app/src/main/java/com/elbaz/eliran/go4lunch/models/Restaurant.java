@@ -10,6 +10,8 @@ public class Restaurant {
     private User userGoing;
     private String urlImage;
 
+    public Restaurant(){}
+
     public Restaurant(String restaurantName, String restaurantType, User userGoing, String urlImage) {
         this.restaurantName = restaurantName;
         this.restaurantID = restaurantType;
