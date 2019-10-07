@@ -1,9 +1,17 @@
-package com.elbaz.eliran.go4lunch.api.google;
+package com.elbaz.eliran.go4lunch.api;
+
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.elbaz.eliran.go4lunch.models.Restaurant;
 import com.elbaz.eliran.go4lunch.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Eliran Elbaz on 06-Oct-19.
@@ -40,5 +48,21 @@ public class GoingUserHelper {
                 .collection(COLLECTION_NAME)
                 .document(userGoing.getUid())
                 .delete();
+    }
+
+    public static Task<QuerySnapshot> deleteUserFromPreviousGoingList(User userGoing, String selctedRestaurantOnLoad){
+        // Query of the current user in the entire collection (call 'delete' OnComplete)
+        return RestaurantHelper.getRestaurantCollection()
+                .whereEqualTo(userGoing.getUid(), true)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG, "deleteUserFromGoingList onComplete: ");
+                            deleteUserFromGoingList(userGoing.getSelectedRestaurantName(), userGoing);
+                        }
+                    }
+                });
     }
 }
