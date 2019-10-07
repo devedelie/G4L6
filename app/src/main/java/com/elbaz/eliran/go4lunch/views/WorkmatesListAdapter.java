@@ -1,5 +1,6 @@
 package com.elbaz.eliran.go4lunch.views;
 
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -23,6 +24,8 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
     //FOR DATA
     private final RequestManager glide;
     private final String idCurrentUser;
+    private User modelCurrentUser;
+    private int index;
 
     //FOR COMMUNICATION
     private Listener callback;
@@ -36,7 +39,12 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
 
     @Override
     protected void onBindViewHolder(@NonNull WorkmatesViewHolder workmatesViewHolder, int i, @NonNull User user) {
-        workmatesViewHolder.updateWorkmatesList(user, this.idCurrentUser, this.glide);
+        // Get resources to enable text color modification
+        Resources resources = workmatesViewHolder.itemView.getContext().getResources();
+        // set the user
+        modelCurrentUser = user;
+        workmatesViewHolder.updateWorkmatesList(user, this.idCurrentUser, this.glide, resources);
+
     }
 
     @NonNull
@@ -51,6 +59,5 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
         super.onDataChanged();
         this.callback.onDataChanged();
     }
-
 
 }
