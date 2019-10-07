@@ -21,9 +21,25 @@ public class GoingUserHelper {
 
     // --- GET ---
 
-    public static Query getAllUsersForWorkmates(String restaurant){
+//    public static Task<QuerySnapshot> getAllGoingUsers(String collectionName){
+//        // Query of the current 'going-users' in the entire collection
+//        return RestaurantHelper.getRestaurantCollection()
+//                .whereEqualTo(collectionName, true)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if(task.isSuccessful()){
+//                            Log.d(TAG, "onComplete: getAllGoingUsers");
+//
+//                        }
+//                    }
+//                });
+//    }
+
+    public static Query getAllUsersForWorkmates(String restaurants){
         return RestaurantHelper.getRestaurantCollection()
-                .document(restaurant)
+                .document()
                 .collection(COLLECTION_NAME)
                 .orderBy("dateCreated")
                 .limit(50);

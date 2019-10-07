@@ -24,7 +24,9 @@ import static android.content.ContentValues.TAG;
 public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
     // Workmates ListView items
     @BindView(R.id.workmate_detail_recyclerView_workmateImage) ImageView workmateImage;
-    @BindView(R.id.workmate_detail_recyclerView_text_view) TextView workmateText;
+    @BindView(R.id.workmate_detail_recyclerView_username) TextView username;
+    @BindView(R.id.workmate_detail_recyclerView_midText) TextView midText;
+    @BindView(R.id.workmate_detail_recyclerView_restaurantName) TextView restaurantName;
 
     public WorkmatesViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -35,8 +37,13 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
         try{
             //set images
             glide.load(user.getUrlPicture()).apply(RequestOptions.circleCropTransform()).into(workmateImage);
+            // split and get first name from the string
+            String getFirstName = user.getUsername();
+            getFirstName = getFirstName.contains(" ") ? getFirstName.split(" ")[0] : getFirstName;
             // set texts
-            workmateText.setText(user.getUsername());
+            username.setText(getFirstName);
+            midText.setText(R.string.is_going_to);
+            restaurantName.setText(user.getSelectedRestaurantName());
         }catch (Exception e){
             Log.d(TAG, "updateWorkmatesList: Error " + e);
         }
