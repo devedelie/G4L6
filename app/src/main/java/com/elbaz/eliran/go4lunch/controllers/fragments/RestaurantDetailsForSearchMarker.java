@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
+import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
@@ -224,6 +225,10 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
+            // set the Index value
+            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex+100);
+            // set query type (Nearby places / Auto-Complete search)
+            UserHelper.updateQueryType(this.getCurrentUser().getUid(), Constants.AUTOCOMPLETE_QUERY_TYPE);
             // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
             updateRestaurantCollection();
         }
@@ -255,7 +260,7 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     // --------------------
     // REST REQUESTS
     // --------------------
-    // 4 - Get Current User from Firestore
+    //  Get Current User from Firestore
     private void getCurrentUserFromFirestore(){
         UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
