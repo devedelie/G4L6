@@ -14,5 +14,7 @@ public class Constants {
     public static final String URL_FOR_IMAGE_KEY = "&key=";
     public static final String NEARBY_TYPE="restaurant";
     public static final int NEARBY_RADIUS= 800;
+    public static final String NEARBY_QUERY_TYPE= "nearby";
+    public static final String AUTOCOMPLETE_QUERY_TYPE= "autocomplete";
 
 }
