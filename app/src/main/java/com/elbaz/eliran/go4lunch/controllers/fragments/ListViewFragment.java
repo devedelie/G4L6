@@ -19,6 +19,7 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.elbaz.eliran.go4lunch.utils.ItemClickSupport;
 import com.elbaz.eliran.go4lunch.utils.SnackbarAndVibrations;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
@@ -46,6 +47,7 @@ public class ListViewFragment extends BaseFragment {
         View view = inflater.inflate(getFragmentLayout(), container, false);
         ButterKnife.bind(this, view); //Configure Butterknife
         this.configureRecyclerView();
+        this.configureOnClickRecyclerView();
 
         return view;
     }
@@ -94,6 +96,21 @@ public class ListViewFragment extends BaseFragment {
         mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext(), Glide.with(this));
         listViewRecyclerView.setAdapter(this.mRestaurantListAdapter);
         listViewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    // -----------------
+    // ACTION RecyclerView onClick
+    // -----------------
+    //  Configure item click on RecyclerView
+    private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(listViewRecyclerView, R.layout.fragment_list_view)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        // Instanciate BottomSheet
+                        RestaurantDetailForNearbyMarker.newInstance(position).show(getActivity().getSupportFragmentManager(), getTag());
+                    }
+                });
     }
 
     //-----------------
