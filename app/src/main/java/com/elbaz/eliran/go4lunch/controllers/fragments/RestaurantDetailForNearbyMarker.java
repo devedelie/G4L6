@@ -14,16 +14,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
+import com.elbaz.eliran.go4lunch.api.RestaurantHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
+import com.elbaz.eliran.go4lunch.models.Constants;
+import com.elbaz.eliran.go4lunch.models.Restaurant;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
+import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -32,6 +38,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -50,7 +57,7 @@ import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
 /**
  * Created by Eliran Elbaz on 29-Sep-19.
  */
-public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
+public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment implements RestaurantDetailAdapter.Listener {
     // FOR DESIGN
     @BindView(R.id.fragment_bottomsheet_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_detail_image) ImageView fragmentDetailMainImage;
@@ -59,6 +66,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
     @BindView(R.id.fragment_restaurant_detail_description) TextView restaurantDetailDescription;
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
     @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
+    @BindView(R.id.empty_list_in_restaurant_detail) TextView emptyListText;
     private SharedViewModel mSharedViewModel;
     private List<Result> mResults;
     private static final String MARKER_TAG = "MARKER_TAG";
@@ -68,6 +76,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
     private String mRestaurantName="";
     private User modelCurrentUser;
     private String mCurrentSelectedRestaurantOnLoad;
+    private RestaurantDetailAdapter mRestaurantDetailAdapter;
 
 
     public static RestaurantDetailForNearbyMarker newInstance(int markerTag) {
@@ -114,9 +123,9 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getDataFromFireStore();
-        setViewElementsForNearbyPlacesSheet();
-        getCurrentUserFromFirestore();
+        this.getDataFromFireStore();
+        this.setViewElementsForNearbyPlacesSheet();
+        this.getCurrentUserFromFirestore();
     }
 
     private void getDataFromFireStore(){
@@ -129,9 +138,10 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
                 mIsGoing = currentUser.getIsGoing();
                 // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
                 mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
-                Log.d(TAG, "onSuccess: "+ mRestaurantName + " " +mCurrentSelectedRestaurantOnLoad);
+                Log.d(TAG, "TEST onSuccess: "+ mRestaurantName + " " +mCurrentSelectedRestaurantOnLoad);
                 // Configure FloatingButton from inside onSuccess, to avoid empty variable case
                 configureFloatingButton();
+                configureRecyclerView();
             }
         });
     }
@@ -208,6 +218,10 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
+            // set the Index value
+            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex);
+            // set query type (Nearby places / Auto-Complete search)
+            UserHelper.updateQueryType(this.getCurrentUser().getUid(), Constants.NEARBY_QUERY_TYPE);
             // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
             updateRestaurantCollection();
         }
@@ -230,6 +244,38 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
         }
     }
 
+    private void configureRecyclerView() {
+        String goingUsers = "goingUsers";
+        //Configure Adapter & RecyclerView
+        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mResults.get(mIndex).getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
+        mRestaurantDetailAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                recyclerView.smoothScrollToPosition(mRestaurantDetailAdapter.getItemCount()); // Scroll to bottom on new workmate added to the list
+            }
+        });
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(this.mRestaurantDetailAdapter);
+    }
+
+    //  Create options for RecyclerView from a Query
+    private FirestoreRecyclerOptions<Restaurant> generateOptionsForAdapter(CollectionReference query){
+        return new FirestoreRecyclerOptions.Builder<Restaurant>()
+                .setQuery(query,Restaurant.class)
+                .setLifecycleOwner(this)
+                .build();
+    }
+
+    // --------------------
+    // CALLBACK
+    // --------------------
+
+    @Override
+    public void onDataChanged() {
+        //  Show TextView in case RecyclerView is empty
+        emptyListText.setVisibility(this.mRestaurantDetailAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
     // --------------------
     // UTILS
     // --------------------
@@ -239,7 +285,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment {
     // --------------------
     // REST REQUESTS
     // --------------------
-    // 4 - Get Current User from Firestore
+    //  Get Current User from Firestore
     private void getCurrentUserFromFirestore(){
         UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
