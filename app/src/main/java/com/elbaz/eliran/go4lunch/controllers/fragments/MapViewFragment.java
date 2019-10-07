@@ -388,9 +388,13 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     public boolean onMarkerClick(final Marker marker) {
         // set the current marker index to pass on BottomSheet fragment
         int i = (int) marker.getTag();
-        Log.d(TAG, "onMarkerClick, index is: " + i);
-        // Instanciate BottomSheet
-        RestaurantBottomSheetFragment.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+        // Instanciate the correct BottomSheet
+        if (i >=0 && i<20){
+            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+        }else if (i>= 100){
+            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+        }
+
         return true;
     }
 
