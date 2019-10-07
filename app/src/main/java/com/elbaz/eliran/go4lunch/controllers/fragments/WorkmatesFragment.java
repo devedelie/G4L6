@@ -2,6 +2,7 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.User;
+import com.elbaz.eliran.go4lunch.utils.ItemClickSupport;
 import com.elbaz.eliran.go4lunch.views.WorkmatesListAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
@@ -24,6 +26,7 @@ import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,6 +57,8 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
         View view = inflater.inflate(getFragmentLayout(), container, false);
         ButterKnife.bind(this, view);
         this.configureRecyclerView();
+        this.configureOnClickRecyclerView();
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -71,6 +76,28 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
         workmatesRecyclerView.setAdapter(this.mWorkmatesListAdapter);
     }
 
+    // -----------------
+    // ACTION RecyclerView onClick
+    // -----------------
+    //  Configure item click on RecyclerView
+    private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(workmatesRecyclerView, R.layout.fragment_workmates)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        int i = 1;
+                        String type = "";
+                        Log.d(TAG, "onItemClicked: " + i + " " + type);
+                        // Instanciate the correct BottomSheet
+                        if (i >=0 && i<20){
+                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+                        }else if (i>= 100){
+                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onDataChanged() {
         //  Show TextView in case RecyclerView is empty
@@ -83,5 +110,9 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
                 .setQuery(query, User.class)
                 .setLifecycleOwner(this)
                 .build();
+    }
+
+    private void itemClickAction(){
+
     }
 }
