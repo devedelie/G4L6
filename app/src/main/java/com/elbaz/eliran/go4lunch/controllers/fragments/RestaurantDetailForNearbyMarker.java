@@ -72,7 +72,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     private static final String MARKER_TAG = "MARKER_TAG";
     private int mIndex;
     // Variables for Firestore
-    private boolean mIsGoing = false; // keep false??
+    private boolean mIsGoing = false; 
     private String mRestaurantName="";
     private User modelCurrentUser;
     private String mCurrentSelectedRestaurantOnLoad;
