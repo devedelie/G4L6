@@ -21,28 +21,28 @@
             android:layout_height="70dip"
             android:padding="@dimen/padding_normal"/>
 
-        <com.elbaz.eliran.go4lunch.views.G4LTextView
+        <TextView
             android:id="@+id/workmate_detail_recyclerView_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fontName="Roboto_Medium"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="5dp"/>
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/has_decided_black"/>
 
-        <com.elbaz.eliran.go4lunch.views.G4LTextView
+        <TextView
             android:id="@+id/workmate_detail_recyclerView_midText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fontName="Roboto_Medium"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="5dp"/>
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/has_decided_black"/>
 
-        <com.elbaz.eliran.go4lunch.views.G4LTextView
+        <TextView
             android:id="@+id/workmate_detail_recyclerView_restaurantName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fontName="Roboto_Medium"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/has_decided_black"/>
 
     </LinearLayout>
 

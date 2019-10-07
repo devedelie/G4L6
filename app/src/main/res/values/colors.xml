@@ -10,4 +10,6 @@
     <color name="colorAccentDark">#E7234C</color>
     <color name="background_light">#97575E</color>
     <color name="floating_btn_green">#8BBB62</color>
+    <color name="has_decided_black">#000000</color>
+    <color name="didnot_decide_gray">#888888</color>
 </resources>

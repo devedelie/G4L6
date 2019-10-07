@@ -70,6 +70,12 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"/>
 
+            <TextView
+                android:id="@+id/empty_list_in_restaurant_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"/>
+
             <!-- Workmates recyclerView-->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fragment_bottomsheet_recycler_view"
