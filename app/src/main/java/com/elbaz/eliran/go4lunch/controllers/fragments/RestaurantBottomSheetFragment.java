@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
-import com.elbaz.eliran.go4lunch.api.google.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -68,12 +68,13 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     public SearchAuto searchAuto;
     private List<SearchAuto> mSearchAutosArray;
     private static final String MARKER_TAG = "MARKER_TAG";
-    PlacesClient mPlacesClient;
+    private PlacesClient mPlacesClient;
     private int mIndex;
     // Variables for Firestore
-    private boolean mIsGoing = false;
-    private String mRestaurantName;
+    private boolean mIsGoing = false; // keep false??
+    private String mRestaurantName="";
     private User modelCurrentUser;
+    private String mCurrentSelectedRestaurantOnLoad;
 
 
     public static RestaurantBottomSheetFragment newInstance(int markerTag) {
@@ -109,7 +110,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 mResults = new ArrayList<>();
                 mResults.clear();
                 mResults.addAll(results);
-                Log.d(TAG, "BottomSheet onChanged: " + results.get(0).getName());
+                Log.d(TAG, "onChanged Results: ");
             }
         });
         // Observe Search ArrayList
@@ -120,7 +121,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
                 mSearchAutosArray =null;
                 mSearchAutosArray = new ArrayList<>();
                 mSearchAutosArray = searchAutos;
-                Log.d(TAG, "Array onChanged: " + mSearchAutosArray.get(0).getName());
+                Log.d(TAG, "onChanged SearchAuto: ");
             }
         });
     }
@@ -131,22 +132,35 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
         getDataFromFireStore();
         setViewElements();
         getCurrentUserFromFirestore();
-
     }
 
     private void getDataFromFireStore(){
-        //  Get additional data from Firestore (restaurant name)
+        //  Get additional data from Firestore (restaurant name & isGoing)
         UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Log.d(TAG, "getDataFromFireStore onSuccess: ");
                 User currentUser = documentSnapshot.toObject(User.class);
                 mRestaurantName = currentUser.getSelectedRestaurantName();
                 mIsGoing = currentUser.getIsGoing();
+                // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
+                mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
+                Log.d(TAG, "onSuccess: "+ mRestaurantName + " " +mCurrentSelectedRestaurantOnLoad);
+                // Configure FloatingButton from inside onSuccess, to avoid empty variable case
                 configureFloatingButton();
             }
         });
+    }
 
+    private void configureFloatingButton(){
+        Log.d(TAG, "configureFloatingButton: "+mIndex+" "+mRestaurantName + " " + mResults.get(mIndex).getName());
+        // Compare the selected restaurant with the one from Firestore
+        if(mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
+            floatingActionButton.setImageResource(R.drawable.ic_check);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.floating_btn_green)));
+        }else{
+            floatingActionButton.setImageResource(R.drawable.ic_add_icon);
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
+        }
     }
 
     private void setViewElements(){
@@ -159,18 +173,6 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
             setViewElementsForAutoCompleteSheet(mIndex);
         }
         Log.d(TAG, "setViewElements: "+ mIndex);
-    }
-
-    private void configureFloatingButton(){
-        Log.d(TAG, "configureFloatingButton: "+mRestaurantName + " " + mResults.get(mIndex).getName());
-        // Compare the selected restaurant with the one from Firestore
-        if(mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
-            floatingActionButton.setImageResource(R.drawable.ic_check);
-            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.floating_btn_green)));
-        }else{
-            floatingActionButton.setImageResource(R.drawable.ic_add_icon);
-            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
-        }
     }
 
     private void setViewElementsForNearbyPlacesSheet(int index){
@@ -233,39 +235,9 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    private int dayToInteger (){
-        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
-        int newDayInteger=-1;
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.DAY_OF_WEEK);
-        switch (today){
-            case Calendar.SUNDAY:
-                newDayInteger = 6;
-                break;
-            case Calendar.MONDAY:
-                newDayInteger = 0;
-                break;
-            case Calendar.TUESDAY:
-                newDayInteger = 1;
-                break;
-            case Calendar.WEDNESDAY:
-                newDayInteger = 2;
-                break;
-            case Calendar.THURSDAY:
-                newDayInteger = 3;
-                break;
-            case Calendar.FRIDAY:
-                newDayInteger = 4;
-                break;
-            case Calendar.SATURDAY:
-                newDayInteger = 5;
-                break;
-        }
-        return newDayInteger;
-    }
-
     @OnClick(R.id.addRestaurantFloatingActionButton)
     public void addTodaysRestaurant (){
+        Log.d(TAG, "addTodaysRestaurant: " + mRestaurantName + " " + mResults.get(mIndex).getName() + " " + mIsGoing);
         // Change mIsGoing status & button color + icon
         if (mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
             floatingActionButton.setImageResource(R.drawable.ic_add_icon);
@@ -276,6 +248,7 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
             floatingActionButton.setImageResource(R.drawable.ic_check);
             floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.floating_btn_green)));
             mIsGoing = true;
+            mRestaurantName = mResults.get(mIndex).getName();
 //            mSharedViewModel.setIsGoing(true);
         }
         Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
@@ -285,15 +258,15 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     private void updateUserOnFireStore(){
         // update Firestore DB with the current data
         if (this.getCurrentUser() != null){
-            // set/remove restaurant name from DB
+            // set/remove restaurant name from user's document
             if(mIsGoing){
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
             }
-            // set the current isGoing status in DB
+            // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
-            // create/update user document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
+            // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
             updateRestaurantCollection();
         }
     }
@@ -301,6 +274,10 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
     private void updateRestaurantCollection(){
         if ( modelCurrentUser != null){
             if(mIsGoing){
+                if(mCurrentSelectedRestaurantOnLoad != null && !mCurrentSelectedRestaurantOnLoad.isEmpty()){
+                    // If Exists, delete the old value of selected restaurant
+                    GoingUserHelper.deleteUserFromPreviousGoingList(modelCurrentUser, mCurrentSelectedRestaurantOnLoad);
+                }
                 // Create a new "going-user" document to restaurant collection on Firestore
                 GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
 
@@ -345,4 +322,36 @@ public class RestaurantBottomSheetFragment extends BottomSheetDialogFragment {
             }
         };
     }
+
+    private int dayToInteger (){
+        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
+        int newDayInteger=-1;
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.DAY_OF_WEEK);
+        switch (today){
+            case Calendar.SUNDAY:
+                newDayInteger = 6;
+                break;
+            case Calendar.MONDAY:
+                newDayInteger = 0;
+                break;
+            case Calendar.TUESDAY:
+                newDayInteger = 1;
+                break;
+            case Calendar.WEDNESDAY:
+                newDayInteger = 2;
+                break;
+            case Calendar.THURSDAY:
+                newDayInteger = 3;
+                break;
+            case Calendar.FRIDAY:
+                newDayInteger = 4;
+                break;
+            case Calendar.SATURDAY:
+                newDayInteger = 5;
+                break;
+        }
+        return newDayInteger;
+    }
+
 }
