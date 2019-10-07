@@ -14,4 +14,5 @@ public class RestaurantHelper {
     public static CollectionReference getRestaurantCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
+
 }
