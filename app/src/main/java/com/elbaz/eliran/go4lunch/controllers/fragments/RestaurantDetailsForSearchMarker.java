@@ -72,7 +72,7 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     private PlacesClient mPlacesClient;
     private int mIndex;
     // Variables for Firestore
-    private boolean mIsGoing = false; // keep false??
+    private boolean mIsGoing = false;
     private String mRestaurantName="";
     private User modelCurrentUser;
     private String mCurrentSelectedRestaurantOnLoad;
