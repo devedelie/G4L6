@@ -2,7 +2,6 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,6 @@ import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +36,7 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     // FOR DATA
     // Declaring Adapter and data
     private WorkmatesListAdapter mWorkmatesListAdapter;
+
     @Nullable
     private User modelCurrentUser;
 
@@ -81,19 +80,21 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     // -----------------
     //  Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
+        modelCurrentUser = this.getCurrentUserFromFirestore();
         ItemClickSupport.addTo(workmatesRecyclerView, R.layout.fragment_workmates)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        int i = 1;
-                        String type = "";
-                        Log.d(TAG, "onItemClicked: " + i + " " + type);
-                        // Instanciate the correct BottomSheet
-                        if (i >=0 && i<20){
-                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-                        }else if (i>= 100){
-                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-                        }
+//                        UserHelper.getUsersCollection().document().collection();
+//                        int i = modelCurrentUser.getRestaurantIndex();
+//                        String type = modelCurrentUser.getQueryType();
+//                        Log.d(TAG, "onItemClicked: " + i + " " + type);
+//                        // Instanciate the correct BottomSheet
+//                        if (i >=0 && i<20 && type == NEARBY_QUERY_TYPE){
+//                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+//                        }else if (i>= 100 && type == AUTOCOMPLETE_QUERY_TYPE){
+//                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+//                        }
                     }
                 });
     }
