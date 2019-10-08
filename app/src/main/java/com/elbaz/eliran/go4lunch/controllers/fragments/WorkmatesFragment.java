@@ -80,7 +80,7 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     // -----------------
     //  Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        modelCurrentUser = this.getCurrentUserFromFirestore();
+//        modelCurrentUser = this.getCurrentUserFromFirestore();
         ItemClickSupport.addTo(workmatesRecyclerView, R.layout.fragment_workmates)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
