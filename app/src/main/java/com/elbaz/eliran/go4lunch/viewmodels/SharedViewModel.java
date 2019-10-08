@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.List;
 
@@ -35,35 +35,66 @@ public class SharedViewModel extends ViewModel {
     }
 
     /**
-     * Get/Set fetched results
+     * Get/Set fetched results List
      */
-    private MutableLiveData<List<Result>> mResults = new MutableLiveData<>();
+    private MutableLiveData<List<Result>> mResultsList = new MutableLiveData<>();
 
-    public void setResults(List<Result> results){
-        mResults.setValue(results);
-        Log.d(TAG, "LiveDataTest setResults: "+ results);
+    public void setResultsList(List<Result> results){
+        mResultsList.setValue(results);
+        Log.d(TAG, "LiveDataTest setResult: "+ results);
     }
 
-    public LiveData<List<Result>> getResults(){
-        Log.d(TAG, "LiveDataTest getResults: "+ mResults);
-        return mResults;
+    public LiveData<List<Result>> getResultsList(){
+        Log.d(TAG, "LiveDataTest getResult: "+ mResultsList);
+        return mResultsList;
     }
 
 
     /**
-     * Get/Set Search_Auto-complete Array of objects
+     * Get/Set fetched result Object
      */
-    private MutableLiveData<List<SearchAuto>> mSearchAutoObjects = new MutableLiveData<>();
+    private MutableLiveData<Result> mResult = new MutableLiveData<>();
 
-    public void setSearchArray (List<SearchAuto> searchArray){
-        mSearchAutoObjects.setValue(searchArray);
-        Log.d(TAG, "setSearchArray: " + searchArray);
+    public void setResult(Result result){
+        mResult.setValue(result);
+        Log.d(TAG, "LiveDataTest setResult: "+ result);
     }
 
-    public LiveData<List<SearchAuto>> getSearchArray(){
-        Log.d(TAG, "getSearchArray: " + mSearchAutoObjects);
-        return mSearchAutoObjects;
+    public LiveData<Result> getResult(){
+        Log.d(TAG, "LiveDataTest getResult: "+ mResult);
+        return mResult;
     }
+
+
+    /**
+     * Get/Set Search_Auto-complete objects
+     */
+    private MutableLiveData<Place> mAutoCompleteSearchObject = new MutableLiveData<>();
+
+    public void setSearchObject(Place searchObject){
+        mAutoCompleteSearchObject.setValue(searchObject);
+        Log.d(TAG, "setSearchObject: " + searchObject);
+    }
+
+    public LiveData<Place> getSearchObject(){
+        Log.d(TAG, "getSearchObject: " + mAutoCompleteSearchObject);
+        return mAutoCompleteSearchObject;
+    }
+
+//    /**
+//     * Get/Set Search_Auto-complete Array of objects
+//     */
+//    private MutableLiveData<List<SearchAuto>> mAutoCompleteSearchObject = new MutableLiveData<>();
+//
+//    public void setSearchObject (List<SearchAuto> searchArray){
+//        mAutoCompleteSearchObject.setValue(searchArray);
+//        Log.d(TAG, "setSearchObject: " + searchArray);
+//    }
+//
+//    public LiveData<List<SearchAuto>> getSearchObject(){
+//        Log.d(TAG, "getSearchObject: " + mAutoCompleteSearchObject);
+//        return mAutoCompleteSearchObject;
+//    }
 
 
     //------------------------------------------------------------------

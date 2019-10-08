@@ -41,9 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,12 +65,12 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
     @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
     @BindView(R.id.empty_list_in_restaurant_detail) TextView emptyListText;
-    private List<Result> mResults;
+    private Result mResult;
     private static final String MARKER_TAG = "MARKER_TAG";
-    private int mIndex;
+//    private int mIndex;
     // Variables for Firestore
     private boolean mIsGoing = false; 
-    private String mRestaurantName="";
+    private String mSavedRestaurantNameOnFB ="";
     private User modelCurrentUser;
     private String mCurrentSelectedRestaurantOnLoad;
     private RestaurantDetailAdapter mRestaurantDetailAdapter;
@@ -95,8 +93,8 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         ButterKnife.bind(this, view);
         PlacesClient mPlacesClient = Places.createClient(getActivity());
         // Get the index
-        int i = getArguments().getInt(MARKER_TAG);
-        this.mIndex = i;
+//        int i = getArguments().getInt(MARKER_TAG);
+//        this.mIndex = i;
 
         return view;
     }
@@ -107,13 +105,12 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
         SharedViewModel mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Observe fetched Results
-        mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
+        mSharedViewModel.getResult().observe(getViewLifecycleOwner(), new Observer<Result>() {
             @Override
-            public void onChanged(List<Result> results) {
+            public void onChanged(Result result) {
                 // set results
-                mResults = new ArrayList<>();
-                mResults.clear();
-                mResults.addAll(results);
+                mResult = null;
+                mResult = result;
                 Log.d(TAG, "onChanged Results: ");
             }
         });
@@ -133,11 +130,11 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User currentUser = documentSnapshot.toObject(User.class);
-                mRestaurantName = currentUser.getSelectedRestaurantName();
+                mSavedRestaurantNameOnFB = currentUser.getSelectedRestaurantName();
                 mIsGoing = currentUser.getIsGoing();
                 // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
                 mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
-                Log.d(TAG, "TEST onSuccess: "+ mRestaurantName + " " +mCurrentSelectedRestaurantOnLoad);
+                Log.d(TAG, "TEST onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
                 // Configure FloatingButton from inside onSuccess, to avoid empty variable case
                 configureFloatingButton();
                 configureRecyclerView();
@@ -146,9 +143,9 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     }
 
     private void configureFloatingButton(){
-        Log.d(TAG, "configureFloatingButton: "+mIndex+" "+mRestaurantName + " " + mResults.get(mIndex).getName());
+        Log.d(TAG, "configureFloatingButton: "+ mSavedRestaurantNameOnFB + " " + mResult.getName());
         // Compare the selected restaurant with the one from Firestore
-        if(mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
+        if(mSavedRestaurantNameOnFB.equals(mResult.getName()) && mIsGoing){
             setFloatingActionButtonGreen();
         }else{
             setFloatingActionButtonRed();
@@ -167,15 +164,15 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
 
     private void setViewElementsForNearbyPlacesSheet(){
         // Set Image reference string and set image with Glide
-        String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResults.get(mIndex).getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
+        String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResult.getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
         Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
         Glide.with(this).load(imageUrl).into(this.fragmentDetailMainImage);
         // set Texts
-        restaurantDetailTitle.setText(mResults.get(mIndex).getName());
-        restaurantDetailAddress.setText(mResults.get(mIndex).getVicinity());
+        restaurantDetailTitle.setText(mResult.getName());
+        restaurantDetailAddress.setText(mResult.getVicinity());
         // Set OpenNow Status (try & catch for null cases)
         try {
-            if(mResults.get(mIndex).getOpeningHours().getOpenNow()){
+            if(mResult.getOpeningHours().getOpenNow()){
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow));
             } else{
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_closed));
@@ -185,22 +182,20 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
             restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow_notAvailable));
         }
         // set rating
-        restaurantDetailLikes.setText(mResults.get(mIndex).getRating().toString());
+        restaurantDetailLikes.setText(mResult.getRating().toString());
     }
 
     @OnClick(R.id.addRestaurantFloatingActionButton)
     public void addTodaysRestaurant (){
-        Log.d(TAG, "addTodaysRestaurant: " + mRestaurantName + " " + mResults.get(mIndex).getName() + " " + mIsGoing);
+        Log.d(TAG, "addTodaysRestaurant: " + mSavedRestaurantNameOnFB + " " + mResult.getName() + " " + mIsGoing);
         // Change mIsGoing status & button color + icon
-        if (mRestaurantName.equals(mResults.get(mIndex).getName()) && mIsGoing){
+        if (mSavedRestaurantNameOnFB.equals(mResult.getName()) && mIsGoing){
             setFloatingActionButtonRed();
             mIsGoing = false;
-//            mSharedViewModel.setIsGoing(false);
         }else{
             setFloatingActionButtonGreen();
             mIsGoing = true;
-            mRestaurantName = mResults.get(mIndex).getName();
-//            mSharedViewModel.setIsGoing(true);
+            mSavedRestaurantNameOnFB = mResult.getName();
         }
         Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
         updateUserOnFireStore();
@@ -211,14 +206,14 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         if (this.getCurrentUser() != null){
             // set/remove restaurant name from user's document
             if(mIsGoing){
-                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
+                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResult.getName()).addOnFailureListener(this.onFailureListener());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
             // set the Index value
-            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex);
+//            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex);
             // set query type (Nearby places / Auto-Complete search)
             UserHelper.updateQueryType(this.getCurrentUser().getUid(), Constants.NEARBY_QUERY_TYPE);
             // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
@@ -233,12 +228,12 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
                     // If Exists, delete the old value of selected restaurant
                     GoingUserHelper.deleteUserFromPreviousGoingList(modelCurrentUser, mCurrentSelectedRestaurantOnLoad);
                 }
-                // Create a new "going-user" document to restaurant collection on Firestore
-                GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                // Then, create a new "going-user" document to restaurant collection on Firestore
+                GoingUserHelper.createUserForGoingList(this.mResult.getId(), mResult.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
 
             }else{
                 // Delete document from going-user collection
-                GoingUserHelper.deleteUserFromGoingList(mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                GoingUserHelper.deleteUserFromGoingList(mResult.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
             }
         }
     }
@@ -246,7 +241,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     private void configureRecyclerView() {
         String goingUsers = "goingUsers";
         //Configure Adapter & RecyclerView
-        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mResults.get(mIndex).getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
+        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mResult.getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
         mRestaurantDetailAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {

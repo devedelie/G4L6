@@ -26,7 +26,7 @@ public class GetNearbyPlaces {
 //                    public void onNext(PlacesModel placesModel) {
 //                        // 1.3 - Update UI with list of titles
 //                        Log.e(TAG, "onNext" );
-//                        updateUI(placesModel.getResults());
+//                        updateUI(placesModel.getResult());
 //                    }
 //                    @Override
 //                    public void onError(Throwable e) {

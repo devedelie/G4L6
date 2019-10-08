@@ -44,7 +44,6 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
         // set the user
         modelCurrentUser = user;
         workmatesViewHolder.updateWorkmatesList(user, this.idCurrentUser, this.glide, resources);
-
     }
 
     @NonNull

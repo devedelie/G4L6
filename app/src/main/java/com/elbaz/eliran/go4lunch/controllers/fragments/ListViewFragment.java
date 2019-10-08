@@ -68,7 +68,7 @@ public class ListViewFragment extends BaseFragment {
             }
         });
         // get fetched Results
-        mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
+        mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
                 Log.d(TAG, "ListView onChanged: ");
@@ -109,6 +109,7 @@ public class ListViewFragment extends BaseFragment {
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         // Instanciate BottomSheet
                         RestaurantDetailForNearbyMarker.newInstance(position).show(getActivity().getSupportFragmentManager(), getTag());
+                        
                     }
                 });
     }

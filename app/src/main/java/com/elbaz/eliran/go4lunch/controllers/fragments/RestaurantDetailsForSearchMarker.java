@@ -25,7 +25,6 @@ import com.elbaz.eliran.go4lunch.api.RestaurantHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.Restaurant;
-import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
@@ -34,6 +33,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -43,9 +43,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,8 +64,8 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
     @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
     @BindView(R.id.empty_list_in_restaurant_detail) TextView emptyListText;
-    public SearchAuto searchAuto;
-    private List<SearchAuto> mSearchAutosArray;
+    public Place mPlace;
+//    private List<SearchAuto> mSearchAutosArray;
     private static final String MARKER_TAG = "MARKER_TAG";
     private PlacesClient mPlacesClient;
     private int mIndex;
@@ -108,13 +106,12 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
         SharedViewModel mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Observe Search ArrayList
-        mSharedViewModel.getSearchArray().observe(getViewLifecycleOwner(), new Observer<List<SearchAuto>>() {
+        mSharedViewModel.getSearchObject().observe(getViewLifecycleOwner(), new Observer<Place>() {
             @Override
-            public void onChanged(List<SearchAuto> searchAutos) {
+            public void onChanged(Place searchObject) {
                 // update the array with new added objects
-                mSearchAutosArray =null;
-                mSearchAutosArray = new ArrayList<>();
-                mSearchAutosArray = searchAutos;
+                mPlace =null;
+                mPlace = searchObject;
                 Log.d(TAG, "onChanged SearchAuto: ");
             }
         });
@@ -147,9 +144,9 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     }
 
     private void configureFloatingButton(){
-        Log.d(TAG, "configureFloatingButton: "+mIndex+" "+mRestaurantName + " " + mSearchAutosArray.get(mIndex));
+        Log.d(TAG, "configureFloatingButton: "+mIndex+" "+mRestaurantName);
         // Compare the selected restaurant with the one from Firestore
-        if(mRestaurantName.equals(mSearchAutosArray.get(mIndex).getName()) && mIsGoing){
+        if(mRestaurantName.equals(mPlace.getName()) && mIsGoing){
             setFloatingActionButtonGreen();
         }else{
             setFloatingActionButtonRed();
@@ -170,7 +167,7 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     private void setViewElementsForAutoCompleteSheet(){
         try {
             // get image
-            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mSearchAutosArray.get(mIndex).getPhotoMeta().get(0))
+            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(mPlace.getPhotoMetadatas().get(0))
                     .setMaxWidth(400).build();
             mPlacesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
                 Bitmap bitmap = fetchPhotoResponse.getBitmap();
@@ -184,14 +181,14 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
                 }
             });
             // get the correct object from the list into TextViews
-            restaurantDetailTitle.setText(mSearchAutosArray.get(mIndex).getName());
-            restaurantDetailAddress.setText(mSearchAutosArray.get(mIndex).getAddress());
+            restaurantDetailTitle.setText(mPlace.getName());
+            restaurantDetailAddress.setText(mPlace.getAddress());
             // set rating
-            restaurantDetailLikes.setText(mSearchAutosArray.get(mIndex).getRating());
+            restaurantDetailLikes.setText(mPlace.getRating().toString());
             // Set Opening-Hours Status (try & catch for null cases)
             int day = dayToInteger();
             Log.d(TAG, "setViewElementsForAutoCompleteSheet: DAY TODAY  "+ day);
-            String openingList = mSearchAutosArray.get(mIndex).getOpeningHours().get(day);
+            String openingList = mPlace.getOpeningHours().getWeekdayText().get(day);
             Log.d(TAG, "Opening times: " + openingList);
             if(openingList != null){
                 restaurantDetailDescription.setText(openingList);
@@ -206,16 +203,16 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
 
     @OnClick(R.id.addRestaurantFloatingActionButton)
     public void addTodaysRestaurant (){
-        Log.d(TAG, "addTodaysRestaurant: " + mRestaurantName + " " + mSearchAutosArray.get(mIndex).getName() + " " + mIsGoing);
+        Log.d(TAG, "addTodaysRestaurant: " + mRestaurantName + " " + mPlace.getName() + " " + mIsGoing);
         // Change mIsGoing status & button color + icon
-        if (mRestaurantName.equals(mSearchAutosArray.get(mIndex).getName()) && mIsGoing){
+        if (mRestaurantName.equals(mPlace.getName()) && mIsGoing){
             setFloatingActionButtonRed();
             mIsGoing = false;
 //            mSharedViewModel.setIsGoing(false);
         }else{
             setFloatingActionButtonGreen();
             mIsGoing = true;
-            mRestaurantName = mSearchAutosArray.get(mIndex).getName();
+            mRestaurantName = mPlace.getName();
 //            mSharedViewModel.setIsGoing(true);
         }
         Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
@@ -228,14 +225,14 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
         if (this.getCurrentUser() != null){
             // set/remove restaurant name from user's document
             if(mIsGoing){
-                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mSearchAutosArray.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
+                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mPlace.getName()).addOnFailureListener(this.onFailureListener());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
             // set the Index value
-            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex+100);
+//            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex+100);
             // set query type (Nearby places / Auto-Complete search)
             UserHelper.updateQueryType(this.getCurrentUser().getUid(), Constants.AUTOCOMPLETE_QUERY_TYPE);
             // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
@@ -251,11 +248,11 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
                     GoingUserHelper.deleteUserFromPreviousGoingList(modelCurrentUser, mCurrentSelectedRestaurantOnLoad);
                 }
                 // Create a new "going-user" document to restaurant collection on Firestore
-                GoingUserHelper.createUserForGoingList(this.mSearchAutosArray.get(mIndex).getId(), mSearchAutosArray.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                GoingUserHelper.createUserForGoingList(this.mPlace.getId(), mPlace.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
 
             }else{
                 // Delete document from going-user collection
-                GoingUserHelper.deleteUserFromGoingList(mSearchAutosArray.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                GoingUserHelper.deleteUserFromGoingList(mPlace.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
             }
         }
     }
@@ -263,7 +260,7 @@ public class RestaurantDetailsForSearchMarker extends BottomSheetDialogFragment 
     private void configureRecyclerView() {
         String goingUsers = "goingUsers";
         //Configure Adapter & RecyclerView
-        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mSearchAutosArray.get(mIndex).getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
+        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mPlace.getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
         mRestaurantDetailAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {

@@ -79,19 +79,22 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private int AUTO_COMPLETE_INDEX_CODE = 100;
     private Disposable mDisposable;
     private String deviceLocationVariable;
+    // Nearby Places
     private PlacesResults mPlacesResults;
     private PlacesResults mPlacesResultsTokenOne;
     private List<Result> mResults;
     private List<Result> mResults_nextPageTokenOne;
     private List<Result> mResults_nextPageTokenTwo;
+    // Search Auto-Complete
     public SearchAuto searchAuto;
-    public List<SearchAuto> sSearchAutoList = null;
+    private Place mPlaceSearch;
+//    public List<SearchAuto> sSearchAutoList = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Create new Array for search objects
-        sSearchAutoList= new ArrayList<>();
+//        sSearchAutoList= new ArrayList<>();
     }
 
     @Override
@@ -132,9 +135,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 }
             }
         });
-
         // get fetched Results
-        mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
+        mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
                 mResults = results;
@@ -254,12 +256,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 moveCamera(place.getLatLng(), DEFAULT_ZOOM);
                 setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE);
                 // Create an object
-                searchAuto = null;
-                searchAuto = new SearchAuto(AUTO_COMPLETE_INDEX_CODE,place.getId(),place.getName(),place.getAddress(),place.getPhoneNumber(),place.getOpeningHours().getWeekdayText(),place.getWebsiteUri(),place.getPhotoMetadatas(),place.getRating().toString(),place.getLatLng());
-                // add the object into Array and set in ViewModel
-                sSearchAutoList.add(searchAuto);
-                Log.d(TAG, "Array onActivityResult: " + sSearchAutoList.get(0));
-                mSharedViewModel.setSearchArray(sSearchAutoList);
+//                mPlaceSearch = null;
+//                mPlaceSearch = new SearchAuto(AUTO_COMPLETE_INDEX_CODE,place.getId(),place.getName(),place.getAddress(),place.getPhoneNumber(),place.getOpeningHours().getWeekdayText(),place.getWebsiteUri(),place.getPhotoMetadatas(),place.getRating().toString(),place.getLatLng());
+//                // add the object into Array and set in ViewModel
+//                sSearchAutoList.add(mPlaceSearch);
+//                Log.d(TAG, "Array onActivityResult: " + sSearchAutoList.get(0));
+                mPlaceSearch = place;
                 AUTO_COMPLETE_INDEX_CODE++;
 
 
@@ -296,7 +298,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         mPlacesResults = placesResults;
                         // Update UI with results
                         updateUI(placesResults.getResults());
-                        setResultsInViewModel(placesResults.getResults());
+                        mSharedViewModel.setResultsList(placesResults.getResults());
                     }
                     @Override
                     public void onError(Throwable e) {
@@ -322,7 +324,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 //            public void onNext(PlacesResults placesResults) {
 //
 //                // Update UI with results
-////                updateUIWithNextToken(placesResults.getResults());
+////                updateUIWithNextToken(placesResults.getResult());
 //            }
 //            @Override
 //            public void onError(Throwable e) { }
@@ -345,11 +347,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 //        setNearbyRestaurantsWithMarkers(mResults_nextPageTokenOne);
 //    }
 
-    // Send data to ViewModel - LiveData
-    private void setResultsInViewModel(List<Result> results){
-        mSharedViewModel.setResults(results);
 
-    }
 
     private void setNearbyRestaurantsWithMarkers(List<Result> results){
 //        Log.d(TAG, "setNearbyRestaurantsWithMarkers: " + results.get(1).getGeometry().getLocation().getLat().toString() + "  " + results.get(1).getGeometry().getLocation().getLng().toString() + " size= "+ results.size());
@@ -391,12 +389,22 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         int i = (int) marker.getTag();
         // Instantiate the correct BottomSheet
         if (i >=0 && i<20){
+            setResultsInViewModel(mPlacesResults.getResults().get(i));
             RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
         }else if (i>= 100){
+            setPlaceInViewModel(mPlaceSearch);
             RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
         }
-
         return true;
     }
+
+    // Send data to ViewModel - LiveData
+    private void setResultsInViewModel(Result results){
+        mSharedViewModel.setResult(results);
+    }
+    private void setPlaceInViewModel(Place place){
+        mSharedViewModel.setSearchObject(place);
+    }
+
 
 }

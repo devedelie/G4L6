@@ -2,6 +2,7 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,10 @@ import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.models.Constants.AUTOCOMPLETE_QUERY_TYPE;
+import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_QUERY_TYPE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,7 +69,7 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
 
     private void configureRecyclerView() {
         //Configure Adapter & RecyclerView
-        this.mWorkmatesListAdapter = new WorkmatesListAdapter(generateOptionsForAdapter(UserHelper.getUsersCollection()), Glide.with(this), this, this.getCurrentUser().getUid());
+        this.mWorkmatesListAdapter = new WorkmatesListAdapter(generateOptionsForAdapter(UserHelper.getUsersCollection()),  Glide.with(this), this, this.getCurrentUser().getUid());
         mWorkmatesListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
@@ -80,21 +85,19 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     // -----------------
     //  Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-//        modelCurrentUser = this.getCurrentUserFromFirestore();
         ItemClickSupport.addTo(workmatesRecyclerView, R.layout.fragment_workmates)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-//                        UserHelper.getUsersCollection().document().collection();
-//                        int i = modelCurrentUser.getRestaurantIndex();
-//                        String type = modelCurrentUser.getQueryType();
-//                        Log.d(TAG, "onItemClicked: " + i + " " + type);
-//                        // Instanciate the correct BottomSheet
-//                        if (i >=0 && i<20 && type == NEARBY_QUERY_TYPE){
-//                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-//                        }else if (i>= 100 && type == AUTOCOMPLETE_QUERY_TYPE){
-//                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-//                        }
+                        String queryType = mWorkmatesListAdapter.getItem(position).getQueryType();
+                        int i = mWorkmatesListAdapter.getItem(position).getRestaurantIndex();
+                        Log.d(TAG, "onItemClicked: " + i + " " + queryType);
+                        // Instantiate the correct BottomSheet
+                        if (i >=0 && i<20 && queryType.equals(NEARBY_QUERY_TYPE)){
+                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+                        }else if (i>= 100 && queryType.equals(AUTOCOMPLETE_QUERY_TYPE)){
+                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+                        }
                     }
                 });
     }
@@ -113,7 +116,4 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
                 .build();
     }
 
-    private void itemClickAction(){
-
-    }
 }
