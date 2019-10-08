@@ -67,7 +67,6 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
     @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
     @BindView(R.id.empty_list_in_restaurant_detail) TextView emptyListText;
-    private SharedViewModel mSharedViewModel;
     private List<Result> mResults;
     private static final String MARKER_TAG = "MARKER_TAG";
     private int mIndex;
@@ -106,7 +105,7 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        SharedViewModel mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Observe fetched Results
         mSharedViewModel.getResults().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
