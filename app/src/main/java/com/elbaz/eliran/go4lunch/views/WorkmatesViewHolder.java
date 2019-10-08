@@ -63,7 +63,8 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
     public void updateUsersOnRestaurantDetail(Restaurant restaurant, String currentUserId, RequestManager glide, Resources resources){
         try{
             //set images
-            glide.load(restaurant.getUrlImage()).apply(RequestOptions.circleCropTransform()).into(workmateImage);
+            glide.load(restaurant.getUserGoing().getUrlPicture()).apply(RequestOptions.circleCropTransform()).into(workmateImage);
+            Log.d(TAG, "updateUsersOnRestaurantDetail: " + restaurant.getUrlImage());
             // split and get first name from the string + make first letter capital
             String getFirstName = restaurant.getUserGoing().getUsername();
             getFirstName = getFirstName.contains(" ") ? getFirstName.split(" ")[0] : getFirstName;
