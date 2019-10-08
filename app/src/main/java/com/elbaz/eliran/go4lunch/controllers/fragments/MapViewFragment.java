@@ -314,22 +314,22 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 });
     }
 
-    private void executeHttpRequestForNextToken() {
-        Log.d(TAG, "executeHttpRequestForNextToken: " + mPlacesResults.getNextPageToken());
-        // Execute the stream subscribing to Observable defined inside PlacesResults
-        this.mDisposable = PlacesStream.streamFetchNextPageToken(mPlacesResults.getNextPageToken()).subscribeWith(new DisposableObserver<PlacesResults>() {
-            @Override
-            public void onNext(PlacesResults placesResults) {
-
-                // Update UI with results
-                updateUIWithNextToken(placesResults.getResults());
-            }
-            @Override
-            public void onError(Throwable e) { }
-            @Override
-            public void onComplete() { }
-        });
-    }
+//    private void executeHttpRequestForNextToken() {
+//        Log.d(TAG, "executeHttpRequestForNextToken: " + mPlacesResults.getNextPageToken());
+//        // Execute the stream subscribing to Observable defined inside PlacesResults
+//        this.mDisposable = PlacesStream.streamFetchNextPageToken(mPlacesResults.getNextPageToken()).subscribeWith(new DisposableObserver<PlacesResults>() {
+//            @Override
+//            public void onNext(PlacesResults placesResults) {
+//
+//                // Update UI with results
+////                updateUIWithNextToken(placesResults.getResults());
+//            }
+//            @Override
+//            public void onError(Throwable e) { }
+//            @Override
+//            public void onComplete() { }
+//        });
+//    }
 
 
     private void updateUI(List<Result> results){
@@ -338,16 +338,17 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mResults.addAll(results);
         setNearbyRestaurantsWithMarkers(mResults);
     }
-    private void updateUIWithNextToken(List<Result> results){
-        mResults_nextPageTokenOne = new ArrayList<>();
-        mResults_nextPageTokenOne.clear();
-        mResults_nextPageTokenOne.addAll(results);
-        setNearbyRestaurantsWithMarkers(mResults_nextPageTokenOne);
-    }
+//    private void updateUIWithNextToken(List<Result> results){
+//        mResults_nextPageTokenOne = new ArrayList<>();
+//        mResults_nextPageTokenOne.clear();
+//        mResults_nextPageTokenOne.addAll(results);
+//        setNearbyRestaurantsWithMarkers(mResults_nextPageTokenOne);
+//    }
 
     // Send data to ViewModel - LiveData
     private void setResultsInViewModel(List<Result> results){
         mSharedViewModel.setResults(results);
+
     }
 
     private void setNearbyRestaurantsWithMarkers(List<Result> results){
@@ -388,7 +389,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     public boolean onMarkerClick(final Marker marker) {
         // set the current marker index to pass on BottomSheet fragment
         int i = (int) marker.getTag();
-        // Instanciate the correct BottomSheet
+        // Instantiate the correct BottomSheet
         if (i >=0 && i<20){
             RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
         }else if (i>= 100){
