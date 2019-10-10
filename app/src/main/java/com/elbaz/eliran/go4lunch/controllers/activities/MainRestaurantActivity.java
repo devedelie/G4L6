@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -250,7 +252,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         switch (order){
             case 0:
                 // Your lunch action
-                this.goToYourLunchActivity();
+                this.yourLunchDialog();
                 break;
             case 1:
                 // settings action
@@ -270,10 +272,36 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         startActivity(intent);
     }
 
-    private void goToYourLunchActivity(){
-        Intent intent = new Intent(this, YourLunchActivity.class);
-        startActivity(intent);
+    private void yourLunchDialog(){
+        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
+        ViewGroup viewGroup = findViewById(android.R.id.content);
+
+        //then we will inflate the custom alert dialog xml that we created
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_your_lunch, viewGroup, false);
+
+        //Now we need an AlertDialog.Builder object
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        //setting the view of the builder to our custom view that we already inflated
+        builder.setView(dialogView);
+
+        TextView dialogContent = (TextView) dialogView.findViewById(R.id.dialog_content_text);
+        TextView dialogRestaurantName = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_name);
+        TextView dialogBottomText = (TextView) dialogView.findViewById(R.id.dialog_bottom_text);
+
+        dialogContent.setText(getResources().getString(R.string.dialog_content));
+        dialogRestaurantName.setText(getResources().getString(R.string.dialog_content));
+        dialogBottomText.setText(getResources().getString(R.string.dialog_bon_appetit));
+
+        //finally creating the alert dialog and displaying it
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
+
+//    private void goToYourLunchActivity(){
+//        Intent intent = new Intent(this, YourLunchActivity.class);
+//        startActivity(intent);
+//    }
 
     // OptionMenu item selection (Search places auto-complete)
     @Override
