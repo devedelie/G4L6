@@ -50,12 +50,8 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).update("isGoing", isGoing);
     }
 
-    public static Task<Void> updateIndex (String uid, Integer restaurantIndex){
-        return UserHelper.getUsersCollection().document(uid).update("restaurantIndex", restaurantIndex);
-    }
-
-    public static Task<Void> updateQueryType (String uid, String queryType){
-        return UserHelper.getUsersCollection().document(uid).update("queryType", queryType);
+    public static Task<Void> updateRestaurantID(String uid, String restaurantID){
+        return UserHelper.getUsersCollection().document(uid).update("restaurantID", restaurantID);
     }
 
     // --- DELETE ---
