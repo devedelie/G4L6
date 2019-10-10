@@ -55,7 +55,7 @@ public class YourLunchActivity extends BaseActivity {
     }
 
     public void setUIElements(){
-        mTextView.setText(R.string.you_are_going_to);
+//        mTextView.setText(R.string.you_are_going_to);
         //  Get additional data from Firestore (restaurant name & isGoing
         UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
