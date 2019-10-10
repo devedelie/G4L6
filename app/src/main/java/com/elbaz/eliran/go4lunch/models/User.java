@@ -13,9 +13,8 @@ public class User {
     private String urlPicture;
     private String selectedRestaurantName;
     private Boolean isGoing;
-    private Integer restaurantIndex;
     private String restaurantID;
-    private String queryType;
+
 
 
     public User() { }
@@ -26,9 +25,8 @@ public class User {
         this.urlPicture = urlPicture;
         this.selectedRestaurantName = "";
         this.isGoing = false;
-        this.restaurantIndex = -1;
         this.restaurantID = "";
-        this.queryType = "";
+
     }
 
     // --- GETTERS ---
@@ -37,8 +35,6 @@ public class User {
     public String getUrlPicture() { return urlPicture; }
     public String getSelectedRestaurantName() { return selectedRestaurantName; }
     public Boolean getIsGoing() {return isGoing; }
-    public Integer getRestaurantIndex() { return restaurantIndex; }
-    public String getQueryType() { return queryType; }
     public String getRestaurantID() { return restaurantID; }
 
     // --- SETTERS ---
@@ -47,7 +43,5 @@ public class User {
     public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
     public void setSelectedRestaurantName(String selectedRestaurantName) { this.selectedRestaurantName = selectedRestaurantName; }
     public void setIsGoing(Boolean isGoing) { this.isGoing = isGoing; }
-    public void setRestaurantIndex(Integer restaurantIndex) { this.restaurantIndex = restaurantIndex; }
-    public void setQueryType(String queryType) { this.queryType = queryType; }
     public void setRestaurantID(String restaurantID) { this.restaurantID = restaurantID; }
 }
