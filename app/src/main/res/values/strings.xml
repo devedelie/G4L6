@@ -41,6 +41,12 @@
     <string name="is_joining">is joining!</string>
     <string name="did_not_decide">hasn\'t decided yet</string>
 
+    <!--Lunch Dialog -->
+    <string name="dialog_title">Are you ready for lunch?</string>
+    <string name="dialog_content">Today you are going to eat at:</string>
+    <string name="dialog_bon_appetit">Bon Appétit!</string>
+    <string name="dialog_button">Close</string>
+
     <!--ProfileSettings Activity-->
     <string name="profileSettings_activity_username">User name: </string>
     <string name="profileSettings_activity_email">Email: </string>
@@ -51,9 +57,6 @@
     <string name="popup_message_choice_no">Cancel</string>
     <string name="info_no_username_found">Empty user name</string>
     <string name="info_no_email_found">Empty email address</string>
-
-<!--    YourLaunchActivity-->
-    <string name="you_are_going_to">You are going to eat at: </string>
 
     <!--BottomSheet -->
     <string name="restaurant_detail_openNow">Status: Open now</string>
