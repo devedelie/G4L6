@@ -20,9 +20,9 @@ import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.ItemClickSupport;
-import com.elbaz.eliran.go4lunch.utils.SnackbarAndVibrations;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +62,7 @@ public class ListViewFragment extends BaseFragment {
             @Override
             public void onChanged(Integer integer) {
                 if (integer == Constants.LIST_VIEW_FRAGMENT){
-//                    autoCompleteSearchBar();
-                    SnackbarAndVibrations.showSnakbarMessage(getView(), "ListViewFragment Search Action");
+                    updateSearchAutoComplete(); // update the Map-UI with the result
                 }
             }
         });
@@ -103,9 +102,11 @@ public class ListViewFragment extends BaseFragment {
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        // Instanciate BottomSheet
-//                        RestaurantDetailsFragment_FromRetrofit.newInstance(position).show(getActivity().getSupportFragmentManager(), getTag());
-
+                        String restaurantID = mResults.get(position).getPlaceId();
+                        String restaurantName = mResults.get(position).getName();
+                        if(!restaurantID.isEmpty() && restaurantID != null){
+                            RestaurantDetailsFragment_FromRetrofit.newInstance(restaurantID, restaurantName).show(getActivity().getSupportFragmentManager(), getTag());
+                        }
                     }
                 });
     }
@@ -132,6 +133,23 @@ public class ListViewFragment extends BaseFragment {
         mResults.addAll(results);
         mRestaurantListAdapter.notifyDataSetChanged();
         Log.d(TAG, "ListView updateUI: ");
+    }
+
+    // Update the UI with the result from Search-Autocomplete bar
+    public void updateSearchAutoComplete(){
+        // Get place Object for Auto-Complete-SearchBar
+        mSharedViewModel.getSearchObject().observe(getViewLifecycleOwner(), new Observer<Place>() {
+            @Override
+            public void onChanged(Place place) {
+                Log.d(TAG, "TEST onChanged: place value changed");
+                String restaurantID = place.getId();
+                String restaurantName = place.getName();
+                if(!restaurantID.isEmpty() && restaurantID != null){
+                    RestaurantDetailsFragment_FromRetrofit.newInstance(restaurantID, restaurantName).show(getActivity().getSupportFragmentManager(), getTag());
+                }
+            }
+        });
+
     }
 
 
