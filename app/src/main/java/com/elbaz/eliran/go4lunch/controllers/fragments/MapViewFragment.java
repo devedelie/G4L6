@@ -2,7 +2,6 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Location;
@@ -30,7 +29,6 @@ import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.PlacesStream;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,11 +42,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,8 +52,6 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_RADIUS;
 import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_TYPE;
@@ -130,7 +121,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             @Override
             public void onChanged(Integer integer) {
                 if (integer == Constants.MAP_VIEW_FRAGMENT){
-                    autoCompleteSearchBar();
+                    Log.d(TAG, "TEST onChanged: updateSearch method");
+                    updateSearchAutoComplete(); // update the Map-UI with the result
                 }
             }
         });
@@ -214,49 +206,64 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 });
     }
 
-    private void autoCompleteSearchBar(){
-        // Bias results to Paris region (use 'bounds' variable in below filter)
-        RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(48.832304, 2.239726),
-                new LatLng(48.900962, 2.42124));
+//    private void autoCompleteSearchBar(){
+//        // Bias results to Paris region (use 'bounds' variable in below filter)
+//        RectangularBounds bounds = RectangularBounds.newInstance(
+//                new LatLng(48.832304, 2.239726),
+//                new LatLng(48.900962, 2.42124));
+//
+//        // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
+//        Intent intent = new Autocomplete.IntentBuilder(
+//                AutocompleteActivityMode.OVERLAY, mFields)
+//                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+//                .setCountry("FR")
+//                .setLocationBias(bounds)
+//                .build(getActivity());
+//        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+//        Log.d(TAG, "onOptionsItemSelected: check");
+//    }
+//
+//    // onActivityResult for Search Auto-Complete
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+//            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
+//            if (resultCode == RESULT_OK) {
+//                Place place = Autocomplete.getPlaceFromIntent(data);
+//                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
+//                // Share data - ViewModel + LiveData
+//                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
+//                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE));
+//                Log.d(TAG, "DATA-TEST SEARCH: " + place.getName() + " "+ place.getId());
+//
+//                mPlaceSearch = place;
+//                AUTO_COMPLETE_INDEX_CODE++;
+//
+//
+//            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+//                // TODO: Handle the error.
+//                Status status = Autocomplete.getStatusFromIntent(data);
+//                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
+//            } else if (resultCode == RESULT_CANCELED) {
+//                // The user canceled the operation.
+//            }
+//        }
+//    }
 
-        // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
-        Intent intent = new Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.OVERLAY, mFields)
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setCountry("FR")
-                .setLocationBias(bounds)
-                .build(getActivity());
-        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-        Log.d(TAG, "onOptionsItemSelected: check");
-    }
-
-    // onActivityResult for Search Auto-Complete
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
-            if (resultCode == RESULT_OK) {
-                Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
-                // Share data - ViewModel + LiveData
+    // Update the UI with the result from Search-Autocomplete bar
+    public void updateSearchAutoComplete(){
+        // Get place Object for Auto-Complete-SearchBar
+        mSharedViewModel.getSearchObject().observe(getViewLifecycleOwner(), new Observer<Place>() {
+            @Override
+            public void onChanged(Place place) {
+                Log.d(TAG, "TEST onChanged: place value changed");
                 moveCamera(place.getLatLng(), DEFAULT_ZOOM);
-                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE));
-                Log.d(TAG, "DATA-TEST SEARCH: " + place.getName() + " "+ place.getId());
-
-                mPlaceSearch = place;
-                AUTO_COMPLETE_INDEX_CODE++;
-
-
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // TODO: Handle the error.
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
+                mRestaurantDetailsFetch = new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE);
+                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, mRestaurantDetailsFetch);
             }
-        }
+        });
+
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom

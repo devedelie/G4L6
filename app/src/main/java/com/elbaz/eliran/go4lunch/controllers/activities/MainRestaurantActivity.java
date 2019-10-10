@@ -35,11 +35,22 @@ import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +66,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @BindView(R.id.main_restaurant_activity_drawerLayout) DrawerLayout drawerLayout;
     @BindView(R.id.drawer_restaurant_main_activity) NavigationView navigationView;
     View rootView;
+    private int AUTOCOMPLETE_REQUEST_CODE = 1;
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -62,6 +74,9 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public static Boolean mLocationPermissionGranted = false;
     public Context mContext;
     SharedViewModel mSharedViewModel;
+    // AutoComplete search
+    private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -156,19 +171,19 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         setSupportActionBar(toolbar);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        if(pager.getCurrentItem() == 1){
-        MenuItem item = menu.findItem(R.id.menu_sort_icon);
-        item.setVisible(true);
-        }
-        if(pager.getCurrentItem() ==  2){
-            MenuItem item = menu.findItem(R.id.menu_search_icon);
-            item.setVisible(false);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        super.onPrepareOptionsMenu(menu);
+//        if(pager.getCurrentItem() == 1){
+//        MenuItem item = menu.findItem(R.id.menu_sort_icon);
+//        item.setVisible(true);
+//        }
+//        if(pager.getCurrentItem() ==  2){
+//            MenuItem item = menu.findItem(R.id.menu_search_icon);
+//            item.setVisible(false);
+//        }
+//        return true;
+//    }
 
     /**
      * ViewPager configuration + Tab Layout
@@ -187,15 +202,15 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_mapView:
-                        configureToolbarWithDrawer();
+//                        configureToolbarWithDrawer();
                         pager.setCurrentItem(0);
                         break;
                     case R.id.action_listView:
-                        configureToolbarWithDrawer(); // Add 'sort' icon in ListViewFragment
+//                        configureToolbarWithDrawer(); // Add 'sort' icon in ListViewFragment
                         pager.setCurrentItem(1);
                         break;
                     case R.id.action_workmates:
-                        configureToolbarWithDrawer(); // Hide 'Search' icon in Workmates fragment
+//                        configureToolbarWithDrawer(); // Hide 'Search' icon in Workmates fragment
                         pager.setCurrentItem(2);
                         break;
                 }
@@ -309,6 +324,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         int itemId = item.getItemId();
         if (itemId == R.id.menu_search_icon){
             setCurrentPagerToViewModel(pager.getCurrentItem());
+            this.launchAutocompleteSearchBar();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -316,6 +332,45 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // Send data to ViewModel - LiveData
     private void setCurrentPagerToViewModel(Integer pagerCurrentItem){
         mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
+    }
+
+    private void launchAutocompleteSearchBar(){
+        // Bias results to Paris region (use 'bounds' variable in below filter)
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(48.832304, 2.239726),
+                new LatLng(48.900962, 2.42124));
+
+        // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
+        Intent intent = new Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.OVERLAY, mFields)
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setCountry("FR")
+                .setLocationBias(bounds)
+                .build(this);
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+        Log.d(TAG, "onOptionsItemSelected: check");
+    }
+
+    // onActivityResult for Search Auto-Complete
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.d(TAG, "onActivityResult: current item" + pager.getCurrentItem());
+                mSharedViewModel.setSearchObject(place);
+
+
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                // TODO: Handle the error.
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
     }
 
     // --------------------
