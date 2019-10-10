@@ -23,7 +23,6 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.api.RestaurantHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
-import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.Restaurant;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -32,7 +31,6 @@ import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -41,7 +39,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,7 +54,7 @@ import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
 /**
  * Created by Eliran Elbaz on 29-Sep-19.
  */
-public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment implements RestaurantDetailAdapter.Listener {
+public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFragment implements RestaurantDetailAdapter.Listener {
     // FOR DESIGN
     @BindView(R.id.fragment_bottomsheet_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_detail_image) ImageView fragmentDetailMainImage;
@@ -65,24 +64,34 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     @BindView(R.id.detail_restaurant_likes) TextView restaurantDetailLikes;
     @BindView(R.id.addRestaurantFloatingActionButton) FloatingActionButton floatingActionButton;
     @BindView(R.id.empty_list_in_restaurant_detail) TextView emptyListText;
-    private Result mResult;
-    private static final String MARKER_TAG = "MARKER_TAG";
-//    private int mIndex;
+    // Bundle
+    private static final String MARKER_RESTAURANT_ID = "MARKER_RESTAURANT_ID";
+    private static final String MARKER_RESTAURANT_NAME = "MARKER_RESTAURANT_NAME";
+    private static final String MARKER_RESTAURANT_INDEX = "MARKER_RESTAURANT_NAME";
+    private static final String FIRESTORE_GOING_USERS_COLLECTION = "goingUsers";
+    private String restaurantIDFromTag;
+    private String restaurantNameFromTag;
+    private PlacesClient mPlacesClient;
+    private int mIndex;
     // Variables for Firestore
-    private boolean mIsGoing = false; 
+    private boolean mIsGoing = false;
     private String mSavedRestaurantNameOnFB ="";
     private User modelCurrentUser;
     private String mCurrentSelectedRestaurantOnLoad;
     private RestaurantDetailAdapter mRestaurantDetailAdapter;
+    // Data
+    private List<Result> mResults;
 
 
-    public static RestaurantDetailForNearbyMarker newInstance(int markerTag) {
-        RestaurantDetailForNearbyMarker restaurantDetailForNearbyMarker;
-        restaurantDetailForNearbyMarker = new RestaurantDetailForNearbyMarker();
+    public static RestaurantDetailsFragment_FromViewModel newInstance(String restaurantID, String restaurantName, int index) {
+        RestaurantDetailsFragment_FromViewModel restaurantDetailsFragment_fromViewModel;
+        restaurantDetailsFragment_fromViewModel = new RestaurantDetailsFragment_FromViewModel();
         Bundle bundle = new Bundle();
-        bundle.putInt(MARKER_TAG, markerTag);
-        restaurantDetailForNearbyMarker.setArguments(bundle);
-        return restaurantDetailForNearbyMarker;
+        bundle.putString(MARKER_RESTAURANT_ID, restaurantID);
+        bundle.putString(MARKER_RESTAURANT_NAME, restaurantName);
+        bundle.putInt(MARKER_RESTAURANT_INDEX, index);
+        restaurantDetailsFragment_fromViewModel.setArguments(bundle);
+        return restaurantDetailsFragment_fromViewModel ;
     }
 
     @Nullable
@@ -91,11 +100,12 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         View view = inflater.inflate(R.layout.fragment_restaurant_details
                 , container, false);
         ButterKnife.bind(this, view);
-        PlacesClient mPlacesClient = Places.createClient(getActivity());
-        // Get the index
-//        int i = getArguments().getInt(MARKER_TAG);
-//        this.mIndex = i;
-
+        // Get details from Bundle
+        restaurantIDFromTag = getArguments().getString(MARKER_RESTAURANT_ID);
+        restaurantNameFromTag = getArguments().getString(MARKER_RESTAURANT_NAME);
+        mIndex = getArguments().getInt(MARKER_RESTAURANT_INDEX);
+//        mPlacesClient = Places.createClient(getActivity());
+        this.getCurrentUserFromFirestore();
         return view;
     }
 
@@ -104,14 +114,14 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
         SharedViewModel mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        // Observe fetched Results
-        mSharedViewModel.getResult().observe(getViewLifecycleOwner(), new Observer<Result>() {
+        // Observe Search ArrayList
+        mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer <List<Result>>() {
             @Override
-            public void onChanged(Result result) {
-                // set results
-                mResult = null;
-                mResult = result;
-                Log.d(TAG, "onChanged Results: ");
+            public void onChanged(List<Result> result) {
+                // update the array with new added objects
+                mResults = new ArrayList<>();
+                mResults.clear();
+                mResults.addAll(result);
             }
         });
     }
@@ -119,9 +129,9 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
     @Override
     public void onResume() {
         super.onResume();
-        this.getDataFromFireStore();
-        this.setViewElementsForNearbyPlacesSheet();
-        this.getCurrentUserFromFirestore();
+        getDataFromFireStore();
+        setViewElements();
+        getCurrentUserFromFirestore();
     }
 
     private void getDataFromFireStore(){
@@ -134,18 +144,22 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
                 mIsGoing = currentUser.getIsGoing();
                 // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
                 mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
-                Log.d(TAG, "TEST onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
+                Log.d(TAG, "onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
                 // Configure FloatingButton from inside onSuccess, to avoid empty variable case
-                configureFloatingButton();
-                configureRecyclerView();
+                updateUI();
             }
         });
     }
 
+    private void updateUI(){
+        this.configureFloatingButton();
+        this.setViewElements();
+        this.configureRecyclerView();
+    }
+
     private void configureFloatingButton(){
-        Log.d(TAG, "configureFloatingButton: "+ mSavedRestaurantNameOnFB + " " + mResult.getName());
         // Compare the selected restaurant with the one from Firestore
-        if(mSavedRestaurantNameOnFB.equals(mResult.getName()) && mIsGoing){
+        if(mSavedRestaurantNameOnFB.equals(mResults.get(mIndex).getName()) && mIsGoing){
             setFloatingActionButtonGreen();
         }else{
             setFloatingActionButtonRed();
@@ -162,60 +176,61 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
     }
 
-    private void setViewElementsForNearbyPlacesSheet(){
-        // Set Image reference string and set image with Glide
-        String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResult.getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
-        Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
-        Glide.with(this).load(imageUrl).into(this.fragmentDetailMainImage);
-        // set Texts
-        restaurantDetailTitle.setText(mResult.getName());
-        restaurantDetailAddress.setText(mResult.getVicinity());
-        // Set OpenNow Status (try & catch for null cases)
+
+    private void setViewElements(){
         try {
-            if(mResult.getOpeningHours().getOpenNow()){
+            // Set Image reference string and set image with Glide
+            String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + mResults.get(mIndex).getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
+            Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
+            Glide.with(this).load(imageUrl).into(this.fragmentDetailMainImage);
+            // set Texts
+            restaurantDetailTitle.setText(mResults.get(mIndex).getName());
+            restaurantDetailAddress.setText(mResults.get(mIndex).getVicinity());
+            // Set OpenNow Status (try & catch for null cases)
+            if(mResults.get(mIndex).getOpeningHours().getOpenNow()){
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow));
             } else{
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_closed));
             }
+            // set rating
+            restaurantDetailLikes.setText(mResults.get(mIndex).getRating().toString());
+
         }
         catch(Exception e) {
-            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow_notAvailable));
+            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_not_available));
         }
-        // set rating
-        restaurantDetailLikes.setText(mResult.getRating().toString());
     }
 
     @OnClick(R.id.addRestaurantFloatingActionButton)
     public void addTodaysRestaurant (){
-        Log.d(TAG, "addTodaysRestaurant: " + mSavedRestaurantNameOnFB + " " + mResult.getName() + " " + mIsGoing);
+        Log.d(TAG, "addTodaysRestaurant: " + mSavedRestaurantNameOnFB + " " + mResults.get(mIndex).getName() + " " + mIsGoing);
         // Change mIsGoing status & button color + icon
-        if (mSavedRestaurantNameOnFB.equals(mResult.getName()) && mIsGoing){
+        if (mSavedRestaurantNameOnFB.equals(mResults.get(mIndex).getName()) && mIsGoing){
             setFloatingActionButtonRed();
             mIsGoing = false;
         }else{
             setFloatingActionButtonGreen();
             mIsGoing = true;
-            mSavedRestaurantNameOnFB = mResult.getName();
+            mSavedRestaurantNameOnFB = mResults.get(mIndex).getName();
         }
         Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
         updateUserOnFireStore();
     }
+
 
     private void updateUserOnFireStore(){
         // update Firestore DB with the current data
         if (this.getCurrentUser() != null){
             // set/remove restaurant name from user's document
             if(mIsGoing){
-                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResult.getName()).addOnFailureListener(this.onFailureListener());
+                UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
+                UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), mResults.get(mIndex).getPlaceId());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
+                UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), "");
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
-            // set the Index value
-//            UserHelper.updateIndex(this.getCurrentUser().getUid(), mIndex);
-            // set query type (Nearby places / Auto-Complete search)
-            UserHelper.updateQueryType(this.getCurrentUser().getUid(), Constants.NEARBY_QUERY_TYPE);
             // create/update 'going-user' document inside Restaurant collection (Restaurants --> {restaurant name} --> goingUsers --> user#)
             updateRestaurantCollection();
         }
@@ -228,20 +243,19 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
                     // If Exists, delete the old value of selected restaurant
                     GoingUserHelper.deleteUserFromPreviousGoingList(modelCurrentUser, mCurrentSelectedRestaurantOnLoad);
                 }
-                // Then, create a new "going-user" document to restaurant collection on Firestore
-                GoingUserHelper.createUserForGoingList(this.mResult.getId(), mResult.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                // Create a new "going-user" document to restaurant collection on Firestore
+                GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
 
             }else{
                 // Delete document from going-user collection
-                GoingUserHelper.deleteUserFromGoingList(mResult.getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                GoingUserHelper.deleteUserFromGoingList(mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
             }
         }
     }
 
     private void configureRecyclerView() {
-        String goingUsers = "goingUsers";
         //Configure Adapter & RecyclerView
-        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mResult.getName()).collection(goingUsers)), Glide.with(this), this, this.getCurrentUser().getUid());
+        this.mRestaurantDetailAdapter = new RestaurantDetailAdapter(generateOptionsForAdapter(RestaurantHelper.getRestaurantCollection().document(mResults.get(mIndex).getName()).collection(FIRESTORE_GOING_USERS_COLLECTION)), Glide.with(this), this, this.getCurrentUser().getUid());
         mRestaurantDetailAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
@@ -305,35 +319,35 @@ public class RestaurantDetailForNearbyMarker extends BottomSheetDialogFragment i
         };
     }
 
-    private int dayToInteger (){
-        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
-        int newDayInteger=-1;
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.DAY_OF_WEEK);
-        switch (today){
-            case Calendar.SUNDAY:
-                newDayInteger = 6;
-                break;
-            case Calendar.MONDAY:
-                newDayInteger = 0;
-                break;
-            case Calendar.TUESDAY:
-                newDayInteger = 1;
-                break;
-            case Calendar.WEDNESDAY:
-                newDayInteger = 2;
-                break;
-            case Calendar.THURSDAY:
-                newDayInteger = 3;
-                break;
-            case Calendar.FRIDAY:
-                newDayInteger = 4;
-                break;
-            case Calendar.SATURDAY:
-                newDayInteger = 5;
-                break;
-        }
-        return newDayInteger;
-    }
+//    private int dayToInteger (){
+//        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
+//        int newDayInteger=-1;
+//        Calendar calendar = Calendar.getInstance();
+//        int today = calendar.get(Calendar.DAY_OF_WEEK);
+//        switch (today){
+//            case Calendar.SUNDAY:
+//                newDayInteger = 6;
+//                break;
+//            case Calendar.MONDAY:
+//                newDayInteger = 0;
+//                break;
+//            case Calendar.TUESDAY:
+//                newDayInteger = 1;
+//                break;
+//            case Calendar.WEDNESDAY:
+//                newDayInteger = 2;
+//                break;
+//            case Calendar.THURSDAY:
+//                newDayInteger = 3;
+//                break;
+//            case Calendar.FRIDAY:
+//                newDayInteger = 4;
+//                break;
+//            case Calendar.SATURDAY:
+//                newDayInteger = 5;
+//                break;
+//        }
+//        return newDayInteger;
+//    }
 
 }

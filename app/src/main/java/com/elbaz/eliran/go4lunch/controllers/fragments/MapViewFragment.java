@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +24,7 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.controllers.activities.MainRestaurantActivity;
 import com.elbaz.eliran.go4lunch.models.Constants;
+import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -80,9 +80,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private Disposable mDisposable;
     private String deviceLocationVariable;
     // Nearby Places
-    private PlacesResults mPlacesResults;
-    private PlacesResults mPlacesResultsTokenOne;
+    private RestaurantDetailsFetch mRestaurantDetailsFetch;
+    private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
+//    private PlacesResults mPlacesResults;
+//    private PlacesResults mPlacesResultsTokenOne;
     private List<Result> mResults;
+    private boolean isRestaurantValueExist = false;
     private List<Result> mResults_nextPageTokenOne;
     private List<Result> mResults_nextPageTokenTwo;
     // Search Auto-Complete
@@ -112,10 +115,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     @Override
     protected int getFragmentLayout() { return R.layout.fragment_map_view; }
 
-    @Override
-    protected void updateData() {
-    }
-
     // This method will be called onDestroy to avoid any risk of memory leaks.
     private void disposeWhenDestroy(){
         if (this.mDisposable != null && !this.mDisposable.isDisposed()) this.mDisposable.dispose();
@@ -135,7 +134,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 }
             }
         });
-        // get fetched Results
+        // Retrieve back fetched Results from ViewModel in case of system changes
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
@@ -202,7 +201,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                             Log.d(TAG, "myReplace: " + "-"+deviceLocationVariable+"-");
                             // move camera to location
                             moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-                            executeHttpRequestForNearbyPlaces();
+                            // if mResults from ViewModel is null - probably caused by system fail/change and need to execute new HttpRequest
+                            if(mResults == null){
+                                executeHttpRequestForNearbyPlaces();
+                            }
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
                             // Call the method until location is synchronised
@@ -213,20 +215,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
     private void autoCompleteSearchBar(){
-        // Set the fields to specify which types of place data to
-        // return after the user has made a selection.
-        List<Place.Field> fields = Arrays.asList(
-                Place.Field.ID,
-                Place.Field.NAME,
-                Place.Field.ADDRESS,
-                Place.Field.PHONE_NUMBER,
-                Place.Field.OPENING_HOURS,
-                Place.Field.WEBSITE_URI,
-                Place.Field.PHOTO_METADATAS,
-                Place.Field.PRICE_LEVEL,
-                Place.Field.RATING,
-                Place.Field.LAT_LNG);
-
         // Bias results to Paris region (use 'bounds' variable in below filter)
         RectangularBounds bounds = RectangularBounds.newInstance(
                 new LatLng(48.832304, 2.239726),
@@ -234,7 +222,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
         // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
         Intent intent = new Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.OVERLAY, fields)
+                AutocompleteActivityMode.OVERLAY, mFields)
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setCountry("FR")
                 .setLocationBias(bounds)
@@ -254,13 +242,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
                 // Share data - ViewModel + LiveData
                 moveCamera(place.getLatLng(), DEFAULT_ZOOM);
-                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE);
-                // Create an object
-//                mPlaceSearch = null;
-//                mPlaceSearch = new SearchAuto(AUTO_COMPLETE_INDEX_CODE,place.getId(),place.getName(),place.getAddress(),place.getPhoneNumber(),place.getOpeningHours().getWeekdayText(),place.getWebsiteUri(),place.getPhotoMetadatas(),place.getRating().toString(),place.getLatLng());
-//                // add the object into Array and set in ViewModel
-//                sSearchAutoList.add(mPlaceSearch);
-//                Log.d(TAG, "Array onActivityResult: " + sSearchAutoList.get(0));
+                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE));
+                Log.d(TAG, "DATA-TEST SEARCH: " + place.getName() + " "+ place.getId());
+
                 mPlaceSearch = place;
                 AUTO_COMPLETE_INDEX_CODE++;
 
@@ -295,10 +279,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     @Override
                     public void onNext(PlacesResults placesResults) {
                         Log.d(TAG, "onNext: HTTP");
-                        mPlacesResults = placesResults;
+                        // Set data in ViewModel
+                        setResultsInViewModel(placesResults);
                         // Update UI with results
                         updateUI(placesResults.getResults());
-                        mSharedViewModel.setResultsList(placesResults.getResults());
+
                     }
                     @Override
                     public void onError(Throwable e) {
@@ -306,33 +291,14 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     }
                     @Override
                     public void onComplete() {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            public void run() {
-                                // Actions after the delay
-//                                executeHttpRequestForNextToken();
-                            }}, 1000);
-                    }
+                        Log.d(TAG, "onComplete: "); }
                 });
     }
 
-//    private void executeHttpRequestForNextToken() {
-//        Log.d(TAG, "executeHttpRequestForNextToken: " + mPlacesResults.getNextPageToken());
-//        // Execute the stream subscribing to Observable defined inside PlacesResults
-//        this.mDisposable = PlacesStream.streamFetchNextPageToken(mPlacesResults.getNextPageToken()).subscribeWith(new DisposableObserver<PlacesResults>() {
-//            @Override
-//            public void onNext(PlacesResults placesResults) {
-//
-//                // Update UI with results
-////                updateUIWithNextToken(placesResults.getResult());
-//            }
-//            @Override
-//            public void onError(Throwable e) { }
-//            @Override
-//            public void onComplete() { }
-//        });
-//    }
-
+    // Send data to ViewModel - LiveData
+    private void setResultsInViewModel(PlacesResults placesResults){
+        mSharedViewModel.setResultsList(placesResults.getResults());
+    }
 
     private void updateUI(List<Result> results){
         mResults = new ArrayList<>();
@@ -340,29 +306,22 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mResults.addAll(results);
         setNearbyRestaurantsWithMarkers(mResults);
     }
-//    private void updateUIWithNextToken(List<Result> results){
-//        mResults_nextPageTokenOne = new ArrayList<>();
-//        mResults_nextPageTokenOne.clear();
-//        mResults_nextPageTokenOne.addAll(results);
-//        setNearbyRestaurantsWithMarkers(mResults_nextPageTokenOne);
-//    }
-
-
 
     private void setNearbyRestaurantsWithMarkers(List<Result> results){
-//        Log.d(TAG, "setNearbyRestaurantsWithMarkers: " + results.get(1).getGeometry().getLocation().getLat().toString() + "  " + results.get(1).getGeometry().getLocation().getLng().toString() + " size= "+ results.size());
         for (int i=results.size()-1; i>=0 ; i-- ){
             LatLng latLng = new LatLng(results.get(i).getGeometry().getLocation().getLat(), results.get(i).getGeometry().getLocation().getLng());
             Log.d(TAG, "updateUI: " + i + "----:" + latLng);
-            setCustomMarker(latLng, i);
+            // Create a detail object to fetch data
+            mRestaurantDetailsFetch = new RestaurantDetailsFetch(results.get(i).getPlaceId(), results.get(i).getName(), i);
+            setCustomMarker(latLng, i, mRestaurantDetailsFetch);
         }
     }
 
     // set custom marker
-    private void setCustomMarker(LatLng latLng, int index){
+    private void setCustomMarker(LatLng latLng,int i, RestaurantDetailsFetch detailObject){
         mMap.addMarker(new MarkerOptions().position(latLng)
-                .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(getActivity(), R.drawable.amu_bubble_mask, index ))))
-                .setTag(index);
+                .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(getActivity(), R.drawable.amu_bubble_mask, i ))))
+                .setTag(detailObject);
     }
 
     // CustomMarker Bitmap
@@ -385,26 +344,27 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        // set the current marker index to pass on BottomSheet fragment
-        int i = (int) marker.getTag();
-        // Instantiate the correct BottomSheet
-        if (i >=0 && i<20){
-            setResultsInViewModel(mPlacesResults.getResults().get(i));
-            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-        }else if (i>= 100){
-            setPlaceInViewModel(mPlaceSearch);
-            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+        // get the current marker id from 'RestaurantDetailsFetch' Object and pass to BottomSheet fragment
+        RestaurantDetailsFetch tagObject = (RestaurantDetailsFetch) marker.getTag();
+        // Check if the restaurant ID equales to one of the fetched details on the List<>
+        for(int i = mResults.size()-1; i>=0 ; i--){
+            if(mResults.get(i).getPlaceId().equals(tagObject.getRestaurantId())){
+                isRestaurantValueExist = true;
+                Log.d(TAG, "onMarkerClick: " + i + " " + isRestaurantValueExist);
+            }
         }
+        // If exist: avoid another Http Request and use ViewModel, else, make httpRequest
+        if(isRestaurantValueExist){
+            Log.d(TAG, "onMarkerClick: value exists");
+            RestaurantDetailsFragment_FromViewModel.newInstance(tagObject.getRestaurantId(), tagObject.getRestaurantName(), tagObject.getIndex()).show(getActivity().getSupportFragmentManager(), getTag());
+            isRestaurantValueExist =false;
+        }else{
+            Log.d(TAG, "onMarkerClick: value doesn't exists");
+            RestaurantDetailsFragment_FromRetrofit.newInstance(tagObject.getRestaurantId(), tagObject.getRestaurantName()).show(getActivity().getSupportFragmentManager(), getTag());
+            isRestaurantValueExist =false;
+        }
+
         return true;
     }
-
-    // Send data to ViewModel - LiveData
-    private void setResultsInViewModel(Result results){
-        mSharedViewModel.setResult(results);
-    }
-    private void setPlaceInViewModel(Place place){
-        mSharedViewModel.setSearchObject(place);
-    }
-
 
 }
