@@ -2,7 +2,6 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +26,6 @@ import javax.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.content.ContentValues.TAG;
-import static com.elbaz.eliran.go4lunch.models.Constants.AUTOCOMPLETE_QUERY_TYPE;
-import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_QUERY_TYPE;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -48,11 +43,6 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
     @Override
     protected int getFragmentLayout() {
         return R.layout.fragment_workmates;
-    }
-
-    @Override
-    protected void updateData() {
-
     }
 
     @Override
@@ -89,14 +79,10 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        String queryType = mWorkmatesListAdapter.getItem(position).getQueryType();
-                        int i = mWorkmatesListAdapter.getItem(position).getRestaurantIndex();
-                        Log.d(TAG, "onItemClicked: " + i + " " + queryType);
-                        // Instantiate the correct BottomSheet
-                        if (i >=0 && i<20 && queryType.equals(NEARBY_QUERY_TYPE)){
-                            RestaurantDetailForNearbyMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
-                        }else if (i>= 100 && queryType.equals(AUTOCOMPLETE_QUERY_TYPE)){
-                            RestaurantDetailsForSearchMarker.newInstance(i).show(getActivity().getSupportFragmentManager(), getTag());
+                        String restaurantID = mWorkmatesListAdapter.getItem(position).getRestaurantID();
+                        String restaurantName = mWorkmatesListAdapter.getItem(position).getSelectedRestaurantName();
+                        if(!restaurantID.isEmpty() && restaurantID != null){
+                            RestaurantDetailsFragment_FromRetrofit.newInstance(restaurantID, restaurantName).show(getActivity().getSupportFragmentManager(), getTag());
                         }
                     }
                 });

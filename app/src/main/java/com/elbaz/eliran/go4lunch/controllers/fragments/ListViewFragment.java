@@ -78,12 +78,8 @@ public class ListViewFragment extends BaseFragment {
 
     }
 
-
     @Override
     protected int getFragmentLayout() { return R.layout.fragment_list_view; }
-
-    @Override
-    protected void updateData() { }
 
     //-----------------
     // RecyclerView Config
@@ -108,8 +104,8 @@ public class ListViewFragment extends BaseFragment {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         // Instanciate BottomSheet
-                        RestaurantDetailForNearbyMarker.newInstance(position).show(getActivity().getSupportFragmentManager(), getTag());
-                        
+//                        RestaurantDetailsFragment_FromRetrofit.newInstance(position).show(getActivity().getSupportFragmentManager(), getTag());
+
                     }
                 });
     }
