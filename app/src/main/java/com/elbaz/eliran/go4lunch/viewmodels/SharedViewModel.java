@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.elbaz.eliran.go4lunch.models.restaurantDetails.RestaurantDetails;
 import com.google.android.libraries.places.api.model.Place;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class SharedViewModel extends ViewModel {
     }
 
     /**
-     * Get/Set fetched results List
+     * Get/Set fetched results List (nearby markers)
      */
     private MutableLiveData<List<Result>> mResultsList = new MutableLiveData<>();
 
@@ -50,20 +51,20 @@ public class SharedViewModel extends ViewModel {
     }
 
 
-    /**
-     * Get/Set fetched result Object
-     */
-    private MutableLiveData<Result> mResult = new MutableLiveData<>();
-
-    public void setResult(Result result){
-        mResult.setValue(result);
-        Log.d(TAG, "LiveDataTest setResult: "+ result);
-    }
-
-    public LiveData<Result> getResult(){
-        Log.d(TAG, "LiveDataTest getResult: "+ mResult);
-        return mResult;
-    }
+//    /**
+//     * Get/Set fetched result Object
+//     */
+//    private MutableLiveData<Result> mResult = new MutableLiveData<>();
+//
+//    public void setResult(Result result){
+//        mResult.setValue(result);
+//        Log.d(TAG, "LiveDataTest setResult: "+ result);
+//    }
+//
+//    public LiveData<Result> getResult(){
+//        Log.d(TAG, "LiveDataTest getResult: "+ mResult);
+//        return mResult;
+//    }
 
 
     /**
@@ -81,38 +82,20 @@ public class SharedViewModel extends ViewModel {
         return mAutoCompleteSearchObject;
     }
 
-//    /**
-//     * Get/Set Search_Auto-complete Array of objects
-//     */
-//    private MutableLiveData<List<SearchAuto>> mAutoCompleteSearchObject = new MutableLiveData<>();
-//
-//    public void setSearchObject (List<SearchAuto> searchArray){
-//        mAutoCompleteSearchObject.setValue(searchArray);
-//        Log.d(TAG, "setSearchObject: " + searchArray);
-//    }
-//
-//    public LiveData<List<SearchAuto>> getSearchObject(){
-//        Log.d(TAG, "getSearchObject: " + mAutoCompleteSearchObject);
-//        return mAutoCompleteSearchObject;
-//    }
+    /**
+     * Get/Set BottomSheet fetched data (to avoid unnecessary Http Requests in cases when the we load the same restaurant)
+     */
+    private MutableLiveData<RestaurantDetails> mBottomSheetRestaurantDetails = new MutableLiveData<>();
 
+    public void setRestaurantDetails (RestaurantDetails restaurantDetails){
+        mBottomSheetRestaurantDetails.setValue(restaurantDetails);
+        Log.d(TAG, "setSearchObject: " + restaurantDetails);
+    }
 
-    //------------------------------------------------------------------
+    public LiveData<RestaurantDetails> getRestaurantDetails(){
+        Log.d(TAG, "getSearchObject: " + mBottomSheetRestaurantDetails);
+        return mBottomSheetRestaurantDetails;
+    }
 
-//    /**
-//     * Get/Set Location on MapFragment
-//     */
-//    // Create an instance of Mutable live data
-//    private MutableLiveData<Place> mPlace = new MutableLiveData<>();
-//
-//    public void setLocationOnMap(Place place){
-//        mPlace.setValue(place);
-//        Log.d(TAG, "LiveDataTest setLocationOnMap: "+ mPlace);
-//    }
-//
-//    public LiveData<Place> getLocationFromMap(){
-//        Log.d(TAG, "LiveDataTest getLocationFromMap was called: "+ mPagerCurrentItem);
-//        return mPlace;
-//    }
 
 }
