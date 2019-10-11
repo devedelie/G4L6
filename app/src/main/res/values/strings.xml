@@ -44,6 +44,7 @@
     <!--Lunch Dialog -->
     <string name="dialog_title">Are you ready for lunch?</string>
     <string name="dialog_content">Today you are going to eat at:</string>
+    <string name="dialog_content_no_go">You haven\'t selected your restaurant yet</string>
     <string name="dialog_bon_appetit">Bon Appétit!</string>
     <string name="dialog_button">Close</string>
 

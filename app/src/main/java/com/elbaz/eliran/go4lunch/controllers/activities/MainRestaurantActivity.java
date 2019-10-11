@@ -31,8 +31,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
+import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
+import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
@@ -48,6 +50,7 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +79,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     SharedViewModel mSharedViewModel;
     // AutoComplete search
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
-
+    private String textForDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,7 +129,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
                 .setCancelable(false)
                 .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
@@ -288,27 +291,25 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     private void yourLunchDialog(){
-        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
         ViewGroup viewGroup = findViewById(android.R.id.content);
-
-        //then we will inflate the custom alert dialog xml that we created
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_your_lunch, viewGroup, false);
-
-        //Now we need an AlertDialog.Builder object
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        //setting the view of the builder to our custom view that we already inflated
         builder.setView(dialogView);
 
+        // Set textViews
         TextView dialogContent = (TextView) dialogView.findViewById(R.id.dialog_content_text);
         TextView dialogRestaurantName = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_name);
         TextView dialogBottomText = (TextView) dialogView.findViewById(R.id.dialog_bottom_text);
 
-        dialogContent.setText(getResources().getString(R.string.dialog_content));
-        dialogRestaurantName.setText(getResources().getString(R.string.dialog_content));
-        dialogBottomText.setText(getResources().getString(R.string.dialog_bon_appetit));
+        String restaurantName = getTextForDialog();
+        if(restaurantName != null && !restaurantName.isEmpty()){
+            dialogContent.setText(getResources().getString(R.string.dialog_content));
+            dialogRestaurantName.setText(restaurantName);
+            dialogBottomText.setText(getResources().getString(R.string.dialog_bon_appetit));
+        }else{
+            dialogContent.setText(getResources().getString(R.string.dialog_content_no_go));
+        }
 
-        //finally creating the alert dialog and displaying it
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -392,6 +393,19 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                     finish();
             }
         };
+    }
+
+    public String getTextForDialog(){
+
+        UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User currentUser = documentSnapshot.toObject(User.class);
+                textForDialog = currentUser.getSelectedRestaurantName();
+                Log.d(TAG, "setUIElements: restoName: " + currentUser.getSelectedRestaurantName());
+            }
+        });
+        return textForDialog;
     }
 
 }
