@@ -229,7 +229,19 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu and add it to the Toolbar
         getMenuInflater().inflate(R.menu.menu_activity_main_restaurant, menu);
+
         return true;
+    }
+
+    // OptionMenu item selection (Search places auto-complete)
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_search_icon){
+            setCurrentPagerToViewModel(pager.getCurrentItem());
+            this.launchAutocompleteSearchBar();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -319,17 +331,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 //        startActivity(intent);
 //    }
 
-    // OptionMenu item selection (Search places auto-complete)
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.menu_search_icon){
-            setCurrentPagerToViewModel(pager.getCurrentItem());
-            this.launchAutocompleteSearchBar();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     // Send data to ViewModel - LiveData
     private void setCurrentPagerToViewModel(Integer pagerCurrentItem){
         mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
@@ -362,8 +363,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 Log.d(TAG, "onActivityResult: current item" + pager.getCurrentItem());
                 mSharedViewModel.setSearchObject(place);
-
-
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
