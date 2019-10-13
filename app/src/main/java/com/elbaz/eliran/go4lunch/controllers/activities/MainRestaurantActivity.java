@@ -120,8 +120,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
         pager.setOffscreenPageLimit(2);
-        // Disable ViewPager horizontal switch
-//        pager.beginFakeDrag();
+        // ViewPager scroll listener
         pager.addOnPageChangeListener(this);
 
         // Configure BottomView Listener
