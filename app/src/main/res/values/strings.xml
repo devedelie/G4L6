@@ -36,6 +36,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_maps">Map</string>
 
+    <!-- MapViewFragment-->
+    <string name="no_location_found">Error locating the device</string>
+
     <!--WorkMates Fragment-->
     <string name="workmates_recycler_view_empty">The list is empty</string>
     <string name="is_going_to">is going to: </string>

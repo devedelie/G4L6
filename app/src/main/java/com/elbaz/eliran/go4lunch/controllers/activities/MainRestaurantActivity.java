@@ -3,6 +3,7 @@ package com.elbaz.eliran.go4lunch.controllers.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -81,6 +83,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
+        this.getTextForDialog();
         // Assign a ViewModel
         mSharedViewModel = ViewModelProviders.of(this).get(SharedViewModel.class);
     }
@@ -238,11 +241,12 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         TextView dialogContent = (TextView) dialogView.findViewById(R.id.dialog_content_text);
         TextView dialogRestaurantName = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_name);
         TextView dialogBottomText = (TextView) dialogView.findViewById(R.id.dialog_bottom_text);
+        Button dialogButton = (Button) dialogView.findViewById(R.id.dialog_button);
 
-        String restaurantName = getTextForDialog();
-        if(restaurantName != null && !restaurantName.isEmpty()){
+        if(textForDialog != null && !textForDialog.isEmpty()){
             dialogContent.setText(getResources().getString(R.string.dialog_content));
-            dialogRestaurantName.setText(restaurantName);
+            dialogRestaurantName.setText(textForDialog);
+            dialogRestaurantName.setPaintFlags(dialogRestaurantName.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
             dialogBottomText.setText(getResources().getString(R.string.dialog_bon_appetit));
         }else{
             dialogContent.setText(getResources().getString(R.string.dialog_content_no_go));
@@ -250,6 +254,13 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
     }
 
 //    private void goToYourLunchActivity(){
@@ -320,8 +331,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         };
     }
 
-    public String getTextForDialog(){
-
+    public void getTextForDialog(){
         UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -330,7 +340,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                 Log.d(TAG, "setUIElements: restoName: " + currentUser.getSelectedRestaurantName());
             }
         });
-        return textForDialog;
     }
 
 
