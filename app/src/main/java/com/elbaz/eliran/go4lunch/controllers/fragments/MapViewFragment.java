@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
@@ -152,34 +153,39 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     // Get Device location
     private void getDeviceLocation(){
-        mFusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            mapLoadingText.setVisibility(View.GONE);
-                            mapProgressBarAnimation.setVisibility(View.GONE);
-                            // create a location string for retrofit (LatLng toString())
-                            deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
-                            deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
-                            deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
+        try{
+            mFusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                mapLoadingText.setVisibility(View.GONE);
+                                mapProgressBarAnimation.setVisibility(View.GONE);
+                                // create a location string for retrofit (LatLng toString())
+                                deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
+                                deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
+                                deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
 
-                            // move camera to location
-                            moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-                            // If NULL, execute Http request, ELSE, update the UI with the data from ViewModel
-                            if(mResults == null){
-                                executeHttpRequestForNearbyPlaces();
-                            }else {
-                                updateUI(mResults);
+                                // move camera to location
+                                moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
+                                // If NULL, execute Http request, ELSE, update the UI with the data from ViewModel
+                                if(mResults == null){
+                                    Log.d(TAG, "onSuccess: mResults is null");
+                                    executeHttpRequestForNearbyPlaces();
+                                }else {
+                                    Log.d(TAG, "onSuccess: mResults isn't null");
+                                    updateUI(mResults);
+                                }
+                            }else{
+                                Log.d(TAG, "onComplete: current location is null");
                             }
-                        }else{
-                            Log.d(TAG, "onComplete: current location is null");
-                            // Call the method until location is synchronised
-//                            getDeviceLocation();
                         }
-                    }
-                });
+                    });
+        }catch (SecurityException e){
+            Log.e(TAG, "Failed to get device location: ", e);
+            Toast.makeText(getActivity(), R.string.no_location_found, Toast.LENGTH_LONG).show();
+        }
     }
 
     // Update the UI with the result from Search-Autocomplete bar
