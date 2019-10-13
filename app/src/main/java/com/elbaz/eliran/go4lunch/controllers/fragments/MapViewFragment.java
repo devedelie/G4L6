@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
-import com.elbaz.eliran.go4lunch.controllers.activities.MainRestaurantActivity;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
 import com.elbaz.eliran.go4lunch.models.SearchAuto;
@@ -170,9 +169,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
 
         // Show current device's location
-        if(MainRestaurantActivity.mLocationPermissionGranted){
-            getDeviceLocation();
-        }
+        getDeviceLocation();
     }
 
     // Get Device location

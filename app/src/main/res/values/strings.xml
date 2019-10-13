@@ -15,6 +15,7 @@
     <string name="error_no_internet">No Internet access! The device is offline.</string>
     <string name="error_unknown_error">An unknown error has occurred</string>
     <string name="connection_succeed">Signed-in</string>
+    <string name="need_to_authorise_location_services">In order to access, please authorise location services for this application.</string>
 
     <!-- Restaurant Activity-->
     <string name="popup_title_permission_files_access">This application needs permissions of location to function correctly.</string>
