@@ -130,8 +130,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     public void onResume() {
         super.onResume();
         getDataFromFireStore();
-        setViewElements();
-        getCurrentUserFromFirestore();
     }
 
     private void getDataFromFireStore(){
