@@ -23,7 +23,6 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
-import com.elbaz.eliran.go4lunch.models.SearchAuto;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.PlacesStream;
@@ -43,7 +42,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,36 +57,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
     @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
     private static final float DEFAULT_ZOOM = 15f ;
-    protected Marker mMarker;
-    public View mViewMarker;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    protected Context mContext;
     private SharedViewModel mSharedViewModel;
-    private int AUTOCOMPLETE_REQUEST_CODE = 1;
     private int AUTO_COMPLETE_INDEX_CODE = 100;
     private Disposable mDisposable;
     private String deviceLocationVariable;
     // Nearby Places
     private RestaurantDetailsFetch mRestaurantDetailsFetch;
-    private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
-//    private PlacesResults mPlacesResults;
-//    private PlacesResults mPlacesResultsTokenOne;
     private List<Result> mResults;
     private boolean isRestaurantValueExist = false;
-    private List<Result> mResults_nextPageTokenOne;
-    private List<Result> mResults_nextPageTokenTwo;
-    // Search Auto-Complete
-    public SearchAuto searchAuto;
-    private Place mPlaceSearch;
-//    public List<SearchAuto> sSearchAutoList = null;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Create new Array for search objects
-//        sSearchAutoList= new ArrayList<>();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -180,19 +158,20 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            Log.d(TAG, "onComplete: found location:" + location.getLatitude() + " & " + location.getLongitude());
                             mapLoadingText.setVisibility(View.GONE);
                             mapProgressBarAnimation.setVisibility(View.GONE);
                             // create a location string for retrofit (LatLng toString())
                             deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
                             deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
                             deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
-                            Log.d(TAG, "myReplace: " + "-"+deviceLocationVariable+"-");
+
                             // move camera to location
                             moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-                            // if mResults from ViewModel is null - probably caused by system fail/change and need to execute new HttpRequest
+                            // If NULL, execute Http request, ELSE, update the UI with the data from ViewModel
                             if(mResults == null){
                                 executeHttpRequestForNearbyPlaces();
+                            }else {
+                                updateUI(mResults);
                             }
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
@@ -202,51 +181,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     }
                 });
     }
-
-//    private void autoCompleteSearchBar(){
-//        // Bias results to Paris region (use 'bounds' variable in below filter)
-//        RectangularBounds bounds = RectangularBounds.newInstance(
-//                new LatLng(48.832304, 2.239726),
-//                new LatLng(48.900962, 2.42124));
-//
-//        // Start the autocomplete intent. (OVERLAY + ESTABLISHMENT + FR)
-//        Intent intent = new Autocomplete.IntentBuilder(
-//                AutocompleteActivityMode.OVERLAY, mFields)
-//                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-//                .setCountry("FR")
-//                .setLocationBias(bounds)
-//                .build(getActivity());
-//        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-//        Log.d(TAG, "onOptionsItemSelected: check");
-//    }
-//
-//    // onActivityResult for Search Auto-Complete
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-//            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
-//            if (resultCode == RESULT_OK) {
-//                Place place = Autocomplete.getPlaceFromIntent(data);
-//                Log.i(TAG, "onActivityResult Place: " + place.getLatLng().latitude +" " + " " + place.getLatLng().longitude + place.getName() + ", " + place.getId() +" "+ place.getAddress()+ " " + place.getPhoneNumber()+ " " + place.getWebsiteUri() + " " + place.getPriceLevel()+ " " + place.getRating());
-//                // Share data - ViewModel + LiveData
-//                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
-//                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE));
-//                Log.d(TAG, "DATA-TEST SEARCH: " + place.getName() + " "+ place.getId());
-//
-//                mPlaceSearch = place;
-//                AUTO_COMPLETE_INDEX_CODE++;
-//
-//
-//            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-//                // TODO: Handle the error.
-//                Status status = Autocomplete.getStatusFromIntent(data);
-//                Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
-//            } else if (resultCode == RESULT_CANCELED) {
-//                // The user canceled the operation.
-//            }
-//        }
-//    }
 
     // Update the UI with the result from Search-Autocomplete bar
     public void updateSearchAutoComplete(){
@@ -260,7 +194,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, mRestaurantDetailsFetch);
             }
         });
-
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
@@ -287,7 +220,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         setResultsInViewModel(placesResults);
                         // Update UI with results
                         updateUI(placesResults.getResults());
-
                     }
                     @Override
                     public void onError(Throwable e) {
