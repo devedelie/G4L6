@@ -53,7 +53,7 @@ import butterknife.ButterKnife;
 
 import static android.content.ContentValues.TAG;
 
-public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
     @BindView(R.id.activity_main_bottom_navigation) BottomNavigationView bottomNavigationView;
     @BindView(R.id.activity_main_restaurant_viewpager) ViewPager pager;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -121,7 +121,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
         pager.setOffscreenPageLimit(2);
         // Disable ViewPager horizontal switch
-        pager.beginFakeDrag();
+//        pager.beginFakeDrag();
+        pager.addOnPageChangeListener(this);
 
         // Configure BottomView Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -145,6 +146,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             }
         });
     }
+    
+    
 
     /**
      * Inflate the top-menu (menu with search and parameters icons)
@@ -330,5 +333,17 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         });
         return textForDialog;
     }
+
+
+    // ------------------
+    // ViewPager helper
+    // ------------------
+    // The below Override method will 'setChecked' the correct BottomView element to flow with viewPager scroll
+    @Override public void onPageSelected(int position) {
+        Log.d(TAG, "onPageSelected: " + position);
+        bottomNavigationView.getMenu().getItem(position).setChecked(true);
+    }
+    @Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+    @Override public void onPageScrollStateChanged(int state) { }
 
 }
