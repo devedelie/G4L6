@@ -3,6 +3,7 @@ package com.elbaz.eliran.go4lunch.api;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
 /**
  * Created by Eliran Elbaz on 06-Oct-19.
  */

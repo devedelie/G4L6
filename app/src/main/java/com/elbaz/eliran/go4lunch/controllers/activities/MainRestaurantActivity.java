@@ -91,6 +91,16 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @Override
     public int getFragmentLayout() { return R.layout.activity_main_restaurant; }
 
+//    @Override
+//    public void onBackPressed() {
+//        // Handle back click to close menu
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+////            super.onBackPressed();
+//        }
+//    }
+
     //-------------------
     // UI Configuration
     //-------------------
@@ -148,8 +158,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             }
         });
     }
-    
-    
 
     /**
      * Inflate the top-menu (menu with search and parameters icons)
@@ -262,11 +270,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             }
         });
     }
-
-//    private void goToYourLunchActivity(){
-//        Intent intent = new Intent(this, YourLunchActivity.class);
-//        startActivity(intent);
-//    }
 
     // Send data to ViewModel - LiveData
     private void setCurrentPagerToViewModel(Integer pagerCurrentItem){

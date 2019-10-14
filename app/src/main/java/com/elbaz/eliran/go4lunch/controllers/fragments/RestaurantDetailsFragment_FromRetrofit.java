@@ -323,35 +323,4 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
         };
     }
 
-//    private int dayToInteger (){
-//        // get the DAY_OF_WEEK and transform it to google's day counting (ex: Sunday 1 --> 6)
-//        int newDayInteger=-1;
-//        Calendar calendar = Calendar.getInstance();
-//        int today = calendar.get(Calendar.DAY_OF_WEEK);
-//        switch (today){
-//            case Calendar.SUNDAY:
-//                newDayInteger = 6;
-//                break;
-//            case Calendar.MONDAY:
-//                newDayInteger = 0;
-//                break;
-//            case Calendar.TUESDAY:
-//                newDayInteger = 1;
-//                break;
-//            case Calendar.WEDNESDAY:
-//                newDayInteger = 2;
-//                break;
-//            case Calendar.THURSDAY:
-//                newDayInteger = 3;
-//                break;
-//            case Calendar.FRIDAY:
-//                newDayInteger = 4;
-//                break;
-//            case Calendar.SATURDAY:
-//                newDayInteger = 5;
-//                break;
-//        }
-//        return newDayInteger;
-//    }
-
 }
