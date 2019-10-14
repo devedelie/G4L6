@@ -16,11 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
@@ -39,8 +41,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +74,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private RestaurantDetailsFetch mRestaurantDetailsFetch;
     private List<Result> mResults;
     private boolean isRestaurantValueExist = false;
+    private List<String> mListOfBookedRestaurants = new ArrayList<>();  // list of restaurants for applying green markers
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,6 +83,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         ButterKnife.bind(this, view); //Configure Butterknife
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+        this.getRestaurantCollectionForMarkers();
         // Initialise map
         this.initMap();
         return view;
@@ -131,7 +139,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Marker click listener
         mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
         // Map-Zoom limitations
-        mMap.setMinZoomPreference(15.0f);
+        mMap.setMinZoomPreference(14.5f);
         mMap.setMaxZoomPreference(18.0f);
         // Map configurations
         mMap.setBuildingsEnabled(true);
@@ -198,6 +206,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 moveCamera(place.getLatLng(), DEFAULT_ZOOM);
                 mRestaurantDetailsFetch = new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE);
                 setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, mRestaurantDetailsFetch);
+                AUTO_COMPLETE_INDEX_CODE++;
             }
         });
     }
@@ -262,14 +271,19 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // set custom marker
     private void setCustomMarker(LatLng latLng,int i, RestaurantDetailsFetch detailObject){
         mMap.addMarker(new MarkerOptions().position(latLng)
-                .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(getActivity(), R.drawable.amu_bubble_mask, i ))))
+                .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(getActivity(), R.drawable.amu_bubble_mask, i , detailObject.getRestaurantId()))))
                 .setTag(detailObject);
     }
 
     // CustomMarker Bitmap
-    public static Bitmap createCustomMarker(Context context, @DrawableRes int resource, int index) {
-        View marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-        Log.d(TAG, "Marker Index tag: "+ index);
+    public Bitmap createCustomMarker(Context context, @DrawableRes int resource, int index, String restaurantID) {
+        View marker;
+        // Verify if the restaurantID exist in the List and set the correct marker color
+        if (mListOfBookedRestaurants.contains(restaurantID)){
+            marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_green_layout, null);
+        }else{
+            marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+        }
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -307,6 +321,32 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
 
         return true;
+    }
+
+    public void getRestaurantCollectionForMarkers(){
+        // Get the users where's the value isGoing=true on their document, and collect the restaurantID
+        UserHelper.getUsersCollection().whereEqualTo("isGoing", true)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // Put Documents in a DocumentSnapshot List
+                            List<DocumentSnapshot> mListOfDocuments = task.getResult().getDocuments();
+                            // String Regex - to extract restaurantID's
+                            for (int i = 0 ; i<mListOfDocuments.size() ; i++ ){
+                                String data = mListOfDocuments.get(i).getData().toString();
+                                data = data.substring(data.indexOf("restaurantID=")+13);
+                                data = data.contains(",") ? data.split(",")[0] : data;
+                                data = data.substring(0, 1).toUpperCase() + data.substring(1);
+                                mListOfBookedRestaurants.add(i, data);
+                            }
+                            Log.d(TAG, "onComplete: Regex -"+ mListOfBookedRestaurants);
+                        }
+                    }
+                });
+
+
     }
 
 }

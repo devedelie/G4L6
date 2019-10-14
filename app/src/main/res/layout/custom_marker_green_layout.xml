@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="50dp"
         android:layout_height="59dp"
-        android:background="@drawable/ic_orange_food_marker">
+        android:background="@drawable/ic_green_food_marker">
 
         <TextView
             android:layout_width="match_parent"
