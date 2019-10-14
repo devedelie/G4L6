@@ -31,7 +31,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
-                app:fontName="Roboto_Medium"
+                android:layout_marginBottom="3dp"
+                app:fontName="Roboto_Bold"
                 android:layout_gravity="top"/>
 
             <com.elbaz.eliran.go4lunch.views.G4LTextView
@@ -39,6 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Address"
+                android:layout_marginBottom="3dp"
                 app:fontName="Roboto_Medium"
                 android:layout_gravity="center_vertical"/>
 
@@ -47,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Opening Times"
+                android:layout_marginBottom="3dp"
                 app:fontName="Roboto_Medium"
                 android:layout_gravity="bottom"/>
 
@@ -56,28 +59,75 @@
             android:id="@+id/second_text_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:orientation="vertical"
+            android:layout_weight="0.9">
 
             <com.elbaz.eliran.go4lunch.views.G4LTextView
                 android:id="@+id/restaurantList_recyclerView_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Distance"
+                android:layout_marginBottom="5dp"
                 app:fontName="Roboto_Medium"
                 android:gravity="start" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="25dp">
 
             <ImageView
                 android:id="@+id/restaurantList_recyclerView_person"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_person_icon"
+                android:layout_marginBottom="5dp"
                 android:gravity="start"/>
 
-            <ImageView
-                android:id="@+id/restaurantList_recyclerView_stars"
+            <com.elbaz.eliran.go4lunch.views.G4LTextView
+                android:id="@+id/restaurantList_recyclerView_persons_number"
                 android:layout_width="wrap_content"
+                android:textStyle=""
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"/>
+                android:text="(#)"
+                android:layout_marginBottom="5dp"
+                app:fontName="Roboto_Medium"
+                android:gravity="start" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="25dp">
+
+                <ImageView
+                    android:id="@+id/restaurantList_recyclerViewList_stars_1"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_w_star_icon"
+
+                    android:backgroundTint="@color/star_yellow"/>
+
+                <ImageView
+                    android:id="@+id/restaurantList_recyclerViewList_stars_2"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_w_star_icon"
+
+                    android:backgroundTint="@color/star_yellow"/>
+
+                <ImageView
+                    android:id="@+id/restaurantList_recyclerViewList_stars_3"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_w_star_icon"
+                    android:backgroundTint="@color/star_yellow"/>
+            </LinearLayout>
 
 
         </LinearLayout>

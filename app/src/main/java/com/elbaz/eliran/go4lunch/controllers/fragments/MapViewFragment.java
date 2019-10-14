@@ -70,6 +70,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private int AUTO_COMPLETE_INDEX_CODE = 100;
     private Disposable mDisposable;
     private String deviceLocationVariable;
+    public static Location deviceLocation; // Used for distance calculation on other fragments.
     // Nearby Places
     private RestaurantDetailsFetch mRestaurantDetailsFetch;
     private List<Result> mResults;
@@ -168,6 +169,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
+                                deviceLocation = location; // Set device location variable for distance calculation
                                 mapLoadingText.setVisibility(View.GONE);
                                 mapProgressBarAnimation.setVisibility(View.GONE);
                                 // create a location string for retrofit (LatLng toString())

@@ -12,4 +12,5 @@
     <color name="floating_btn_green">#8BBB62</color>
     <color name="has_decided_black">#000000</color>
     <color name="didnot_decide_gray">#888888</color>
+    <color name="star_yellow">#ECCF07</color>
 </resources>

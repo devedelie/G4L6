@@ -1,5 +1,7 @@
 package com.elbaz.eliran.go4lunch.views;
 
+import android.graphics.Typeface;
+import android.location.Location;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment.deviceLocation;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
@@ -33,7 +36,7 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.restaurantList_recyclerView_distance) TextView distanceTextView;
     @BindView(R.id.restaurantList_recyclerView_person) ImageView personImage;
 //    @BindView(R.id.restaurantList_recyclerView_person_number) TextView personNumberTextView;
-    @BindView(R.id.restaurantList_recyclerView_stars) ImageView starsImage;
+    @BindView(R.id.restaurantList_recyclerViewList_stars_1) ImageView starsImage;
     @BindView(R.id.restaurantList_recyclerView_restaurantImage) ImageView restaurantImage;
 
     public RestaurantListViewHolder(@NonNull View itemView) {
@@ -49,12 +52,33 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             glide.load(imageUrl).apply(RequestOptions.centerCropTransform()).into(restaurantImage);
             // set texts
             restaurantNameTextView.setText(result.getName());
+            restaurantNameTextView.setTypeface(null, Typeface.BOLD);
             addressTextView.setText(result.getVicinity());
-            openingTextView.setText(result.getOpeningHours().getOpenNow().toString());
-            distanceTextView.setText(result.getRating().toString());
+            openingTextView.setText(result.getOpeningHours().getOpenNow() ? R.string.listView_open_now : R.string.listView_closed);
+            openingTextView.setTypeface(null, Typeface.ITALIC);
+            distanceTextView.setText(calculateDistance(result)+"m");
             Log.d(TAG, "ListView updateRestaurantsList: ");
         }catch (Exception e){
             Log.d(TAG, "updateRestaurantsList: Error " + e);
+        }
+    }
+
+    private int calculateDistance(Result result){
+        float[] distance = new float[1];
+        try{
+            Location.distanceBetween(deviceLocation.getLatitude(), deviceLocation.getLongitude(), result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng(), distance);
+        }catch (Exception e){
+            Log.d(TAG, "calculateDistance Error: " +e);
+        }
+        Log.d(TAG, "calculateStarRating: "+ result.getRating());
+        return Math.round(distance[0]);
+    }
+
+    private void calculateStarRating(Result result){
+        try{
+            Log.d(TAG, "calculateStarRating: "+ result.getRating());
+        }catch (Exception e){
+            Log.d(TAG, "calculateStarRating: "+ e);
         }
     }
 
