@@ -347,8 +347,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         }
                     }
                 });
-
-
     }
 
 }
