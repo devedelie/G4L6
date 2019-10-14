@@ -14,7 +14,10 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.elbaz.eliran.go4lunch.BuildConfig;
 import com.elbaz.eliran.go4lunch.R;
+import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,8 +38,10 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.restaurantList_recyclerView_openingTimes) TextView openingTextView;
     @BindView(R.id.restaurantList_recyclerView_distance) TextView distanceTextView;
     @BindView(R.id.restaurantList_recyclerView_person) ImageView personImage;
-//    @BindView(R.id.restaurantList_recyclerView_person_number) TextView personNumberTextView;
+    @BindView(R.id.restaurantList_recyclerView_persons_number) TextView personNumberTextView;
     @BindView(R.id.restaurantList_recyclerViewList_stars_1) ImageView starsImage;
+    @BindView(R.id.restaurantList_recyclerViewList_stars_2) ImageView starsImage2;
+    @BindView(R.id.restaurantList_recyclerViewList_stars_3) ImageView starsImage3;
     @BindView(R.id.restaurantList_recyclerView_restaurantImage) ImageView restaurantImage;
 
     public RestaurantListViewHolder(@NonNull View itemView) {
@@ -57,6 +62,8 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             openingTextView.setText(result.getOpeningHours().getOpenNow() ? R.string.listView_open_now : R.string.listView_closed);
             openingTextView.setTypeface(null, Typeface.ITALIC);
             distanceTextView.setText(calculateDistance(result)+"m");
+            retrieveGoingPersons(result);
+            calculateStarRating(result);
             Log.d(TAG, "ListView updateRestaurantsList: ");
         }catch (Exception e){
             Log.d(TAG, "updateRestaurantsList: Error " + e);
@@ -70,16 +77,51 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
         }catch (Exception e){
             Log.d(TAG, "calculateDistance Error: " +e);
         }
-        Log.d(TAG, "calculateStarRating: "+ result.getRating());
         return Math.round(distance[0]);
     }
 
     private void calculateStarRating(Result result){
         try{
-            Log.d(TAG, "calculateStarRating: "+ result.getRating());
+            Log.d(TAG, "calculateStarRating: "+ result.getName()+ " " +  result.getRating());
+            double ratingValue = result.getRating(); // round the value of rating
+            if (ratingValue < 1.25 ) {
+                starsImage.setVisibility(View.INVISIBLE);
+                starsImage2.setVisibility(View.INVISIBLE);
+                starsImage3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 1.25 && ratingValue < 2.5){
+                starsImage.setVisibility(View.VISIBLE);
+                starsImage2.setVisibility(View.INVISIBLE);
+                starsImage3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 2.5 && ratingValue < 3.75){
+                starsImage.setVisibility(View.VISIBLE);
+                starsImage2.setVisibility(View.VISIBLE);
+                starsImage3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 3.75 && ratingValue <= 5){
+                starsImage.setVisibility(View.VISIBLE);
+                starsImage2.setVisibility(View.VISIBLE);
+                starsImage3.setVisibility(View.VISIBLE);
+            }
         }catch (Exception e){
             Log.d(TAG, "calculateStarRating: "+ e);
         }
     }
 
+    private void retrieveGoingPersons(Result result){
+            GoingUserHelper.getAllRestaurantsWithGoingUsers(result.getName()).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    Log.d(TAG, "#of persons: "+ queryDocumentSnapshots.size());
+                    if(queryDocumentSnapshots.size() > 0){
+                        personNumberTextView.setVisibility(View.VISIBLE);
+                        personNumberTextView.setText("("+queryDocumentSnapshots.size()+")");
+                        personImage.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }
+
 }
+
+
+

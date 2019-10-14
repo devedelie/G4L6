@@ -8,7 +8,6 @@ import com.elbaz.eliran.go4lunch.models.Restaurant;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import static android.content.ContentValues.TAG;
@@ -21,29 +20,19 @@ public class GoingUserHelper {
 
     // --- GET ---
 
-//    public static Task<QuerySnapshot> getAllGoingUsers(String collectionName){
-//        // Query of the current 'going-users' in the entire collection
-//        return RestaurantHelper.getRestaurantCollection()
-//                .whereEqualTo(collectionName, true)
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if(task.isSuccessful()){
-//                            Log.d(TAG, "onComplete: getAllGoingUsers");
-//
-//                        }
-//                    }
-//                });
-//    }
-
-    public static Query getAllUsersForWorkmates(String restaurants){
-        return RestaurantHelper.getRestaurantCollection()
-                .document()
-                .collection(COLLECTION_NAME)
-                .orderBy("dateCreated")
-                .limit(50);
+    public static Task<QuerySnapshot> getAllRestaurantsWithGoingUsers(String restaurantName) {
+        // Query of the current 'going-users' in the entire collection
+        return RestaurantHelper.getRestaurantCollection().document(restaurantName).collection(COLLECTION_NAME).get();
     }
+
+
+//    public static Query getAllUsersForWorkmates(String restaurants){
+//        return RestaurantHelper.getRestaurantCollection()
+//                .document()
+//                .collection(COLLECTION_NAME)
+//                .orderBy("dateCreated")
+//                .limit(50);
+//    }
 
     public static Task<Void> createUserForGoingList(String restaurantID, String restaurantNameId, User userGoing){
         // Create userGoing object
