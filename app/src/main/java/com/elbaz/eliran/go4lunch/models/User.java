@@ -1,5 +1,7 @@
 package com.elbaz.eliran.go4lunch.models;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 /**
@@ -14,7 +16,7 @@ public class User {
     private String selectedRestaurantName;
     private Boolean isGoing;
     private String restaurantID;
-
+    private List<String> likes;
 
 
     public User() { }
@@ -26,6 +28,7 @@ public class User {
         this.selectedRestaurantName = "";
         this.isGoing = false;
         this.restaurantID = "";
+        this.likes = null;
 
     }
 
@@ -36,6 +39,7 @@ public class User {
     public String getSelectedRestaurantName() { return selectedRestaurantName; }
     public Boolean getIsGoing() {return isGoing; }
     public String getRestaurantID() { return restaurantID; }
+    public List<String> getLikes(){return likes;}
 
     // --- SETTERS ---
     public void setUsername(String username) { this.username = username; }
@@ -44,4 +48,5 @@ public class User {
     public void setSelectedRestaurantName(String selectedRestaurantName) { this.selectedRestaurantName = selectedRestaurantName; }
     public void setIsGoing(Boolean isGoing) { this.isGoing = isGoing; }
     public void setRestaurantID(String restaurantID) { this.restaurantID = restaurantID; }
+    public void setLikes(List<String> likes){this.likes = likes;}
 }

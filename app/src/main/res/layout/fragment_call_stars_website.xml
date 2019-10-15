@@ -49,6 +49,7 @@
         android:focusable="true">
 
         <ImageView
+            android:id="@+id/restaurant_details_star"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_star_icon"/>
@@ -57,6 +58,7 @@
             android:id="@+id/detail_restaurant_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/restaurant_detail_like"
             app:fontName="Roboto_Light"/>
 
     </LinearLayout>

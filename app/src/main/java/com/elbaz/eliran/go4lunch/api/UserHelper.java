@@ -6,12 +6,15 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
 /**
  * Created by Eliran Elbaz on 19-Sep-19.
  */
 public class UserHelper {
 
     private static final String COLLECTION_NAME = "users";
+    private static final String LIKE_COLLECTION_NAME = "likes";
 
     // --- COLLECTION REFERENCE ---
 
@@ -52,6 +55,10 @@ public class UserHelper {
 
     public static Task<Void> updateRestaurantID(String uid, String restaurantID){
         return UserHelper.getUsersCollection().document(uid).update("restaurantID", restaurantID);
+    }
+
+    public static Task<Void> updateLikedRestaurants(String uid, List<String> restaurantID){
+        return UserHelper.getUsersCollection().document(uid).update("likes", restaurantID);
     }
 
     // --- DELETE ---

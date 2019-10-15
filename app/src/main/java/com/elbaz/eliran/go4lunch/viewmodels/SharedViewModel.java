@@ -19,21 +19,21 @@ public class SharedViewModel extends ViewModel {
     private static final String TAG = "MapViewFragmentViewMode";
 
 
-    /**
-     * Get/Set current pager (of the visible fragment)
-     */
-    // Create an instance of Mutable live data
-    private MutableLiveData<Integer> mPagerCurrentItem = new MutableLiveData<>();
-
-    public void setPagerCurrentItem(Integer searchRestaurantOnMap){
-        mPagerCurrentItem.setValue(searchRestaurantOnMap);
-        Log.d(TAG, "LiveDataTest setLocationOnMap: "+ mPagerCurrentItem);
-    }
-
-    public LiveData<Integer> getPagerCurrentItem(){
-        Log.d(TAG, "LiveDataTest getLocationFromMap was called: "+ mPagerCurrentItem);
-        return mPagerCurrentItem;
-    }
+//    /**
+//     * Get/Set current pager (of the visible fragment)
+//     */
+//    // Create an instance of Mutable live data
+//    private MutableLiveData<Integer> mPagerCurrentItem = new MutableLiveData<>();
+//
+//    public void setPagerCurrentItem(Integer searchRestaurantOnMap){
+//        mPagerCurrentItem.setValue(searchRestaurantOnMap);
+//        Log.d(TAG, "LiveDataTest setLocationOnMap: "+ mPagerCurrentItem);
+//    }
+//
+//    public LiveData<Integer> getPagerCurrentItem(){
+//        Log.d(TAG, "LiveDataTest getLocationFromMap was called: "+ mPagerCurrentItem);
+//        return mPagerCurrentItem;
+//    }
 
     /**
      * Get/Set fetched results List (nearby markers)

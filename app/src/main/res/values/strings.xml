@@ -76,6 +76,7 @@
     <string name="restaurant_detail_call_no_number">The current restaurant did not provide any phone number.</string>
     <string name="restaurant_detail_call_no_website">The current restaurant did not provide any website address.</string>
     <string name="restaurant_detail_website">Website</string>
+    <string name="restaurant_detail_like">Like</string>
 
     <!--ERRORS-->
     <string name="location_is_null">Couldn\'t find your location! Please restart the app</string>

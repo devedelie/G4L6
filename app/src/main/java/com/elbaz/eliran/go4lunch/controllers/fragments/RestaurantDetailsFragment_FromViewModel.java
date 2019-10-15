@@ -64,6 +64,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     // FOR DESIGN
     @BindView(R.id.fragment_bottomsheet_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_detail_image) ImageView fragmentDetailMainImage;
+    @BindView(R.id.restaurant_details_star) ImageView starImage;
     @BindView(R.id.fragment_restaurant_detail_title) TextView restaurantDetailTitle;
     @BindView(R.id.fragment_restaurant_detail_address) TextView restaurantDetailAddress;
     @BindView(R.id.fragment_restaurant_detail_description) TextView restaurantDetailDescription;
@@ -89,6 +90,8 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     private RestaurantDetailAdapter mRestaurantDetailAdapter;
     // Data
     private List<Result> mResults;
+    List<String> likes = new ArrayList<>();
+    boolean mStarFlag = false;
 
 
     public static RestaurantDetailsFragment_FromViewModel newInstance(String restaurantID, String restaurantName, int index) {
@@ -110,7 +113,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         ButterKnife.bind(this, view);
         // Get details from Bundle
         restaurantIDFromTag = getArguments().getString(MARKER_RESTAURANT_ID);
-        restaurantNameFromTag = getArguments().getString(MARKER_RESTAURANT_NAME);
+//        restaurantNameFromTag = getArguments().getString(MARKER_RESTAURANT_NAME);
         mIndex = getArguments().getInt(MARKER_RESTAURANT_INDEX);
 //        mPlacesClient = Places.createClient(getActivity());
         this.getCurrentUserFromFirestore();
@@ -142,13 +145,14 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     }
 
     private void getDataFromFireStore(){
-        //  Get additional data from Firestore (restaurant name & isGoing)
+        //  Get additional data from Firestore (restaurant name, likes, isGoing...etc)
         UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User currentUser = documentSnapshot.toObject(User.class);
                 mSavedRestaurantNameOnFB = currentUser.getSelectedRestaurantName();
                 mIsGoing = currentUser.getIsGoing();
+                likes = currentUser.getLikes();
                 // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
                 mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
                 Log.d(TAG, "onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
@@ -199,9 +203,13 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
             } else{
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_closed));
             }
-            // set rating
-            restaurantDetailLikes.setText(mResults.get(mIndex).getRating().toString());
-
+            // Check if user likes the current restaurant
+            for(int i= 0 ; i<likes.size() ; i++){
+                if(likes.get(i).equals(restaurantIDFromTag)){
+                    mStarFlag = true;
+                    starImage.setImageResource(R.drawable.ic_star_yellow_24dp);
+                }
+            }
         }
         catch(Exception e) {
             restaurantDetailDescription.setText(getString(R.string.restaurant_detail_not_available));
@@ -231,6 +239,22 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
             startActivity(intent);
         }else{
             Toast.makeText(getActivity(), R.string.restaurant_detail_call_no_number, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @OnClick(R.id.restaurant_details_like_button)
+    public void likeRestaurantBtn(){
+        if (mStarFlag){  // User already like the current restaurant (need to remove)
+            likes.remove(restaurantIDFromTag);
+            UserHelper.updateLikedRestaurants(getCurrentUser().getUid(), likes).addOnFailureListener(this.onFailureListener());
+            starImage.setImageResource(R.drawable.ic_star_icon);
+            mStarFlag=false;
+
+        }else{      // User like the restaurant (need to add)
+            likes.add(restaurantIDFromTag);
+            UserHelper.updateLikedRestaurants(getCurrentUser().getUid(), likes).addOnFailureListener(this.onFailureListener());
+            starImage.setImageResource(R.drawable.ic_star_yellow_24dp);
+            mStarFlag=false;
         }
     }
 
