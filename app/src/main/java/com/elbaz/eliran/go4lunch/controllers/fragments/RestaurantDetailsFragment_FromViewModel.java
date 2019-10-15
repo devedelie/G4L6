@@ -65,6 +65,9 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     @BindView(R.id.fragment_bottomsheet_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_detail_image) ImageView fragmentDetailMainImage;
     @BindView(R.id.restaurant_details_star) ImageView starImage;
+    @BindView(R.id.restaurantDetail_stars_1) ImageView starIcon1;
+    @BindView(R.id.restaurantDetail_stars_2) ImageView starIcon2;
+    @BindView(R.id.restaurantDetail_stars_3) ImageView starIcon3;
     @BindView(R.id.fragment_restaurant_detail_title) TextView restaurantDetailTitle;
     @BindView(R.id.fragment_restaurant_detail_address) TextView restaurantDetailAddress;
     @BindView(R.id.fragment_restaurant_detail_description) TextView restaurantDetailDescription;
@@ -90,8 +93,8 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     private RestaurantDetailAdapter mRestaurantDetailAdapter;
     // Data
     private List<Result> mResults;
-    List<String> likes = new ArrayList<>();
-    boolean mStarFlag = false;
+    private List<String> likes = new ArrayList<>();
+    private boolean mStarFlag = false;
 
 
     public static RestaurantDetailsFragment_FromViewModel newInstance(String restaurantID, String restaurantName, int index) {
@@ -113,9 +116,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         ButterKnife.bind(this, view);
         // Get details from Bundle
         restaurantIDFromTag = getArguments().getString(MARKER_RESTAURANT_ID);
-//        restaurantNameFromTag = getArguments().getString(MARKER_RESTAURANT_NAME);
         mIndex = getArguments().getInt(MARKER_RESTAURANT_INDEX);
-//        mPlacesClient = Places.createClient(getActivity());
         this.getCurrentUserFromFirestore();
         executeHttpRequestForMoreDetails();
         return view;
@@ -197,6 +198,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
             // set Texts
             restaurantDetailTitle.setText(mResults.get(mIndex).getName());
             restaurantDetailAddress.setText(mResults.get(mIndex).getVicinity());
+            calculateStarRating(mResults);
             // Set OpenNow Status (try & catch for null cases)
             if(mResults.get(mIndex).getOpeningHours().getOpenNow()){
                 restaurantDetailDescription.setText(getString(R.string.restaurant_detail_openNow));
@@ -213,6 +215,32 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         }
         catch(Exception e) {
             restaurantDetailDescription.setText(getString(R.string.restaurant_detail_not_available));
+        }
+    }
+
+    private void calculateStarRating(List<Result> result){
+        try{
+            Log.d(TAG, "calculateStarRating: "+ result.get(mIndex).getName()+ " " +  result.get(mIndex).getRating());
+            double ratingValue = result.get(mIndex).getRating(); // round the value of rating
+            if (ratingValue < 1.25 ) {
+                starIcon1.setVisibility(View.INVISIBLE);
+                starIcon2.setVisibility(View.INVISIBLE);
+                starIcon3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 1.25 && ratingValue < 2.5){
+                starIcon1.setVisibility(View.VISIBLE);
+                starIcon2.setVisibility(View.INVISIBLE);
+                starIcon3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 2.5 && ratingValue < 3.75){
+                starIcon1.setVisibility(View.VISIBLE);
+                starIcon2.setVisibility(View.VISIBLE);
+                starIcon3.setVisibility(View.INVISIBLE);
+            }else if(ratingValue >= 3.75 && ratingValue <= 5){
+                starIcon1.setVisibility(View.VISIBLE);
+                starIcon2.setVisibility(View.VISIBLE);
+                starIcon3.setVisibility(View.VISIBLE);
+            }
+        }catch (Exception e){
+            Log.d(TAG, "calculateStarRating: "+ e);
         }
     }
 

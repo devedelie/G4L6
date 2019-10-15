@@ -13,4 +13,5 @@
     <dimen name="margin_small">2dip</dimen>
     <dimen name="margin_huge">56dip</dimen>
     <dimen name="recyclerView_padding">3dp</dimen>
+    <dimen name="starIcon_bottomsheet">18dp</dimen>
 </resources>

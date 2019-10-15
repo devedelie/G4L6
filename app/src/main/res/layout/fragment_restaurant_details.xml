@@ -34,7 +34,47 @@
                 android:layout_weight="0.2"
                 android:layout_marginEnd="@dimen/margin_huge"
                 style="@style/G4LText.Title"
-                app:fontName="Roboto_Medium"/>
+                app:fontName="Roboto_Medium" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="start"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="50dp">
+
+                <ImageView
+                    android:id="@+id/restaurantDetail_stars_1"
+                    android:layout_width="@dimen/starIcon_bottomsheet"
+                    android:layout_height="@dimen/starIcon_bottomsheet"
+                    android:background="@drawable/ic_w_star_icon"
+                    android:visibility="invisible"
+                    android:backgroundTint="@color/star_yellow"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/restaurantDetail_stars_2"
+                    android:layout_width="@dimen/starIcon_bottomsheet"
+                    android:layout_height="@dimen/starIcon_bottomsheet"
+                    android:background="@drawable/ic_w_star_icon"
+                    android:visibility="invisible"
+                    android:backgroundTint="@color/star_yellow"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/restaurantDetail_stars_3"
+                    android:layout_width="@dimen/starIcon_bottomsheet"
+                    android:layout_height="@dimen/starIcon_bottomsheet"
+                    android:background="@drawable/ic_w_star_icon"
+                    android:visibility="invisible"
+                    android:backgroundTint="@color/star_yellow"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
 
             <com.elbaz.eliran.go4lunch.views.G4LTextView
                 android:id="@+id/fragment_restaurant_detail_address"
