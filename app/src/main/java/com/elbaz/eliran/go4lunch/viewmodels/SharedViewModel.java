@@ -20,7 +20,7 @@ public class SharedViewModel extends ViewModel {
 
 
     /**
-     * Get/Set current pager (visible fragment)
+     * Get/Set current pager (of the visible fragment)
      */
     // Create an instance of Mutable live data
     private MutableLiveData<Integer> mPagerCurrentItem = new MutableLiveData<>();

@@ -311,7 +311,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 Log.d(TAG, "onMarkerClick: " + i + " " + isRestaurantValueExist);
             }
         }
-        // If exist: avoid another Http Request and use ViewModel, else, make httpRequest
+        // If data exist: avoid another Http Request and use ViewModel. Otherwise, execute httpRequest
         if(isRestaurantValueExist){
             Log.d(TAG, "onMarkerClick: value exists");
             RestaurantDetailsFragment_FromViewModel.newInstance(tagObject.getRestaurantId(), tagObject.getRestaurantName(), tagObject.getIndex()).show(getActivity().getSupportFragmentManager(), getTag());
@@ -321,7 +321,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             RestaurantDetailsFragment_FromRetrofit.newInstance(tagObject.getRestaurantId(), tagObject.getRestaurantName()).show(getActivity().getSupportFragmentManager(), getTag());
             isRestaurantValueExist =false;
         }
-
         return true;
     }
 

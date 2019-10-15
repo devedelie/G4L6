@@ -1,6 +1,8 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +28,8 @@ import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.models.Restaurant;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.elbaz.eliran.go4lunch.models.restaurantDetails.RestaurantDetails;
+import com.elbaz.eliran.go4lunch.utils.PlacesStream;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -45,6 +49,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
@@ -72,6 +78,8 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     private String restaurantIDFromTag;
     private String restaurantNameFromTag;
     private PlacesClient mPlacesClient;
+    private Disposable mDisposable;
+    private RestaurantDetails mRestaurantDetails;
     private int mIndex;
     // Variables for Firestore
     private boolean mIsGoing = false;
@@ -106,6 +114,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         mIndex = getArguments().getInt(MARKER_RESTAURANT_INDEX);
 //        mPlacesClient = Places.createClient(getActivity());
         this.getCurrentUserFromFirestore();
+        executeHttpRequestForMoreDetails();
         return view;
     }
 
@@ -215,6 +224,24 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         updateUserOnFireStore();
     }
 
+    @OnClick(R.id.restaurant_details_call_button)
+    public void callToRestaurant(){
+        if(mRestaurantDetails.getResult().getFormattedPhoneNumber()!=null && !mRestaurantDetails.getResult().getFormattedPhoneNumber().isEmpty()){
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + mRestaurantDetails.getResult().getFormattedPhoneNumber()));
+            startActivity(intent);
+        }else{
+            Toast.makeText(getActivity(), R.string.restaurant_detail_call_no_number, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @OnClick(R.id.restaurant_details_website_button)
+    public void goToWebsite(){
+        if(mRestaurantDetails.getResult().getWebsite() != null && !mRestaurantDetails.getResult().getWebsite().isEmpty()){
+            startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(mRestaurantDetails.getResult().getWebsite())));
+        }else{
+            Toast.makeText(getActivity(), R.string.restaurant_detail_call_no_website, Toast.LENGTH_LONG).show();
+        }
+    }
 
     private void updateUserOnFireStore(){
         // update Firestore DB with the current data
@@ -242,7 +269,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
                     GoingUserHelper.deleteUserFromPreviousGoingList(modelCurrentUser, mCurrentSelectedRestaurantOnLoad);
                 }
                 // Create a new "going-user" document to restaurant collection on Firestore
-                GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
+                GoingUserHelper.createUserForGoingList(this.mResults.get(mIndex).getPlaceId(), mResults.get(mIndex).getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
 
             }else{
                 // Delete document from going-user collection
@@ -315,6 +342,38 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
                 Log.d(TAG, "onFailure: " +e);
             }
         };
+    }
+
+    // Execute the stream to fetch restaurant details
+    private void executeHttpRequestForMoreDetails(){
+        // Execute the stream subscribing to Observable defined inside PlacesResults
+        this.mDisposable = PlacesStream.streamFetchRestaurantDetailsByID(restaurantIDFromTag)
+                .subscribeWith(new DisposableObserver<RestaurantDetails>(){
+                    @Override
+                    public void onNext(RestaurantDetails restaurantDetails) {
+                        mRestaurantDetails = new RestaurantDetails();
+                        mRestaurantDetails = restaurantDetails;
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "onErrorHTTP: "+ e );
+                    }
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.disposeWhenDestroy();
+    }
+
+    // This method will be called onDestroy to avoid any risk of memory leaks.
+    private void disposeWhenDestroy(){
+        if (this.mDisposable != null && !this.mDisposable.isDisposed()) this.mDisposable.dispose();
     }
 
 }

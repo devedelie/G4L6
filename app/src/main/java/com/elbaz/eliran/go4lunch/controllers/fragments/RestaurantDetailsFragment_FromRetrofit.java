@@ -1,6 +1,8 @@
 package com.elbaz.eliran.go4lunch.controllers.fragments;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -254,6 +256,25 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
                 // Delete document from going-user collection
                 GoingUserHelper.deleteUserFromGoingList(mRestaurantDetails.getResult().getName(), modelCurrentUser).addOnFailureListener(this.onFailureListener());
             }
+        }
+    }
+
+    @OnClick(R.id.restaurant_details_call_button)
+    public void callToRestaurant(){
+        if(mRestaurantDetails.getResult().getFormattedPhoneNumber()!=null && !mRestaurantDetails.getResult().getFormattedPhoneNumber().isEmpty()){
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + mRestaurantDetails.getResult().getFormattedPhoneNumber()));
+            startActivity(intent);
+        }else{
+            Toast.makeText(getActivity(), R.string.restaurant_detail_call_no_number, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @OnClick(R.id.restaurant_details_website_button)
+    public void goToWebsite(){
+        if(mRestaurantDetails.getResult().getWebsite() != null && !mRestaurantDetails.getResult().getWebsite().isEmpty()){
+            startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(mRestaurantDetails.getResult().getWebsite())));
+        }else{
+            Toast.makeText(getActivity(), R.string.restaurant_detail_call_no_website, Toast.LENGTH_LONG).show();
         }
     }
 

@@ -14,6 +14,7 @@
 
     <!-- Call Row -->
     <LinearLayout
+        android:id="@+id/restaurant_details_call_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -38,6 +39,7 @@
 
     <!-- Stars Row -->
     <LinearLayout
+        android:id="@+id/restaurant_details_like_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -61,7 +63,7 @@
 
     <!-- Website Row -->
     <LinearLayout
-        android:id="@+id/social_view_comments_button"
+        android:id="@+id/restaurant_details_website_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
