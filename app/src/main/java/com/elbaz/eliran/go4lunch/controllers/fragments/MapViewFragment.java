@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProviders;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
-import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -103,21 +102,13 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
         mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        // Get currentPagerItem for Auto-Complete-SearchBar
-        mSharedViewModel.getPagerCurrentItem().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer == Constants.MAP_VIEW_FRAGMENT){
-                    Log.d(TAG, "TEST onChanged: updateSearch method");
-                    updateSearchAutoComplete(); // update the Map-UI with the result
-                }
-            }
-        });
         // Retrieve back fetched Results from ViewModel in case of system changes
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                mResults = results;
+                if(mResults.isEmpty()){
+                    mResults = results;
+                }
             }
         });
     }
@@ -198,21 +189,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
     }
 
-    // Update the UI with the result from Search-Autocomplete bar
-    public void updateSearchAutoComplete(){
-        // Get place Object for Auto-Complete-SearchBar
-        mSharedViewModel.getSearchObject().observe(getViewLifecycleOwner(), new Observer<Place>() {
-            @Override
-            public void onChanged(Place place) {
-                Log.d(TAG, "TEST onChanged: place value changed");
-                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
-                mRestaurantDetailsFetch = new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE);
-                setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, mRestaurantDetailsFetch);
-                AUTO_COMPLETE_INDEX_CODE++;
-            }
-        });
-    }
-
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
     public void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + " lng: " + latLng.longitude + " " + zoom + " " + latLng );
@@ -222,7 +198,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     //-----------------
     // HTTP (RxJAVA)
     //-----------------
-
     // Execute the stream to fetch nearby locations
     private void executeHttpRequestForNearbyPlaces(){
         Log.d(TAG, "executeHttpRequestForNearbyPlaces: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
@@ -346,6 +321,17 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         }
                     }
                 });
+    }
+
+    // Update the UI with the result from Search-Autocomplete bar
+    public void searchAction(Place place){
+        String restaurantID = place.getId();
+        if(!restaurantID.isEmpty() && restaurantID != null){
+            moveCamera(place.getLatLng(), DEFAULT_ZOOM);
+            mRestaurantDetailsFetch = new RestaurantDetailsFetch(place.getId(), place.getName(), AUTO_COMPLETE_INDEX_CODE);
+            setCustomMarker(place.getLatLng(), AUTO_COMPLETE_INDEX_CODE, mRestaurantDetailsFetch);
+            AUTO_COMPLETE_INDEX_CODE++;
+        }
     }
 
 }

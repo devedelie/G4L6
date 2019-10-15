@@ -31,6 +31,8 @@ import com.elbaz.eliran.go4lunch.adapters.PageAdapter;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.auth.ProfileSettingsActivity;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
+import com.elbaz.eliran.go4lunch.controllers.fragments.ListViewFragment;
+import com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
@@ -67,7 +69,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     private static final int SIGN_OUT_TASK = 10;
     public Context mContext;
     SharedViewModel mSharedViewModel;
-    // AutoComplete search
+    // AutoComplete searchAction
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
     private String textForDialog;
 
@@ -105,7 +107,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // UI Configuration
     //-------------------
 
-    // Toolbar for Navigation Drawer and search icon
+    // Toolbar for Navigation Drawer and searchAction icon
     protected void configureToolbarWithDrawer(){
         // Sets the Toolbar
         setSupportActionBar(toolbar);
@@ -160,7 +162,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     /**
-     * Inflate the top-menu (menu with search and parameters icons)
+     * Inflate the top-menu (menu with searchAction and parameters icons)
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -175,8 +177,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_search_icon){
-            setCurrentPagerToViewModel(pager.getCurrentItem());
-            this.launchAutocompleteSearchBar();
+            if(pager.getCurrentItem() == 0 || pager.getCurrentItem()== 1){
+                launchAutocompleteSearchBar(); // Launch Autocomplete searchAction bar only for fragment 0/1
+            }else{
+                // Search for workmates
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -271,11 +276,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         });
     }
 
-    // Send data to ViewModel - LiveData
-    private void setCurrentPagerToViewModel(Integer pagerCurrentItem){
-        mSharedViewModel.setPagerCurrentItem(pagerCurrentItem);
-    }
-
     private void launchAutocompleteSearchBar(){
         // Bias results to Paris region (use 'bounds' variable in below filter)
         RectangularBounds bounds = RectangularBounds.newInstance(
@@ -298,18 +298,30 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            Log.d(TAG, "onActivityResult: code is " + requestCode +" "+ resultCode);
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.d(TAG, "onActivityResult: current item" + pager.getCurrentItem());
-                mSharedViewModel.setSearchObject(place);
+                searchAction(place); // Pass the data to current fragment
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // TODO: Handle the error.
+                // Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Log.i(TAG, "onActivityResult Error: " + status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }
+        }
+    }
+
+    // Search action to be taken for MapView and ListView Fragments
+    private void searchAction(Place place){
+        switch (pager.getCurrentItem()){
+            case 0:
+                MapViewFragment mapViewFragment = (MapViewFragment) pager.getAdapter().instantiateItem(pager, pager.getCurrentItem());
+                mapViewFragment.searchAction(place);
+                break;
+            case 1:
+                ListViewFragment listViewFragment = (ListViewFragment) pager.getAdapter().instantiateItem(pager, pager.getCurrentItem());
+                listViewFragment.searchAction(place);
+                break;
         }
     }
 

@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
-import com.elbaz.eliran.go4lunch.models.Constants;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.ItemClickSupport;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
@@ -39,6 +38,7 @@ public class ListViewFragment extends BaseFragment {
     private SharedViewModel mSharedViewModel;
     private List<Result> mResults;
     private List<Result> mResultsSorted;
+    private Place mPlace;
     private RestaurantListAdapter mRestaurantListAdapter;
     @BindView(R.id.listView_recyclerView) RecyclerView listViewRecyclerView;
 
@@ -57,15 +57,6 @@ public class ListViewFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
         mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        // Get currentPagerItem for Auto-Complete-SearchBar
-        mSharedViewModel.getPagerCurrentItem().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer == Constants.LIST_VIEW_FRAGMENT){
-                    updateSearchAutoComplete(); // update the Map-UI with the result
-                }
-            }
-        });
         // get fetched Results
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
@@ -74,7 +65,6 @@ public class ListViewFragment extends BaseFragment {
                 updateUI(results);
             }
         });
-
     }
 
     @Override
@@ -94,9 +84,8 @@ public class ListViewFragment extends BaseFragment {
     }
 
     // -----------------
-    // ACTION RecyclerView onClick
+    // ACTION RecyclerView onClick Configuration
     // -----------------
-    //  Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(listViewRecyclerView, R.layout.fragment_list_view)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -136,23 +125,13 @@ public class ListViewFragment extends BaseFragment {
     }
 
     // Update the UI with the result from Search-Autocomplete bar
-    public void updateSearchAutoComplete(){
-        // Get place Object for Auto-Complete-SearchBar
-        mSharedViewModel.getSearchObject().observe(getViewLifecycleOwner(), new Observer<Place>() {
-            @Override
-            public void onChanged(Place place) {
-                Log.d(TAG, "TEST onChanged: place value changed");
-                String restaurantID = place.getId();
-                String restaurantName = place.getName();
-                if(!restaurantID.isEmpty() && restaurantID != null){
-                    RestaurantDetailsFragment_FromRetrofit.newInstance(restaurantID, restaurantName).show(getActivity().getSupportFragmentManager(), getTag());
-                }
-            }
-        });
-
+    public void searchAction(Place place){
+        String restaurantID = place.getId();
+        String restaurantName = place.getName();
+        if(!restaurantID.isEmpty() && restaurantID != null){
+            RestaurantDetailsFragment_FromRetrofit.newInstance(restaurantID, restaurantName).show(getActivity().getSupportFragmentManager(), getTag());
+        }
     }
-
-
 
 
 }
