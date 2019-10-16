@@ -11,9 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,7 +61,7 @@ import butterknife.ButterKnife;
 
 import static android.content.ContentValues.TAG;
 
-public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
+public class MainRestaurantActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener, Spinner.OnItemSelectedListener{
     @BindView(R.id.activity_main_bottom_navigation) BottomNavigationView bottomNavigationView;
     @BindView(R.id.activity_main_restaurant_viewpager) ViewPager pager;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -85,7 +89,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
-        this.getTextForDialog();
         // Assign a ViewModel
         mSharedViewModel = ViewModelProviders.of(this).get(SharedViewModel.class);
     }
@@ -128,7 +131,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 //    }
 
     /**
-     * ViewPager configuration + Tab Layout
+     * ViewPager configuration + BottomNavigation Layout
      */
     protected void configureViewPagerAndTabs(){
         //Set Adapter PageAdapter and glue it together
@@ -138,21 +141,18 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // ViewPager scroll listener
         pager.addOnPageChangeListener(this);
 
-        // Configure BottomView Listener
+        // Configure BottomNavigation Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_mapView:
-//                        configureToolbarWithDrawer();
                         pager.setCurrentItem(0);
                         break;
                     case R.id.action_listView:
-//                        configureToolbarWithDrawer(); // Add 'sort' icon in ListViewFragment
                         pager.setCurrentItem(1);
                         break;
                     case R.id.action_workmates:
-//                        configureToolbarWithDrawer(); // Hide 'Search' icon in Workmates fragment
                         pager.setCurrentItem(2);
                         break;
                 }
@@ -168,6 +168,15 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu and add it to the Toolbar
         getMenuInflater().inflate(R.menu.menu_activity_main_restaurant, menu);
+        // Configure Spinner
+        MenuItem item = menu.findItem(R.id.menu_sort_icon);
+        Spinner spinner = (Spinner) item.getActionView();
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
         return true;
     }
 
@@ -178,8 +187,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         if (itemId == R.id.menu_search_icon){
             if(pager.getCurrentItem() == 0 || pager.getCurrentItem()== 1){
                 launchAutocompleteSearchBar(); // Launch Autocomplete searchAction bar only for fragment 0/1
-            }else{
-                // Search for workmates
+            }else if(pager.getCurrentItem() == 2){
+                // Search for workmates (Not implemented yet)
             }
         }
         return super.onOptionsItemSelected(item);
@@ -222,7 +231,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         Log.d(TAG, "Test onNavigationItemSelected: "+ order);
         switch (order){
             case 0:
-                this.yourLunchDialog(); // Your lunch action
+                this.getTextForDialog(); // Your lunch action
                 break;
             case 1:
                 this.goToProfileSettings(); // settings action
@@ -321,6 +330,17 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         }
     }
 
+    // Spinner Item selection
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        Toast.makeText(parent.getContext(),
+                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString() + " " + pos,
+                Toast.LENGTH_SHORT).show();
+        ListViewFragment listViewFragment = (ListViewFragment) pager.getAdapter().instantiateItem(pager, pager.getCurrentItem());
+        listViewFragment.sortResults(parent.getItemAtPosition(pos).toString());
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) { }
+
     // --------------------
     // REST REQUESTS
     // --------------------
@@ -348,7 +368,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User currentUser = documentSnapshot.toObject(User.class);
                 textForDialog = currentUser.getSelectedRestaurantName();
-                Log.d(TAG, "setUIElements: restoName: " + currentUser.getSelectedRestaurantName());
+                yourLunchDialog();
             }
         });
     }
