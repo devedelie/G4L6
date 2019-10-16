@@ -396,6 +396,10 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         };
     }
 
+    // --------------------
+    // Http Request
+    // --------------------
+
     // Execute the stream to fetch restaurant details
     private void executeHttpRequestForMoreDetails(){
         // Execute the stream subscribing to Observable defined inside PlacesResults

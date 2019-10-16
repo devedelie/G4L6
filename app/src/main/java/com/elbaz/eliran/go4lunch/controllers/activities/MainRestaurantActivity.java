@@ -168,7 +168,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu and add it to the Toolbar
         getMenuInflater().inflate(R.menu.menu_activity_main_restaurant, menu);
-
         return true;
     }
 
@@ -223,16 +222,13 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         Log.d(TAG, "Test onNavigationItemSelected: "+ order);
         switch (order){
             case 0:
-                // Your lunch action
-                this.yourLunchDialog();
+                this.yourLunchDialog(); // Your lunch action
                 break;
             case 1:
-                // settings action
-                this.goToProfileSettings();
+                this.goToProfileSettings(); // settings action
                 break;
             case 2:
-                // logout action
-                this.signOutUserFromFirebase();
+                this.signOutUserFromFirebase(); // logout action
                 break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);

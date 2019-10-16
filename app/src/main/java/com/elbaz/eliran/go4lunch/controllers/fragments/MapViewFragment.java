@@ -106,9 +106,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                if(mResults.isEmpty()){
                     mResults = results;
-                }
             }
         });
     }
@@ -170,12 +168,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
                                 // move camera to location
                                 moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-                                // If NULL, execute Http request, ELSE, update the UI with the data from ViewModel
+                                // If mResult is NULL, execute Http request, ELSE, update the UI with the data from ViewModel
                                 if(mResults == null){
-                                    Log.d(TAG, "onSuccess: mResults is null");
                                     executeHttpRequestForNearbyPlaces();
                                 }else {
-                                    Log.d(TAG, "onSuccess: mResults isn't null");
                                     updateUI(mResults);
                                 }
                             }else{
@@ -204,7 +200,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Execute the stream subscribing to Observable defined inside PlacesResults
         this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
                 .subscribeWith(new DisposableObserver<PlacesResults>(){
-
                     @Override
                     public void onNext(PlacesResults placesResults) {
                         Log.d(TAG, "onNext: HTTP");
