@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.ButterKnife;
+
 import static android.content.ContentValues.TAG;
 
 /**
@@ -44,8 +45,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Nullable
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-
-
 
     // --------------------
     // ERROR HANDLER

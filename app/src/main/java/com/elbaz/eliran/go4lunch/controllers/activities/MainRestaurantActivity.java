@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +24,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -73,6 +71,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     private static final int SIGN_OUT_TASK = 10;
     public Context mContext;
     SharedViewModel mSharedViewModel;
+    private User mUser;
     // AutoComplete searchAction
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
     private String textForDialog;
@@ -89,8 +88,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         this.configureViewPagerAndTabs();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
-        // Assign a ViewModel
-        mSharedViewModel = ViewModelProviders.of(this).get(SharedViewModel.class);
     }
 
     @Override
@@ -112,23 +109,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 
     // Toolbar for Navigation Drawer and searchAction icon
     protected void configureToolbarWithDrawer(){
-        // Sets the Toolbar
         setSupportActionBar(toolbar);
     }
-
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        super.onPrepareOptionsMenu(menu);
-//        if(pager.getCurrentItem() == 1){
-//        MenuItem item = menu.findItem(R.id.menu_sort_icon);
-//        item.setVisible(true);
-//        }
-//        if(pager.getCurrentItem() ==  2){
-//            MenuItem item = menu.findItem(R.id.menu_search_icon);
-//            item.setVisible(false);
-//        }
-//        return true;
-//    }
 
     /**
      * ViewPager configuration + BottomNavigation Layout
@@ -137,7 +119,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         //Set Adapter PageAdapter and glue it together
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
-        pager.setOffscreenPageLimit(2);
+        pager.setOffscreenPageLimit(1);
         // ViewPager scroll listener
         pager.addOnPageChangeListener(this);
 
@@ -209,6 +191,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         TextView userEmail = headerView.findViewById(R.id.navigation_header_email);
         ImageView userImage = headerView.findViewById(R.id.navigation_header_image);
         // set user name and email
+
         userName.setText(this.getCurrentUser().getDisplayName());
         userEmail.setText(this.getCurrentUser().getEmail());
         // Set Image
@@ -231,7 +214,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         Log.d(TAG, "Test onNavigationItemSelected: "+ order);
         switch (order){
             case 0:
-                this.getTextForDialog(); // Your lunch action
+                this.getUserDataFromFirestore(); // Your lunch action
                 break;
             case 1:
                 this.goToProfileSettings(); // settings action
@@ -332,11 +315,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
 
     // Spinner Item selection
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        Toast.makeText(parent.getContext(),
-                "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString() + " " + pos,
-                Toast.LENGTH_SHORT).show();
-        ListViewFragment listViewFragment = (ListViewFragment) pager.getAdapter().instantiateItem(pager, pager.getCurrentItem());
-        listViewFragment.sortResults(parent.getItemAtPosition(pos).toString());
+        if(!parent.getItemAtPosition(pos).toString().equals("Default")){
+            Log.d(TAG, "onItemSelected Sort: "+ parent.getItemAtPosition(pos).toString());
+            ListViewFragment listViewFragment = (ListViewFragment) pager.getAdapter().instantiateItem(pager, pager.getCurrentItem());
+            listViewFragment.sortResults(parent.getItemAtPosition(pos).toString());
+        }
     }
     @Override
     public void onNothingSelected(AdapterView<?> parent) { }
@@ -362,7 +345,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         };
     }
 
-    public void getTextForDialog(){
+    public void getUserDataFromFirestore(){
         UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
