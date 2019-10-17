@@ -51,6 +51,7 @@ import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
+import static com.elbaz.eliran.go4lunch.utils.UtilsHelper.rating;
 
 /**
  * Created by Eliran Elbaz on 29-Sep-19.
@@ -108,7 +109,7 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
         restaurantNameFromTag = getArguments().getString(MARKER_RESTAURANT_NAME);
         this.executeHttpRequestForDetails();
         // Get user from Firestore
-        this.getCurrentUserFromFirestore();
+//        this.getCurrentUserFromFirestore();
         return view;
     }
 
@@ -149,24 +150,6 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
     // This method will be called onDestroy to avoid any risk of memory leaks.
     private void disposeWhenDestroy(){
         if (this.mDisposable != null && !this.mDisposable.isDisposed()) this.mDisposable.dispose();
-    }
-
-    private void getDataFromFireStore(){
-        //  Get additional data from Firestore (restaurant Name, ID & isGoing)
-        UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User currentUser = documentSnapshot.toObject(User.class);
-                mSavedRestaurantNameOnFB = currentUser.getSelectedRestaurantName();
-                mIsGoing = currentUser.getIsGoing();
-                likes = currentUser.getLikes();
-                // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
-                mCurrentSelectedRestaurantOnLoad = currentUser.getSelectedRestaurantName();
-                Log.d(TAG, "TEST onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
-                // Update the UI while all data has been fetched (httpRequest & Firestore Data)
-                updateUI();
-            }
-        });
     }
 
     private void updateUI(){
@@ -219,27 +202,19 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
             }
         }
         catch(Exception e) {
-            restaurantDetailDescription.setText(getString(R.string.restaurant_detail_not_available));
+            Log.d(TAG, "setViewElements: Error"+ e);
         }
     }
 
     private void calculateStarRating(RestaurantDetails restaurantDetails){
         try{
-            Log.d(TAG, "calculateStarRating: "+ restaurantDetails.getResult().getName()+ " " +  restaurantDetails.getResult().getRating());
-            double ratingValue = restaurantDetails.getResult().getRating(); // round the value of rating
-            if (ratingValue < 1.25 ) {
-                starIcon1.setVisibility(View.INVISIBLE);
-                starIcon2.setVisibility(View.INVISIBLE);
-                starIcon3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 1.25 && ratingValue < 2.5){
+            double ratingValue = rating(restaurantDetails.getResult().getRating()); // round the value of rating
+            if(ratingValue == 1){
                 starIcon1.setVisibility(View.VISIBLE);
-                starIcon2.setVisibility(View.INVISIBLE);
-                starIcon3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 2.5 && ratingValue < 3.75){
+            }else if(ratingValue == 2){
                 starIcon1.setVisibility(View.VISIBLE);
                 starIcon2.setVisibility(View.VISIBLE);
-                starIcon3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 3.75 && ratingValue <= 5){
+            }else if(ratingValue == 3){
                 starIcon1.setVisibility(View.VISIBLE);
                 starIcon2.setVisibility(View.VISIBLE);
                 starIcon3.setVisibility(View.VISIBLE);
@@ -312,7 +287,7 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
 
     @OnClick(R.id.restaurant_details_like_button)
     public void likeRestaurantBtn(){
-        if (mStarFlag){  // User already like the current restaurant (need to remove)
+        if (mStarFlag){  // User already liked the current restaurant (need to remove)
             likes.remove(restaurantIDFromTag);
             UserHelper.updateLikedRestaurants(getCurrentUser().getUid(), likes).addOnFailureListener(this.onFailureListener());
             starImage.setImageResource(R.drawable.ic_star_icon);
@@ -322,7 +297,7 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
             likes.add(restaurantIDFromTag);
             UserHelper.updateLikedRestaurants(getCurrentUser().getUid(), likes).addOnFailureListener(this.onFailureListener());
             starImage.setImageResource(R.drawable.ic_star_yellow_24dp);
-            mStarFlag=false;
+            mStarFlag=true;
         }
     }
 
@@ -375,13 +350,25 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
     // --------------------
     // REST REQUESTS
     // --------------------
-    //  Get Current User from Firestore
-    private void getCurrentUserFromFirestore(){
-        UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+    //  Get Current User's data from Firestore
+    private void getDataFromFireStore(){
+        //  Get additional data from Firestore (restaurant Name, ID & isGoing)
+        UserHelper.getUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                User currentUser = documentSnapshot.toObject(User.class);
                 modelCurrentUser = documentSnapshot.toObject(User.class);
-                Log.d(TAG, "onSuccess: getCurrentUserFromFirestore" + modelCurrentUser);
+                mSavedRestaurantNameOnFB = modelCurrentUser.getSelectedRestaurantName();
+                mIsGoing = modelCurrentUser.getIsGoing();
+                if(modelCurrentUser.getLikes() != null){
+                    likes = modelCurrentUser.getLikes();
+                }
+                Log.d(TAG, "onSuccess Likes: " + likes);
+                // keep the current restaurant name which saved on user's document, to help erasing it from isGoing collection if the user change restaurant
+                mCurrentSelectedRestaurantOnLoad = modelCurrentUser.getSelectedRestaurantName();
+                Log.d(TAG, "TEST onSuccess: "+ mSavedRestaurantNameOnFB + " " +mCurrentSelectedRestaurantOnLoad);
+                // Update the UI while all data has been fetched (httpRequest & Firestore Data)
+                updateUI();
             }
         });
     }
