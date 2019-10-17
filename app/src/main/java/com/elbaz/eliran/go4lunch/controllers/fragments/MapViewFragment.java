@@ -28,6 +28,7 @@ import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.PlacesStream;
+import com.elbaz.eliran.go4lunch.utils.UtilsHelper;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -203,10 +204,13 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     @Override
                     public void onNext(PlacesResults placesResults) {
                         Log.d(TAG, "onNext: HTTP");
+                        // Calculate additional values
+                        calculateAdditionalValues(placesResults.getResults());
                         // Set data in ViewModel
                         setResultsInViewModel(placesResults);
                         // Update UI with results
                         updateUI(placesResults.getResults());
+
                     }
                     @Override
                     public void onError(Throwable e) {
@@ -228,6 +232,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mResults.clear();
         mResults.addAll(results);
         setNearbyRestaurantsWithMarkers(mResults);
+    }
+
+    private void calculateAdditionalValues(List<Result> results){
+        // Set Distance and Going workmates into List<Result>
+        for (int i = 0 ; i<results.size(); i++){
+            results.get(i).setDistance(UtilsHelper.calculateDistance(results.get(i)));
+//            UtilsHelper.retrieveGoingPersons(results.get(i), i);
+            Log.d(TAG, "calculateAdditionalValues: " + results.get(i).getDistance() + " " + results.get(i).getWorkmates());
+        }
+
     }
 
     private void setNearbyRestaurantsWithMarkers(List<Result> results){
@@ -312,7 +326,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                                 data = data.substring(0, 1).toUpperCase() + data.substring(1);
                                 mListOfBookedRestaurants.add(i, data);
                             }
-                            Log.d(TAG, "onComplete: Regex -"+ mListOfBookedRestaurants);
+                            Log.d(TAG, "onComplete: Regex -1s"+ mListOfBookedRestaurants);
                         }
                     }
                 });
