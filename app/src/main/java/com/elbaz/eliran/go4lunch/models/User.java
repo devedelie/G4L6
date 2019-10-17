@@ -28,7 +28,6 @@ public class User {
         this.selectedRestaurantName = "";
         this.isGoing = false;
         this.restaurantID = "";
-        this.likes = null;
 
     }
 
