@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 
@@ -25,13 +25,10 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListVi
     // DATA
     private List<Result> mResults;
     Context mContext;
-    // Glide object
-    private RequestManager glide;
 
-    public RestaurantListAdapter(List<Result> results, Context context, RequestManager glide) {
+    public RestaurantListAdapter(List<Result> results, Context context) {
         mResults = results;
         mContext = context;
-        this.glide = glide;
     }
 
     @NonNull
@@ -46,7 +43,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListVi
     @Override
     public void onBindViewHolder (@NonNull RestaurantListViewHolder restaurantListViewHolder, int i){
         Log.d(TAG, "ListView onBindViewHolder: ");
-        restaurantListViewHolder.updateRestaurantsList(this.mResults.get(i), this.glide);
+        restaurantListViewHolder.updateRestaurantsList(this.mResults.get(i), Glide.with(mContext));
     }
 
     @Override
