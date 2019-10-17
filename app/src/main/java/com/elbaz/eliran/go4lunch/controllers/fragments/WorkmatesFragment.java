@@ -3,6 +3,7 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -52,9 +53,15 @@ public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdap
         ButterKnife.bind(this, view);
         this.configureRecyclerView();
         this.configureOnClickRecyclerView();
-
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.menu_search_icon).setVisible(false);
+        super.onPrepareOptionsMenu(menu);
     }
 
     private void configureRecyclerView() {
