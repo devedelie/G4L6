@@ -63,7 +63,7 @@
                 android:background="@drawable/button_radius_primary_color"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_marginBottom="@dimen/default_buttons_margin_bottom"
-                android:drawableLeft="@drawable/ic_google_icon"/>
+                android:drawableStart="@drawable/ic_google_icon"/>
 
             <!-- BUTTON Facebook -->
             <Button
@@ -75,7 +75,7 @@
                 android:textSize="@dimen/default_text_size"
                 android:background="@drawable/button_radius_accent_color"
                 style="?android:attr/borderlessButtonStyle"
-                android:drawableLeft="@drawable/ic_facebook_icon" />
+                android:drawableStart="@drawable/ic_facebook_icon" />
 
         </LinearLayout>
 

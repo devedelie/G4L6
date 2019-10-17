@@ -1,24 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--Search icon-->
+    <!--Sort icon-->
     <item
         android:id="@+id/menu_sort_icon"
         android:icon="@drawable/ic_sort_icon"
         app:showAsAction="always"
         android:title=""
+        app:actionViewClass="android.widget.Spinner"
         android:orderInCategory="0"
         android:visible="false">
-
     </item>
-
+    <!--Search icon-->
     <item
         android:id="@+id/menu_search_icon"
         android:icon="@drawable/ic_search_icon"
         app:showAsAction="always"
         android:title=""
-        android:orderInCategory="0">
+        android:orderInCategory="1">
     </item>
-
-
 
 </menu>

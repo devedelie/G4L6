@@ -90,13 +90,17 @@
     <!-- ANIMATION -->
     <string name="animation_main_to_detail" translatable="false">AnimationMainToDetail</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--Restaurant detail item -->
+    <string name="item_restaurant_name">Restaurant Name</string>
+    <string name="item_restaurant_address">Address is not available</string>
+    <string name="restaurant_detail_opening_times">Opening Times are not available</string>
+    <string name="restaurant_detail_distance">N/A</string>
 
     <string-array name="sort_array">
+        <item>Default</item>
         <item>Distance</item>
-        <item>Type</item>
         <item>Rating</item>
+        <item>Workmates</item>
     </string-array>
 
 
