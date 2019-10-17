@@ -17,11 +17,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
+import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
 import com.elbaz.eliran.go4lunch.models.User;
+import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,6 +45,8 @@ public class ProfileSettingsActivity extends BaseActivity {
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
     private static final int UPDATE_USERNAME = 30;
+    private SharedViewModel sharedViewModel;
+
 
     @Override
     public int getFragmentLayout() {
@@ -172,8 +175,8 @@ public class ProfileSettingsActivity extends BaseActivity {
                         finish();
                         break;
                     case DELETE_USER_TASK:
-                        finish();
                         clearActivityBackStack();
+                        Log.d(TAG, "onSuccess: updateUIAfterRESTRequestsCompleted");
                         break;
                     default:
                         break;
@@ -183,9 +186,11 @@ public class ProfileSettingsActivity extends BaseActivity {
     }
 
     public void clearActivityBackStack(){
+        finish();
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
+
     }
 
 }
