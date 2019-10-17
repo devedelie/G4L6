@@ -53,6 +53,28 @@ public class Result {
     @SerializedName("vicinity")
     @Expose
     private String vicinity;
+    @SerializedName("distance")
+    @Expose
+    private Integer distance;
+    @SerializedName("workmates")
+    @Expose
+    private Integer workmates;
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.distance = distance;
+    }
+
+    public Integer getWorkmates() {
+        return workmates;
+    }
+
+    public void setWorkmates(Integer workmates) {
+        this.workmates = workmates;
+    }
 
     public Geometry getGeometry() {
         return geometry;
