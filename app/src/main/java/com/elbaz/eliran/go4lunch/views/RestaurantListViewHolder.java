@@ -1,7 +1,6 @@
 package com.elbaz.eliran.go4lunch.views;
 
 import android.graphics.Typeface;
-import android.location.Location;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,10 +22,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.content.ContentValues.TAG;
-import static com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment.deviceLocation;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
+import static com.elbaz.eliran.go4lunch.utils.UtilsHelper.rating;
 
 /**
  * Created by Eliran Elbaz on 02-Oct-19.
@@ -53,7 +52,6 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
         try{
             //set images
             String imageUrl = GOOGLE_MAPS_API_BASE_URL + URL_FOR_IMAGE + result.getPhotos().get(0).getPhotoReference() + URL_FOR_IMAGE_KEY + BuildConfig.GOOGLE_BROWSER_API_KEY;
-            Log.d(TAG, "setViewElementsForNearbyPlaces: " + imageUrl);
             glide.load(imageUrl).apply(RequestOptions.centerCropTransform()).into(restaurantImage);
             // set texts
             restaurantNameTextView.setText(result.getName());
@@ -61,42 +59,32 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             addressTextView.setText(result.getVicinity());
             openingTextView.setText(result.getOpeningHours().getOpenNow() ? R.string.listView_open_now : R.string.listView_closed);
             openingTextView.setTypeface(null, Typeface.ITALIC);
-            distanceTextView.setText(calculateDistance(result)+"m");
+//            distanceTextView.setText(calculateDistance(result)+"m");
+            distanceTextView.setText(result.getDistance()+"m");
             retrieveGoingPersons(result);
             calculateStarRating(result);
             Log.d(TAG, "ListView updateRestaurantsList: ");
         }catch (Exception e){
-            Log.d(TAG, "updateRestaurantsList: Error " + e);
+            Log.d(TAG, "updateRestaurantsList: Error "+result.getName()  + "  "+ e );
         }
-    }
-
-    private int calculateDistance(Result result){
-        float[] distance = new float[1];
-        try{
-            Location.distanceBetween(deviceLocation.getLatitude(), deviceLocation.getLongitude(), result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng(), distance);
-        }catch (Exception e){
-            Log.d(TAG, "calculateDistance Error: " +e);
-        }
-        return Math.round(distance[0]);
     }
 
     private void calculateStarRating(Result result){
         try{
-            Log.d(TAG, "calculateStarRating: "+ result.getName()+ " " +  result.getRating());
-            double ratingValue = result.getRating(); // round the value of rating
-            if (ratingValue < 1.25 ) {
+            double ratingValue = rating(result.getRating()); // round the value of rating
+            if (ratingValue == 0 ) {
                 starsImage.setVisibility(View.INVISIBLE);
                 starsImage2.setVisibility(View.INVISIBLE);
                 starsImage3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 1.25 && ratingValue < 2.5){
+            }else if(ratingValue == 1){
                 starsImage.setVisibility(View.VISIBLE);
                 starsImage2.setVisibility(View.INVISIBLE);
                 starsImage3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 2.5 && ratingValue < 3.75){
+            }else if(ratingValue == 2){
                 starsImage.setVisibility(View.VISIBLE);
                 starsImage2.setVisibility(View.VISIBLE);
                 starsImage3.setVisibility(View.INVISIBLE);
-            }else if(ratingValue >= 3.75 && ratingValue <= 5){
+            }else if(ratingValue == 3){
                 starsImage.setVisibility(View.VISIBLE);
                 starsImage2.setVisibility(View.VISIBLE);
                 starsImage3.setVisibility(View.VISIBLE);
@@ -110,7 +98,7 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             GoingUserHelper.getAllRestaurantsWithGoingUsers(result.getName()).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    Log.d(TAG, "#of persons: "+ queryDocumentSnapshots.size());
+                    Log.d(TAG, "#of persons: "+ result.getName()+":  "+ queryDocumentSnapshots.size() + "  "+queryDocumentSnapshots.getDocuments());
                     if(queryDocumentSnapshots.size() > 0){
                         personNumberTextView.setVisibility(View.VISIBLE);
                         personNumberTextView.setText("("+queryDocumentSnapshots.size()+")");
