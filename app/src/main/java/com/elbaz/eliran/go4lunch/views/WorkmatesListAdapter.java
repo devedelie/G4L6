@@ -24,8 +24,6 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
     //FOR DATA
     private final RequestManager glide;
     private final String idCurrentUser;
-    private User modelCurrentUser;
-    private int index;
 
     //FOR COMMUNICATION
     private Listener callback;
@@ -42,7 +40,7 @@ public class WorkmatesListAdapter extends FirestoreRecyclerAdapter <User, Workma
         // Get resources to enable text color modification
         Resources resources = workmatesViewHolder.itemView.getContext().getResources();
         // set the user
-        modelCurrentUser = user;
+        User modelCurrentUser = user;
         workmatesViewHolder.updateWorkmatesList(user, this.idCurrentUser, this.glide, resources);
     }
 
