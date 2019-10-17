@@ -4,6 +4,7 @@ package com.elbaz.eliran.go4lunch.controllers.fragments;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,7 +15,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
@@ -24,6 +24,8 @@ import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
 import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,9 +38,10 @@ import static android.content.ContentValues.TAG;
  */
 public class ListViewFragment extends BaseFragment {
     private SharedViewModel mSharedViewModel;
-    private List<Result> mResults;
-    private List<Result> mResultsSorted;
+    public static List<Result> mResults;
+    private List<Result> mResultsCopy1= new ArrayList<>(); // Copy for sorting
     private Place mPlace;
+    private int sortValue;
     private RestaurantListAdapter mRestaurantListAdapter;
     @BindView(R.id.listView_recyclerView) RecyclerView listViewRecyclerView;
 
@@ -48,7 +51,7 @@ public class ListViewFragment extends BaseFragment {
         ButterKnife.bind(this, view); //Configure Butterknife
         this.configureRecyclerView();
         this.configureOnClickRecyclerView();
-
+        setHasOptionsMenu(true); // Prepare the correct optionsMenu items
         return view;
     }
 
@@ -67,6 +70,13 @@ public class ListViewFragment extends BaseFragment {
         });
     }
 
+    // Prepare the correct optionsMenu items
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.menu_sort_icon).setVisible(true);
+        super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     protected int getFragmentLayout() { return R.layout.fragment_list_view; }
 
@@ -78,7 +88,7 @@ public class ListViewFragment extends BaseFragment {
         // Set the recyclerView to fixed size in order to increase performances
         listViewRecyclerView.setHasFixedSize(true);
         mResults = new ArrayList<>();
-        mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext(), Glide.with(this));
+        mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext());
         listViewRecyclerView.setAdapter(this.mRestaurantListAdapter);
         listViewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -107,21 +117,10 @@ public class ListViewFragment extends BaseFragment {
     private void updateUI(List<Result> results){
         // completely erase the previous list of results each time
         // in order to avoid duplicating it due to  .addAll()
-
-//        // sort the data
-//        if(results.size() > 0){
-//            Collections.sort(results, new Comparator<Result>() {
-//                @Override
-//                public int compare(Result o1, Result o2) {
-//                    return o2.getRating().compareTo(o1.getRating());
-//                }
-//            });
-//        }
-        // Notify changes
         mResults.clear();
         mResults.addAll(results);
+        // Notify changes
         mRestaurantListAdapter.notifyDataSetChanged();
-        Log.d(TAG, "ListView updateUI: ");
     }
 
     // Update the UI with the result from Search-Autocomplete bar
@@ -133,5 +132,37 @@ public class ListViewFragment extends BaseFragment {
         }
     }
 
+    //-----------------
+    // Sorting results
+    //-----------------
+
+    public void sortResults(String sortType){
+        // sort the data
+        if(mResults.size() > 0){
+            Collections.sort(mResults, new Comparator<Result>() {
+                @Override
+                public int compare(Result o1, Result o2) {
+                    switch (sortType){
+                        case "Default":
+                            break;
+                        case "Distance":
+                            sortValue = o1.getDistance().compareTo(o2.getDistance());
+                            Log.d(TAG, "compare: "+sortValue);
+                            break;
+                        case "Rating":
+                            sortValue = o2.getRating().compareTo(o1.getRating());
+                            Log.d(TAG, "compare: "+sortValue);
+                            break;
+                        case "Workmates":
+                            sortValue = o2.getWorkmates().compareTo(o1.getWorkmates());
+                            break;
+                    }
+                    return sortValue;
+                }
+            });
+        }
+        mRestaurantListAdapter = new RestaurantListAdapter(this.mResults, getActivity().getApplicationContext());
+        listViewRecyclerView.setAdapter(mRestaurantListAdapter);
+    }
 
 }
