@@ -52,18 +52,16 @@ public class SharedViewModel extends ViewModel {
 
 
 //    /**
-//     * Get/Set fetched result Object
+//     * Get/Set User data in Firestore
 //     */
-//    private MutableLiveData<Result> mResult = new MutableLiveData<>();
+//    private MutableLiveData<User> mUser = new MutableLiveData<>();
 //
-//    public void setResult(Result result){
-//        mResult.setValue(result);
-//        Log.d(TAG, "LiveDataTest setResult: "+ result);
+//    public void setUser(User user){
+//        mUser.setValue(user);
 //    }
 //
-//    public LiveData<Result> getResult(){
-//        Log.d(TAG, "LiveDataTest getResult: "+ mResult);
-//        return mResult;
+//    public LiveData<User> getUser(){
+//        return mUser;
 //    }
 
 
