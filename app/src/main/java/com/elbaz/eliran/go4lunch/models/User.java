@@ -14,10 +14,10 @@ public class User {
     @Nullable
     private String urlPicture;
     private String selectedRestaurantName;
+    private String selectedRestaurantAddress;
     private Boolean isGoing;
     private String restaurantID;
     private List<String> likes;
-
 
     public User() { }
 
@@ -26,9 +26,9 @@ public class User {
         this.username = username;
         this.urlPicture = urlPicture;
         this.selectedRestaurantName = "";
+        this.selectedRestaurantAddress = "";
         this.isGoing = false;
         this.restaurantID = "";
-
     }
 
     // --- GETTERS ---
@@ -39,6 +39,7 @@ public class User {
     public Boolean getIsGoing() {return isGoing; }
     public String getRestaurantID() { return restaurantID; }
     public List<String> getLikes(){return likes;}
+    public String getSelectedRestaurantAddress() { return selectedRestaurantAddress; }
 
     // --- SETTERS ---
     public void setUsername(String username) { this.username = username; }
@@ -48,4 +49,6 @@ public class User {
     public void setIsGoing(Boolean isGoing) { this.isGoing = isGoing; }
     public void setRestaurantID(String restaurantID) { this.restaurantID = restaurantID; }
     public void setLikes(List<String> likes){this.likes = likes;}
+    public void setSelectedRestaurantAddress(String selectedRestaurantAddress) { this.selectedRestaurantAddress = selectedRestaurantAddress; }
+
 }
