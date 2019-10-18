@@ -96,15 +96,16 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     @Override
     public int getFragmentLayout() { return R.layout.activity_main_restaurant; }
 
-//    @Override
-//    public void onBackPressed() {
-//        // Handle back click to close menu
-//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//            this.drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-////            super.onBackPressed();
-//        }
-//    }
+    @Override
+    public void onBackPressed() {
+        // Handle 'back' press to close menu
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+//            super.onBackPressed();
+            this.moveTaskToBack(true);
+        }
+    }
 
     //-------------------
     // UI Configuration
@@ -115,9 +116,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         setSupportActionBar(toolbar);
     }
 
-    /**
-     * ViewPager configuration + BottomNavigation Layout
-     */
+    //ViewPager configuration + BottomNavigation Layout
     protected void configureViewPagerAndTabs(){
         //Set Adapter PageAdapter and glue it together
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
@@ -146,9 +145,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         });
     }
 
-    /**
-     * Inflate the top-menu (menu with searchAction and parameters icons)
-     */
+     // Inflate the top-menu (menu with searchAction and parameters icons)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu and add it to the Toolbar
@@ -179,9 +176,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Navigation drawer config
-     */
+
+    // Navigation drawer config
     protected void configureDrawerLayoutAndNavigationView(){
         // Configure drawer layout
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -209,6 +205,10 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // Set listener
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+    //-------------------
+    // Actions
+    //-------------------
 
     // Drawer item selection
     @Override
@@ -330,8 +330,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // --------------------
     // REST REQUESTS
     // --------------------
-    // 1 - Create http requests (SignOut & Delete)
 
+    // Create http requests (SignOut & Delete)
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()
                 .signOut(this)
@@ -358,7 +358,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             }
         });
     }
-
 
     // ------------------
     // ViewPager helper

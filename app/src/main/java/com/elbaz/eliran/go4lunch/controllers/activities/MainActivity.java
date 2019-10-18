@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity {
         // Verify all permissions and setups
         this.verifyPlacesSDK();
         this.isGpsEnabled();
-        // Avoid login-screen if the user is already authenticated (and location services are authorized)
+        // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
         if (this.isCurrentUserLogged() && mLocationPermissionGranted) {
             this.startMainRestaurantsActivity();
         }
