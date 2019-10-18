@@ -103,5 +103,14 @@
         <item>Workmates</item>
     </string-array>
 
+    <!--Firebase Token -->
+    <string name="msg_token_fmt">FB-Cloud Token: </string>
+
+    <!--Notification (Firebase service) -->
+    <string name="notification_title">Go4Lunch! It is time to eat</string>
+    <string name="notification_title2">Are you hungry?</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="workmates_list_for_notification">The following workmates are joining:</string>
+
 
 </resources>
