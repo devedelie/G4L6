@@ -88,7 +88,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // Get RootView for snackBarMessage
         rootView = getWindow().getDecorView().getRootView();
         // Configure the basic design structure of the app with tabs and viewPager
-        this.configureViewPagerAndTabs();
+        this.configureViewPager();
+        this.configureBottomNavigation();
         this.configureToolbarWithDrawer();
         this.configureDrawerLayoutAndNavigationView();
     }
@@ -117,14 +118,16 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     }
 
     //ViewPager configuration + BottomNavigation Layout
-    protected void configureViewPagerAndTabs(){
+    protected void configureViewPager() {
         //Set Adapter PageAdapter and glue it together
         pager.setAdapter(new PageAdapter(mContext, getSupportFragmentManager()));
         // Set the offscreenLimit - loads 2 fragments simultaneously offScreen, to improves fluency of visual load
-        pager.setOffscreenPageLimit(1);
+        pager.setOffscreenPageLimit(2);
         // ViewPager scroll listener
         pager.addOnPageChangeListener(this);
+    }
 
+     private void configureBottomNavigation(){
         // Configure BottomNavigation Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
