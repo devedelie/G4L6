@@ -49,6 +49,10 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).update("selectedRestaurantName", todaysRestaurant);
     }
 
+    public static Task<Void> updateTodaysRestaurantAddress(String uid, String todaysAddress) {
+        return UserHelper.getUsersCollection().document(uid).update("selectedRestaurantAddress", todaysAddress);
+    }
+
     public static Task<Void> updateIsGoing (String uid, boolean isGoing){
         return UserHelper.getUsersCollection().document(uid).update("isGoing", isGoing);
     }

@@ -247,9 +247,12 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
             if(mIsGoing){
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mRestaurantDetails.getResult().getName()).addOnFailureListener(this.onFailureListener());
                 UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), mRestaurantDetails.getResult().getPlaceId());
+                UserHelper.updateTodaysRestaurantAddress(this.getCurrentUser().getUid(), mRestaurantDetails.getResult().getVicinity()).addOnFailureListener(this.onFailureListener());
+
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
                 UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), "");
+                UserHelper.updateTodaysRestaurantAddress(this.getCurrentUser().getUid(),"");
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);

@@ -279,10 +279,13 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
             // set/remove restaurant name from user's document
             if(mIsGoing){
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), mResults.get(mIndex).getName()).addOnFailureListener(this.onFailureListener());
-                UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), mResults.get(mIndex).getPlaceId());
+                UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), mResults.get(mIndex).getPlaceId()).addOnFailureListener(this.onFailureListener());
+                UserHelper.updateTodaysRestaurantAddress(this.getCurrentUser().getUid(), mResults.get(mIndex).getVicinity()).addOnFailureListener(this.onFailureListener());
             }else{
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
                 UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), "");
+                UserHelper.updateTodaysRestaurantAddress(this.getCurrentUser().getUid(), "");
+
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);
