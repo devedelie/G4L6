@@ -80,7 +80,10 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
-        // Context for the fragments
+        //---Firebase Messaging Token------
+//        NotificationsService.getToken(mContext);
+//        FirebaseMessagingToken.getToken();
+        //---------------------------------
         mContext = this;
         // Get RootView for snackBarMessage
         rootView = getWindow().getDecorView().getRootView();
