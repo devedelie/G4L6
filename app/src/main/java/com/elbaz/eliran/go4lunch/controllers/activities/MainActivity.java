@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.elbaz.eliran.go4lunch.BuildConfig;
@@ -51,6 +53,14 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public int getFragmentLayout() { return R.layout.activity_main; }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(!this.isNetworkAvailable()){
+            displayMobileDataSettingsDialog(this, this);
+        }
+    }
 
     @Override
     protected void onResume() {

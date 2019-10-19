@@ -87,11 +87,16 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         mContext = this;
         // Get RootView for snackBarMessage
         rootView = getWindow().getDecorView().getRootView();
-        // Configure the basic design structure of the app with tabs and viewPager
-        this.configureViewPager();
-        this.configureBottomNavigation();
-        this.configureToolbarWithDrawer();
-        this.configureDrawerLayoutAndNavigationView();
+        // Check network connectivity
+        if(!this.isNetworkAvailable()){
+            displayMobileDataSettingsDialog(this, this);
+        }else{
+            // Configure the basic design structure of the app with tabs and viewPager
+            this.configureViewPager();
+            this.configureBottomNavigation();
+            this.configureToolbarWithDrawer();
+            this.configureDrawerLayoutAndNavigationView();
+        }
     }
 
     @Override
