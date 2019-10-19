@@ -54,6 +54,7 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
                 username.setText(getFirstName);
                 midText.setText(R.string.is_going_to);
                 midText.setTextColor(resources.getColor(R.color.has_decided_black));
+                username.setTextColor(resources.getColor(R.color.has_decided_black));
             }
             restaurantName.setText(user.getSelectedRestaurantName());
         }catch (Exception e){
