@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat;
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
-import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
+import com.elbaz.eliran.go4lunch.controllers.activities.OnNotificationClickActivity;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -103,8 +103,9 @@ public class NotificationsService extends FirebaseMessagingService {
     private void sendVisualNotification() {
 
         // Create an Intent that will be shown when user will click on the Notification
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        Intent intent = new Intent(this, OnNotificationClickActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, OnNotificationClickActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         // Create a Style for the Notification
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();

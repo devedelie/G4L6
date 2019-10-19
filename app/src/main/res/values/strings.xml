@@ -55,6 +55,7 @@
     <string name="dialog_content_no_go">You haven\'t selected your restaurant yet</string>
     <string name="dialog_bon_appetit">Bon Appétit!</string>
     <string name="dialog_button">Close</string>
+    <string name="dialog_joining_workmates">These workmates are joining:</string>
 
     <!--ProfileSettings Activity-->
     <string name="profileSettings_activity_username">User name: </string>

@@ -12,4 +12,5 @@ public class Constants {
     public static final String NEARBY_TYPE="restaurant";
     public static final int NEARBY_RADIUS= 800;
     public static final String SEARCH_FIELDS = "place_id,photo,name,vicinity,rating,formatted_phone_number,website,opening_hours,review";
+    public static final String FIREBASE_DATA_MESSAGE_KEY = "BackgroundCall";
 }

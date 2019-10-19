@@ -33,6 +33,7 @@ import butterknife.OnClick;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.models.Constants.FIREBASE_DATA_MESSAGE_KEY;
 import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class MainActivity extends BaseActivity {
@@ -41,6 +42,7 @@ public class MainActivity extends BaseActivity {
     private static final int RC_SIGN_IN = 100;
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int RC_PERMISSION_CODE = 100;
+    private static final int DATA_MESSAGE_CODE = 80;
     public static Boolean mLocationPermissionGranted = false;
 
     @BindView(R.id.main_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
@@ -58,10 +60,30 @@ public class MainActivity extends BaseActivity {
         // Verify all permissions and setups
         this.verifyPlacesSDK();
         this.isGpsEnabled();
-        // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
-        if (this.isCurrentUserLogged() && mLocationPermissionGranted) {
-            this.startMainRestaurantsActivity();
+
+        if (isDataMessageArrived()){
+            this.startOnNotificationActivity();
+        }else {
+            // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
+            if (this.isCurrentUserLogged() && mLocationPermissionGranted) {
+                this.startMainRestaurantsActivity();
+            }
         }
+    }
+
+    // Check if Data-Message has arrived from Firebase
+    private boolean isDataMessageArrived(){
+        boolean isDataMessageArrived = false;
+        if(getIntent().getExtras() != null){
+            for(String key : getIntent().getExtras().keySet()){
+                // Then get Data message from Firebase notification for action
+                if(key.equals(FIREBASE_DATA_MESSAGE_KEY)){
+                    isDataMessageArrived =true;
+                    Toast.makeText(this, "Extra sent", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+        return isDataMessageArrived;
     }
 
     //----------------------------
@@ -236,7 +258,12 @@ public class MainActivity extends BaseActivity {
         }else {
             showSnackBar(this.coordinatorLayout, getString(R.string.need_to_authorise_location_services));
         }
+    }
 
+    // Launching Restaurants Activity
+    private void startOnNotificationActivity(){
+        Intent intent = new Intent(this, OnNotificationClickActivity.class);
+        startActivity(intent);
     }
 
     // --------------------
