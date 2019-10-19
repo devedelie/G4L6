@@ -243,13 +243,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_your_lunch, viewGroup, false);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
-
         // Set textViews
         TextView dialogContent = (TextView) dialogView.findViewById(R.id.dialog_content_text);
         TextView dialogRestaurantName = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_name);
         TextView dialogBottomText = (TextView) dialogView.findViewById(R.id.dialog_bottom_text);
         Button dialogButton = (Button) dialogView.findViewById(R.id.dialog_button);
-
         if(textForDialog != null && !textForDialog.isEmpty()){
             dialogContent.setText(getResources().getString(R.string.dialog_content));
             dialogRestaurantName.setText(textForDialog);
@@ -258,7 +256,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         }else{
             dialogContent.setText(getResources().getString(R.string.dialog_content_no_go));
         }
-
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
