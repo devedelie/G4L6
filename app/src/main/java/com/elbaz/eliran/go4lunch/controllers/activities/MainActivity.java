@@ -42,7 +42,6 @@ public class MainActivity extends BaseActivity {
     private static final int RC_SIGN_IN = 100;
     private static final String PERMS_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int RC_PERMISSION_CODE = 100;
-    private static final int DATA_MESSAGE_CODE = 80;
     public static Boolean mLocationPermissionGranted = false;
 
     @BindView(R.id.main_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
@@ -61,6 +60,7 @@ public class MainActivity extends BaseActivity {
         this.verifyPlacesSDK();
         this.isGpsEnabled();
 
+        // Check if Data-Message has arrived from Firebase
         if (isDataMessageArrived()){
             this.startOnNotificationActivity();
         }else {
@@ -79,7 +79,6 @@ public class MainActivity extends BaseActivity {
                 // Then get Data message from Firebase notification for action
                 if(key.equals(FIREBASE_DATA_MESSAGE_KEY)){
                     isDataMessageArrived =true;
-                    Toast.makeText(this, "Extra sent", Toast.LENGTH_LONG).show();
                 }
             }
         }
