@@ -84,9 +84,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         ButterKnife.bind(this, view); //Configure Butterknife
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
-        this.getRestaurantCollectionForMarkers();
         // Initialise map
         this.initMap();
+        // Show current device's location
+        this.getDeviceLocation();
         return view;
     }
 
@@ -145,9 +146,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
-
-        // Show current device's location
-        getDeviceLocation();
     }
 
     // Get Device location
@@ -206,11 +204,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         Log.d(TAG, "onNext: HTTP");
                         // Calculate additional values
                         calculateAdditionalValues(placesResults.getResults());
-                        // Set data in ViewModel
-                        setResultsInViewModel(placesResults);
                         // Update UI with results
                         updateUI(placesResults.getResults());
-
+                        // Pass data to ViewModel
+                        mSharedViewModel.setResultsList(placesResults.getResults());
                     }
                     @Override
                     public void onError(Throwable e) {
@@ -222,16 +219,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 });
     }
 
-    // Send data to ViewModel - LiveData
-    private void setResultsInViewModel(PlacesResults placesResults){
-        mSharedViewModel.setResultsList(placesResults.getResults());
-    }
-
     private void updateUI(List<Result> results){
         mResults = new ArrayList<>();
         mResults.clear();
         mResults.addAll(results);
-        setNearbyRestaurantsWithMarkers(mResults);
+        getRestaurantCollectionForMarkers();
+
     }
 
     private void calculateAdditionalValues(List<Result> results){
@@ -244,12 +237,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     }
 
-    private void setNearbyRestaurantsWithMarkers(List<Result> results){
-        for (int i=results.size()-1; i>=0 ; i-- ){
-            LatLng latLng = new LatLng(results.get(i).getGeometry().getLocation().getLat(), results.get(i).getGeometry().getLocation().getLng());
+    private void setNearbyRestaurantsWithMarkers(){
+        for (int i= 0 ; i<mResults.size(); i++ ){
+            LatLng latLng = new LatLng(mResults.get(i).getGeometry().getLocation().getLat(), mResults.get(i).getGeometry().getLocation().getLng());
             Log.d(TAG, "updateUI: " + i + "----:" + latLng);
             // Create a detail object to fetch data
-            mRestaurantDetailsFetch = new RestaurantDetailsFetch(results.get(i).getPlaceId(), results.get(i).getName(), i);
+            mRestaurantDetailsFetch = new RestaurantDetailsFetch(mResults.get(i).getPlaceId(), mResults.get(i).getName(), i);
             setCustomMarker(latLng, i, mRestaurantDetailsFetch);
         }
     }
@@ -289,7 +282,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // get the current marker id from 'RestaurantDetailsFetch' Object and pass to BottomSheet fragment
         RestaurantDetailsFetch tagObject = (RestaurantDetailsFetch) marker.getTag();
         // Check if the restaurant ID equales to one of the fetched details on the List<>
-        for(int i = mResults.size()-1; i>=0 ; i--){
+        for(int i = 0; i< mResults.size();  i++){
             if(mResults.get(i).getPlaceId().equals(tagObject.getRestaurantId())){
                 isRestaurantValueExist = true;
                 Log.d(TAG, "onMarkerClick: " + i + " " + isRestaurantValueExist);
@@ -308,7 +301,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         return true;
     }
 
-    public void getRestaurantCollectionForMarkers(){
+    private void getRestaurantCollectionForMarkers(){
         // Get the users where's the value isGoing=true on their document, and collect the restaurantID
         UserHelper.getUsersCollection().whereEqualTo("isGoing", true)
                 .get()
@@ -328,6 +321,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                             }
                             Log.d(TAG, "onComplete: Regex -1s"+ mListOfBookedRestaurants);
                         }
+                        setNearbyRestaurantsWithMarkers();
                     }
                 });
     }
