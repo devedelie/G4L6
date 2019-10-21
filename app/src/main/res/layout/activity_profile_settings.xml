@@ -49,7 +49,9 @@
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_check"
                 android:layout_weight="1"
-                android:background="@color/fui_transparent" />
+                android:focusable="true"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground" />
 
         </LinearLayout>
 

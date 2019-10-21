@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -170,9 +172,10 @@ public class ProfileSettingsActivity extends BaseActivity {
                 switch (origin){
                     // 8 - Hiding Progress bar after request completed
                     case UPDATE_USERNAME:
+                        updateName();
                         break;
                     case SIGN_OUT_TASK:
-                        finish();
+                        clearActivityBackStack();
                         break;
                     case DELETE_USER_TASK:
                         clearActivityBackStack();
@@ -185,12 +188,17 @@ public class ProfileSettingsActivity extends BaseActivity {
         };
     }
 
-    public void clearActivityBackStack(){
+    private void updateName(){
+        Toast toast = Toast.makeText(this,getString(R.string.name_successfully_updated), Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    private void clearActivityBackStack(){
         finish();
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
-
     }
 
 }

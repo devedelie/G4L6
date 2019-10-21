@@ -69,6 +69,7 @@
     <string name="popup_message_choice_no">Cancel</string>
     <string name="info_no_username_found">Empty user name</string>
     <string name="info_no_email_found">Empty email address</string>
+    <string name="name_successfully_updated">Your name has been successfully updated on the system</string>
 
     <!--BottomSheet -->
     <string name="restaurant_detail_openNow">Status: Open now</string>
