@@ -81,8 +81,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         //---Firebase Cloud-Messaging Token------
-//        NotificationsService.getToken(mContext);
-//        FirebaseMessagingToken.getToken();
+//        NotificationsService.getTokenFromFB();
         //---------------------------------
         mContext = this;
         // Get RootView for snackBarMessage

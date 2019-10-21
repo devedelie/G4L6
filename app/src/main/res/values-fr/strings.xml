@@ -74,7 +74,7 @@
     <string name="restaurant_detail_like">J\'aime</string>
 
     <!--ERRORS-->
-    <string name="location_is_null">Impossible de trouver ton emplacement! S\'il vous plaît redémarrer l'application</string>
+    <string name="location_is_null">Impossible de trouver ton emplacement! S\'il vous plaît redémarrer l\'application</string>
 
     <!--Restaurant detail item -->
     <string name="item_restaurant_name">Nom du restaurant</string>
