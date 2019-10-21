@@ -33,7 +33,6 @@ import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -80,8 +79,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     private static final String MARKER_RESTAURANT_INDEX = "MARKER_RESTAURANT_NAME";
     private static final String FIRESTORE_GOING_USERS_COLLECTION = "goingUsers";
     private String restaurantIDFromTag;
-    private String restaurantNameFromTag;
-    private PlacesClient mPlacesClient;
     private Disposable mDisposable;
     private RestaurantDetails mRestaurantDetails;
     private int mIndex;
@@ -137,13 +134,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-//        getCurrentUserFromFirestore();
-
-    }
-
     private void updateUI(){
         this.configureFloatingButton();
         this.setViewElements();
@@ -168,7 +158,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         floatingActionButton.setImageResource(R.drawable.ic_add_icon);
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gmail_btn_color)));
     }
-
 
     private void setViewElements(){
         try {
