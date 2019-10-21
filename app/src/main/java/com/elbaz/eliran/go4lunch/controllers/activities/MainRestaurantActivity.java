@@ -348,7 +348,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             @Override
             public void onSuccess(Void aVoid) {
                 if(origin == SIGN_OUT_TASK)
-                    finish();
+                logOut();
             }
         };
     }
@@ -362,6 +362,13 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                 yourLunchDialog();
             }
         });
+    }
+
+    private void logOut(){
+        finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
 
     // ------------------
