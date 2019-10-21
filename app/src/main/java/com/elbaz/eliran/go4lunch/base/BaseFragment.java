@@ -34,17 +34,5 @@ public abstract class BaseFragment extends Fragment {
 
     @Nullable
     public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-
-
-//    //  Get Current User from Firestore
-//    protected User getCurrentUserFromFirestore(){
-//        UserHelper.getUser(getCurrentUser().getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                modelCurrentUser = documentSnapshot.toObject(User.class);
-//                Log.d(TAG, "onSuccess: getCurrentUserFromFirestore" + modelCurrentUser);
-//            }
-//        });
-//        return modelCurrentUser;
-//    }
+    
 }
