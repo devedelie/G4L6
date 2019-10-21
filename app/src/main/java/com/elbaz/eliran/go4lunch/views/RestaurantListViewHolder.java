@@ -59,11 +59,11 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             addressTextView.setText(result.getVicinity());
             openingTextView.setText(result.getOpeningHours().getOpenNow() ? R.string.listView_open_now : R.string.listView_closed);
             openingTextView.setTypeface(null, Typeface.ITALIC);
-//            distanceTextView.setText(calculateDistance(result)+"m");
             distanceTextView.setText(result.getDistance()+"m");
             retrieveGoingPersons(result);
             calculateStarRating(result);
             Log.d(TAG, "ListView updateRestaurantsList: ");
+
         }catch (Exception e){
             Log.d(TAG, "updateRestaurantsList: Error "+result.getName()  + "  "+ e );
         }
@@ -103,12 +103,16 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
                         personNumberTextView.setVisibility(View.VISIBLE);
                         personNumberTextView.setText("("+queryDocumentSnapshots.size()+")");
                         personImage.setVisibility(View.VISIBLE);
+                        result.setWorkmates(queryDocumentSnapshots.size());
+                    }else{
+                        personNumberTextView.setVisibility(View.INVISIBLE);
+                        personNumberTextView.setText("");
+                        personImage.setVisibility(View.INVISIBLE);
+                        result.setWorkmates(0);
                     }
-
                 }
             });
         }
-
 }
 
 

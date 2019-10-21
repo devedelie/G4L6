@@ -80,7 +80,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
-        //---Firebase Messaging Token------
+        //---Firebase Cloud-Messaging Token------
 //        NotificationsService.getToken(mContext);
 //        FirebaseMessagingToken.getToken();
         //---------------------------------

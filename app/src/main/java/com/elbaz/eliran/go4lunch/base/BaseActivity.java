@@ -29,7 +29,7 @@ import static android.content.ContentValues.TAG;
  * Created by Eliran Elbaz on 19-Sep-19.
  */
 public abstract class BaseActivity extends AppCompatActivity {
-    
+
     // --------------------
     // LIFE CYCLE
     // --------------------
