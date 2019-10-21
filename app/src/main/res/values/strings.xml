@@ -18,7 +18,9 @@
     <string name="need_to_authorise_location_services">In order to access, please authorise location services for this application.</string>
 
     <!-- Restaurant Activity-->
-    <string name="popup_title_permission_files_access">This application needs permissions of location to function correctly.</string>
+    <string name="popup_title_permission_location_access">This application needs permissions of location to function correctly.</string>
+    <string name="popup_title_permission_gps_access">This application requires GPS to work properly, do you want to enable it?</string>
+    <string name="popup_title_permission_gps_enable_btn">Enable</string>
     <string name="map_loading_text">Waiting for your location</string>
 
     <!--Restaurant Main Activity-->

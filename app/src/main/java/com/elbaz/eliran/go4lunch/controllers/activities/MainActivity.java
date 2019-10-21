@@ -121,9 +121,9 @@ public class MainActivity extends BaseActivity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+        builder.setMessage(getString(R.string.popup_title_permission_gps_access))
                 .setCancelable(false)
-                .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.popup_title_permission_gps_enable_btn), new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
@@ -139,11 +139,10 @@ public class MainActivity extends BaseActivity {
      */
     private void askPermission() {
         if (!EasyPermissions.hasPermissions(this, PERMS_FINE )) {
-            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_files_access), RC_PERMISSION_CODE, PERMS_FINE);
+            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_location_access), RC_PERMISSION_CODE, PERMS_FINE);
             return;
         }
         mLocationPermissionGranted = true;
-        Toast.makeText(this, "Location access authorized!", Toast.LENGTH_SHORT).show();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
