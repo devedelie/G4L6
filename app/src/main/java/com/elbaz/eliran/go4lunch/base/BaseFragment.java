@@ -34,5 +34,5 @@ public abstract class BaseFragment extends Fragment {
 
     @Nullable
     public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-    
+
 }

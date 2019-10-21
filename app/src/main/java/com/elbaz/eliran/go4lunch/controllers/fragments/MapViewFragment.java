@@ -74,8 +74,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
         // Initialise map
         this.initMap();
-        // Show current device's location
-//        this.getDeviceLocation();
         return view;
     }
 
