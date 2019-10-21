@@ -33,7 +33,7 @@ public class UtilsHelper {
         float[] distance = new float[1];
         try{
             if(result.getGeometry().getLocation().getLat()!=null || result.getGeometry().getLocation().getLng()!=null){
-                Location.distanceBetween(deviceLocation.getLatitude(), deviceLocation.getLongitude(), result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng(), distance);            }
+                Location.distanceBetween(deviceLocation.getLatitude(), deviceLocation.getLongitude(), result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng(), distance); }
         }catch (Exception e){
             Log.d(TAG, "calculateDistance Error: " +e);
         }
@@ -47,7 +47,6 @@ public class UtilsHelper {
                 Log.d(TAG, "#of persons: "+ queryDocumentSnapshots.size());
                 if(queryDocumentSnapshots.size() > 0){
                     SplashScreen.mResults.get(index).setWorkmates(queryDocumentSnapshots.size());
-                    Log.d(TAG, "onSuccess GoingPersons: "+ SplashScreen.mResults.get(index).getWorkmates());
                 }else{
                     SplashScreen.mResults.get(index).setWorkmates(0);
                 }

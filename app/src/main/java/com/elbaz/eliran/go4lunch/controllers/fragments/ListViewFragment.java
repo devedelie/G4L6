@@ -143,14 +143,11 @@ public class ListViewFragment extends BaseFragment {
                             break;
                         case "Distance":
                             sortValue = o1.getDistance().compareTo(o2.getDistance());
-                            Log.d(TAG, "compare distance: "+ o1.getDistance() + "  "+ o2.getDistance() +"  " + sortValue);
                             break;
                         case "Rating":
                             sortValue = o2.getRating().compareTo(o1.getRating());
-                            Log.d(TAG, "compare: "+sortValue);
                             break;
                         case "Workmates":
-//                            Log.d(TAG, "compare: " + o1.getWorkmates() + "  "+ o2.getWorkmates()  );
                             sortValue = o2.getWorkmates().compareTo(o1.getWorkmates());
                             break;
                     }

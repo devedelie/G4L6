@@ -29,6 +29,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListVi
     public RestaurantListAdapter(List<Result> results, Context context) {
         mResults = results;
         mContext = context;
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -48,5 +49,16 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListVi
 
     @Override
     public int getItemCount() {return this.mResults.size();}
+
+    //setHasStableIds(true) & the methods below are making an optimization while providing data to ViewHolder, to keep id as unique and unchangeable.
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
 }

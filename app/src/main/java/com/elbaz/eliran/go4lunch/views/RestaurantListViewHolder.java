@@ -60,6 +60,11 @@ public class RestaurantListViewHolder extends RecyclerView.ViewHolder {
             openingTextView.setText(result.getOpeningHours().getOpenNow() ? R.string.listView_open_now : R.string.listView_closed);
             openingTextView.setTypeface(null, Typeface.ITALIC);
             distanceTextView.setText(result.getDistance()+"m");
+//            if(result.getDistance() == -1){
+//                distanceTextView.setText(R.string.restaurant_detail_not_available);
+//            }else{
+//                distanceTextView.setText(result.getDistance()+"m");
+//            }
             retrieveGoingPersons(result);
             calculateStarRating(result);
             Log.d(TAG, "ListView updateRestaurantsList: ");
