@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,7 +18,6 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.utils.ItemClickSupport;
-import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantListAdapter;
 import com.google.android.libraries.places.api.model.Place;
 
@@ -32,13 +30,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.mSharedViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ListViewFragment extends BaseFragment {
-    private SharedViewModel mSharedViewModel;
-    public static List<Result> mResults;
+    private List<Result> mResults = new ArrayList<>();
     private List<Result> mResultsCopy1= new ArrayList<>(); // Copy for sorting
     private Place mPlace;
     private int sortValue;
@@ -59,13 +57,15 @@ public class ListViewFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+//        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // get fetched Results
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
                 Log.d(TAG, "ListView onChanged: ");
-                updateUI(results);
+                mResults.clear();
+                mResults.addAll(results);
+                updateUI(mResults);
             }
         });
     }
@@ -115,10 +115,6 @@ public class ListViewFragment extends BaseFragment {
     //-----------------
     // Update UI showing news titles
     private void updateUI(List<Result> results){
-        // completely erase the previous list of results each time
-        // in order to avoid duplicating it due to  .addAll()
-        mResults.clear();
-        mResults.addAll(results);
         // Notify changes
         mRestaurantListAdapter.notifyDataSetChanged();
     }
@@ -147,13 +143,14 @@ public class ListViewFragment extends BaseFragment {
                             break;
                         case "Distance":
                             sortValue = o1.getDistance().compareTo(o2.getDistance());
-                            Log.d(TAG, "compare: "+sortValue);
+                            Log.d(TAG, "compare distance: "+ o1.getDistance() + "  "+ o2.getDistance() +"  " + sortValue);
                             break;
                         case "Rating":
                             sortValue = o2.getRating().compareTo(o1.getRating());
                             Log.d(TAG, "compare: "+sortValue);
                             break;
                         case "Workmates":
+//                            Log.d(TAG, "compare: " + o1.getWorkmates() + "  "+ o2.getWorkmates()  );
                             sortValue = o2.getWorkmates().compareTo(o1.getWorkmates());
                             break;
                     }

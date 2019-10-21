@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,7 +29,6 @@ import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.models.restaurantDetails.RestaurantDetails;
 import com.elbaz.eliran.go4lunch.utils.PlacesStream;
-import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.elbaz.eliran.go4lunch.views.RestaurantDetailAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -53,6 +51,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
 import static android.content.ContentValues.TAG;
+import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.mSharedViewModel;
 import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_URL;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE;
 import static com.elbaz.eliran.go4lunch.models.Constants.URL_FOR_IMAGE_KEY;
@@ -126,8 +125,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-        SharedViewModel mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Observe Search ArrayList
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer <List<Result>>() {
             @Override
