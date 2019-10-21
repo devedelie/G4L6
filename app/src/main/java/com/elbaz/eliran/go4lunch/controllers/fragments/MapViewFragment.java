@@ -90,8 +90,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-//        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Retrieve back fetched Results from ViewModel in case of system changes
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
@@ -100,7 +98,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 mResults.clear();
                 mResults.addAll(results);
                 Log.d(TAG, "TESTFF-onChanged: "+ mResults.get(0).getName());
-                updateUI(mResults);
+                updateUI();
             }
         });
     }
@@ -141,89 +139,15 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         moveCamera(new LatLng(deviceLocation.getLatitude(), deviceLocation.getLongitude()), DEFAULT_ZOOM);
     }
 
-//    // Get Device location
-//    private void getDeviceLocation(){
-//        try{
-//            mFusedLocationProviderClient.getLastLocation()
-//                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                deviceLocation = location; // Set device location variable for distance calculation
-//                                mapLoadingText.setVisibility(View.GONE);
-//                                mapProgressBarAnimation.setVisibility(View.GONE);
-//                                // create a location string for retrofit (LatLng toString())
-//                                deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
-//                                deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
-//                                deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
-//
-//                                // move camera to location
-//                                moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-//                                // If mResult is NULL, execute Http request, ELSE, update the UI with the data from ViewModel
-//                                if(mResults == null){
-//                                    executeHttpRequestForNearbyPlaces();
-//                                }else {
-//                                    updateUI(mResults);
-//                                }
-//                            }else{
-//                                Log.d(TAG, "onComplete: current location is null");
-//                            }
-//                        }
-//                    });
-//        }catch (SecurityException e){
-//            Log.e(TAG, "Failed to get device location: ", e);
-//            Toast.makeText(getActivity(), R.string.no_location_found, Toast.LENGTH_LONG).show();
-//        }
-//    }
-
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
     public void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + " lng: " + latLng.longitude + " " + zoom + " " + latLng );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
-//    //-----------------
-//    // HTTP (RxJAVA)
-//    //-----------------
-//    // Execute the stream to fetch nearby locations
-//    private void executeHttpRequestForNearbyPlaces(){
-//        Log.d(TAG, "executeHttpRequestForNearbyPlaces: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
-//        // Execute the stream subscribing to Observable defined inside PlacesResults
-//        this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
-//                .subscribeWith(new DisposableObserver<PlacesResults>(){
-//                    @Override
-//                    public void onNext(PlacesResults placesResults) {
-//                        Log.d(TAG, "onNext: HTTP");
-//                        // Calculate additional values
-//                        calculateAdditionalValues(placesResults.getResults());
-//                        // Update UI with results
-//                        updateUI(placesResults.getResults());
-//                        // Pass data to ViewModel
-//                        mSharedViewModel.setResultsList(placesResults.getResults());
-//                    }
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e(TAG, "onErrorHTTP: "+ e );
-//                    }
-//                    @Override
-//                    public void onComplete() {
-//                        Log.d(TAG, "onComplete: "); }
-//                });
-//    }
-
-    private void updateUI(List<Result> results){
+    private void updateUI(){
         getRestaurantCollectionForMarkers();
     }
-
-//    private void calculateAdditionalValues(List<Result> results){
-//        // Set Distance and Going workmates into List<Result>
-//        for (int i = 0 ; i<results.size(); i++){
-//            results.get(i).setDistance(UtilsHelper.calculateDistance(results.get(i)));
-//            UtilsHelper.retrieveGoingPersons(results.get(i), i);
-//            Log.d(TAG, "calculateAdditionalValues: " + results.get(i).getDistance() + " " + results.get(i).getWorkmates());
-//        }
-//    }
 
     private void setNearbyRestaurantsWithMarkers(){
         for (int i= 0 ; i<mResults.size(); i++ ){

@@ -93,7 +93,7 @@ public class SplashScreen extends BaseActivity {
             Toast.makeText(this, R.string.no_location_found, Toast.LENGTH_LONG).show();
         }
     }
-    
+
     //-----------------
     // HTTP (RxJAVA)
     //-----------------
