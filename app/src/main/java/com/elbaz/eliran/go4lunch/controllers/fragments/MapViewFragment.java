@@ -4,32 +4,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseFragment;
 import com.elbaz.eliran.go4lunch.models.RestaurantDetailsFetch;
-import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.PlacesResults;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
-import com.elbaz.eliran.go4lunch.utils.PlacesStream;
-import com.elbaz.eliran.go4lunch.utils.UtilsHelper;
-import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,7 +33,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -51,26 +41,24 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 
 import static android.content.ContentValues.TAG;
-import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_RADIUS;
-import static com.elbaz.eliran.go4lunch.models.Constants.NEARBY_TYPE;
+import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.deviceLocation;
+import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.mSharedViewModel;
 
 public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-    @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
-    @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
+//    @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
+//    @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
     private static final float DEFAULT_ZOOM = 15f ;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private SharedViewModel mSharedViewModel;
+
     private int AUTO_COMPLETE_INDEX_CODE = 100;
     private Disposable mDisposable;
     private String deviceLocationVariable;
-    public static Location deviceLocation; // Used for distance calculation on other fragments.
+//    public static Location deviceLocation; // Used for distance calculation on other fragments.
     // Nearby Places
     private RestaurantDetailsFetch mRestaurantDetailsFetch;
     private List<Result> mResults;
@@ -87,7 +75,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Initialise map
         this.initMap();
         // Show current device's location
-        this.getDeviceLocation();
+//        this.getDeviceLocation();
         return view;
     }
 
@@ -103,12 +91,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+//        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // Retrieve back fetched Results from ViewModel in case of system changes
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
             public void onChanged(List<Result> results) {
-                    mResults = results;
+                mResults = new ArrayList<>();
+                mResults.clear();
+                mResults.addAll(results);
+                Log.d(TAG, "TESTFF-onChanged: "+ mResults.get(0).getName());
+                updateUI(mResults);
             }
         });
     }
@@ -146,43 +138,44 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
+        moveCamera(new LatLng(deviceLocation.getLatitude(), deviceLocation.getLongitude()), DEFAULT_ZOOM);
     }
 
-    // Get Device location
-    private void getDeviceLocation(){
-        try{
-            mFusedLocationProviderClient.getLastLocation()
-                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                deviceLocation = location; // Set device location variable for distance calculation
-                                mapLoadingText.setVisibility(View.GONE);
-                                mapProgressBarAnimation.setVisibility(View.GONE);
-                                // create a location string for retrofit (LatLng toString())
-                                deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
-                                deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
-                                deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
-
-                                // move camera to location
-                                moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
-                                // If mResult is NULL, execute Http request, ELSE, update the UI with the data from ViewModel
-                                if(mResults == null){
-                                    executeHttpRequestForNearbyPlaces();
-                                }else {
-                                    updateUI(mResults);
-                                }
-                            }else{
-                                Log.d(TAG, "onComplete: current location is null");
-                            }
-                        }
-                    });
-        }catch (SecurityException e){
-            Log.e(TAG, "Failed to get device location: ", e);
-            Toast.makeText(getActivity(), R.string.no_location_found, Toast.LENGTH_LONG).show();
-        }
-    }
+//    // Get Device location
+//    private void getDeviceLocation(){
+//        try{
+//            mFusedLocationProviderClient.getLastLocation()
+//                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                deviceLocation = location; // Set device location variable for distance calculation
+//                                mapLoadingText.setVisibility(View.GONE);
+//                                mapProgressBarAnimation.setVisibility(View.GONE);
+//                                // create a location string for retrofit (LatLng toString())
+//                                deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
+//                                deviceLocationVariable = deviceLocationVariable.replaceAll("[()]", "");
+//                                deviceLocationVariable = deviceLocationVariable.replaceAll("[lat/lng:]", "");
+//
+//                                // move camera to location
+//                                moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
+//                                // If mResult is NULL, execute Http request, ELSE, update the UI with the data from ViewModel
+//                                if(mResults == null){
+//                                    executeHttpRequestForNearbyPlaces();
+//                                }else {
+//                                    updateUI(mResults);
+//                                }
+//                            }else{
+//                                Log.d(TAG, "onComplete: current location is null");
+//                            }
+//                        }
+//                    });
+//        }catch (SecurityException e){
+//            Log.e(TAG, "Failed to get device location: ", e);
+//            Toast.makeText(getActivity(), R.string.no_location_found, Toast.LENGTH_LONG).show();
+//        }
+//    }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
     public void moveCamera(LatLng latLng, float zoom){
@@ -190,52 +183,47 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
-    //-----------------
-    // HTTP (RxJAVA)
-    //-----------------
-    // Execute the stream to fetch nearby locations
-    private void executeHttpRequestForNearbyPlaces(){
-        Log.d(TAG, "executeHttpRequestForNearbyPlaces: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
-        // Execute the stream subscribing to Observable defined inside PlacesResults
-        this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
-                .subscribeWith(new DisposableObserver<PlacesResults>(){
-                    @Override
-                    public void onNext(PlacesResults placesResults) {
-                        Log.d(TAG, "onNext: HTTP");
-                        // Calculate additional values
-                        calculateAdditionalValues(placesResults.getResults());
-                        // Update UI with results
-                        updateUI(placesResults.getResults());
-                        // Pass data to ViewModel
-                        mSharedViewModel.setResultsList(placesResults.getResults());
-                    }
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "onErrorHTTP: "+ e );
-                    }
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete: "); }
-                });
-    }
+//    //-----------------
+//    // HTTP (RxJAVA)
+//    //-----------------
+//    // Execute the stream to fetch nearby locations
+//    private void executeHttpRequestForNearbyPlaces(){
+//        Log.d(TAG, "executeHttpRequestForNearbyPlaces: " + deviceLocationVariable+ " " +NEARBY_RADIUS+ " "+ NEARBY_TYPE);
+//        // Execute the stream subscribing to Observable defined inside PlacesResults
+//        this.mDisposable = PlacesStream.streamFetchNearbyLocations(deviceLocationVariable, NEARBY_RADIUS, NEARBY_TYPE)
+//                .subscribeWith(new DisposableObserver<PlacesResults>(){
+//                    @Override
+//                    public void onNext(PlacesResults placesResults) {
+//                        Log.d(TAG, "onNext: HTTP");
+//                        // Calculate additional values
+//                        calculateAdditionalValues(placesResults.getResults());
+//                        // Update UI with results
+//                        updateUI(placesResults.getResults());
+//                        // Pass data to ViewModel
+//                        mSharedViewModel.setResultsList(placesResults.getResults());
+//                    }
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(TAG, "onErrorHTTP: "+ e );
+//                    }
+//                    @Override
+//                    public void onComplete() {
+//                        Log.d(TAG, "onComplete: "); }
+//                });
+//    }
 
     private void updateUI(List<Result> results){
-        mResults = new ArrayList<>();
-        mResults.clear();
-        mResults.addAll(results);
         getRestaurantCollectionForMarkers();
-
     }
 
-    private void calculateAdditionalValues(List<Result> results){
-        // Set Distance and Going workmates into List<Result>
-        for (int i = 0 ; i<results.size(); i++){
-            results.get(i).setDistance(UtilsHelper.calculateDistance(results.get(i)));
+//    private void calculateAdditionalValues(List<Result> results){
+//        // Set Distance and Going workmates into List<Result>
+//        for (int i = 0 ; i<results.size(); i++){
+//            results.get(i).setDistance(UtilsHelper.calculateDistance(results.get(i)));
 //            UtilsHelper.retrieveGoingPersons(results.get(i), i);
-            Log.d(TAG, "calculateAdditionalValues: " + results.get(i).getDistance() + " " + results.get(i).getWorkmates());
-        }
-
-    }
+//            Log.d(TAG, "calculateAdditionalValues: " + results.get(i).getDistance() + " " + results.get(i).getWorkmates());
+//        }
+//    }
 
     private void setNearbyRestaurantsWithMarkers(){
         for (int i= 0 ; i<mResults.size(); i++ ){

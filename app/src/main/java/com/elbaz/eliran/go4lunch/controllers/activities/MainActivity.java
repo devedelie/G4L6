@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity {
         }else {
             // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
             if (this.isCurrentUserLogged() && mLocationPermissionGranted) {
-                this.startMainRestaurantsActivity();
+                this.startSplashScreenActivity();
             }
         }
     }
@@ -260,9 +260,9 @@ public class MainActivity extends BaseActivity {
     }
 
     // Launching Restaurants Activity
-    private void startMainRestaurantsActivity(){
+    private void startSplashScreenActivity(){
         if (mLocationPermissionGranted){
-            Intent intent = new Intent(this, MainRestaurantActivity.class);
+            Intent intent = new Intent(this, SplashScreen.class);
             startActivity(intent);
         }else {
             showSnackBar(this.coordinatorLayout, getString(R.string.need_to_authorise_location_services));

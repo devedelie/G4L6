@@ -3,10 +3,14 @@ package com.elbaz.eliran.go4lunch.utils;
 import android.location.Location;
 import android.util.Log;
 
+import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
+import com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen;
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import static android.content.ContentValues.TAG;
-import static com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment.deviceLocation;
+import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.deviceLocation;
 
 /**
  * Created by Eliran Elbaz on 16-Oct-19.
@@ -36,18 +40,19 @@ public class UtilsHelper {
         return Math.round(distance[0]);
     }
 
-//    public static void retrieveGoingPersons(Result result, int index){
-//        GoingUserHelper.getAllRestaurantsWithGoingUsers(result.getName()).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                Log.d(TAG, "#of persons: "+ queryDocumentSnapshots.size());
-//                if(queryDocumentSnapshots.size() > 0){
-//                    mResults.get(index).setWorkmates(queryDocumentSnapshots.size());
-//                    Log.d(TAG, "onSuccess GoingPersons: "+ mResults.get(index).getWorkmates());
-//                }else{
-//                    mResults.get(index).setWorkmates(0);
-//                }
-//            }
-//        });
-//    }
+    public static void retrieveGoingPersons(Result result, int index){
+        GoingUserHelper.getAllRestaurantsWithGoingUsers(result.getName()).addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG, "#of persons: "+ queryDocumentSnapshots.size());
+                if(queryDocumentSnapshots.size() > 0){
+                    SplashScreen.mResults.get(index).setWorkmates(queryDocumentSnapshots.size());
+                    Log.d(TAG, "onSuccess GoingPersons: "+ SplashScreen.mResults.get(index).getWorkmates());
+                }else{
+                    SplashScreen.mResults.get(index).setWorkmates(0);
+                }
+            }
+        });
+    }
+
 }

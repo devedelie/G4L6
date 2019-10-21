@@ -35,19 +35,24 @@
             android:launchMode="singleTop"
             android:parentActivityName=".controllers.activities.MainActivity"
             android:screenOrientation="portrait">
-        </activity>
-        <!-- ProfileSettingsActivity -->
+
+        </activity> <!-- ProfileSettingsActivity -->
         <activity
             android:name=".auth.ProfileSettingsActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".controllers.activities.MainRestaurantActivity"
             android:screenOrientation="portrait">
-        </activity>
-        <!-- OnNotificationClickActivity -->
+
+        </activity> <!-- OnNotificationClickActivity -->
         <activity
             android:name=".controllers.activities.OnNotificationClickActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".controllers.activities.MainActivity">
+            android:parentActivityName=".controllers.activities.MainActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity
+            android:name=".controllers.activities.SplashScreen"
+            android:screenOrientation="portrait">
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
