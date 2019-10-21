@@ -76,8 +76,6 @@ public class SplashScreen extends BaseActivity {
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-//                                mapLoadingText.setVisibility(View.GONE);
-//                                mapProgressBarAnimation.setVisibility(View.GONE);
                                 deviceLocation = location; // Set device location variable for distance calculation
                                 // create a location string for retrofit (LatLng toString())
                                 deviceLocationVariable = new LatLng(location.getLatitude(), location.getLongitude()).toString(); // set a global location variable for other use
@@ -95,8 +93,7 @@ public class SplashScreen extends BaseActivity {
             Toast.makeText(this, R.string.no_location_found, Toast.LENGTH_LONG).show();
         }
     }
-
-
+    
     //-----------------
     // HTTP (RxJAVA)
     //-----------------
@@ -117,9 +114,7 @@ public class SplashScreen extends BaseActivity {
                     }
                     @Override
                     public void onComplete() {
-                        Log.d(TAG, "onComplete: ");
-
-                    }
+                        Log.d(TAG, "onComplete: "); }
                 });
     }
 
@@ -137,10 +132,8 @@ public class SplashScreen extends BaseActivity {
         for (int i = 0 ; i<mResults.size(); i++){
             mResults.get(i).setDistance(UtilsHelper.calculateDistance(mResults.get(i)));
             UtilsHelper.retrieveGoingPersons(mResults.get(i), i);
-            Log.d(TAG, "XX1-calculateAdditionalValues: " + mResults.get(i).getDistance() + " " + mResults.get(i).getWorkmates());
         }
         // Pass data to ViewModel
-        Log.d(TAG, "XX2-calculateAdditionalValues: ");
         mSharedViewModel.setResultsList(mResults);
         intentActivity();
     }
