@@ -15,21 +15,16 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-public class ExampleUnitTest {
+public class MainRestaurantActivityTest {
     Context mContext;
     FragmentManager mFragmentManager;
 
-    // Test for returning 4 tabs
+    // Test for returning 3 fragments
     @Test
-    public void PageAdapter_TestNumberOfTabs_assertCorrectNumber () throws Exception{
+    public void PageAdapter_TestNumberOfFragments_assertCorrectNumber () throws Exception{
         // Create a new PageAdapter instance
         PageAdapter pageAdapter = new PageAdapter(mContext, mFragmentManager );
-        // Check that the method returns 4 as the number of tabs to show
+        // Check that the method returns 3 as the number of fragments to show
         assertEquals(3, pageAdapter.getCount());
     }
 
