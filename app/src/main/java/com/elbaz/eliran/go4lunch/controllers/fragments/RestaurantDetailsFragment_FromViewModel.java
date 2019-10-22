@@ -215,12 +215,13 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
         if (mSavedRestaurantNameOnFB.equals(mResults.get(mIndex).getName()) && mIsGoing){
             setFloatingActionButtonRed();
             mIsGoing = false;
+            mCurrentSelectedRestaurantOnLoad="";
         }else{
             setFloatingActionButtonGreen();
             mIsGoing = true;
             mSavedRestaurantNameOnFB = mResults.get(mIndex).getName();
         }
-        Log.d(TAG, "addTodaysRestaurant: is user going ? " + mIsGoing);
+        Log.d(TAG, "addTodaysRestaurant: is user going? " + mIsGoing);
         updateUserOnFireStore();
     }
 
@@ -271,7 +272,6 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
                 UserHelper.updateTodaysRestaurant(this.getCurrentUser().getUid(), "");
                 UserHelper.updateRestaurantID(this.getCurrentUser().getUid(), "");
                 UserHelper.updateTodaysRestaurantAddress(this.getCurrentUser().getUid(), "");
-
             }
             // set the current isGoing status in user's document
             UserHelper.updateIsGoing(this.getCurrentUser().getUid(), mIsGoing);

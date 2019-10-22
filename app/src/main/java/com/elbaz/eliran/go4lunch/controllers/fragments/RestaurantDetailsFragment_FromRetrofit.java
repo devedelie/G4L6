@@ -231,6 +231,7 @@ public class RestaurantDetailsFragment_FromRetrofit extends BottomSheetDialogFra
         if (mSavedRestaurantNameOnFB.equals(mRestaurantDetails.getResult().getName()) && mIsGoing){
             setFloatingActionButtonRed();
             mIsGoing = false;
+            mCurrentSelectedRestaurantOnLoad="";
         }else{
             setFloatingActionButtonGreen();
             mIsGoing = true;
