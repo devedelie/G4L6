@@ -71,7 +71,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public Context mContext;
     // AutoComplete searchAction
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
-    private String textForDialog;
+    public static String textForDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
