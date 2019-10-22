@@ -37,8 +37,6 @@ import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.mSha
  */
 public class ListViewFragment extends BaseFragment {
     private List<Result> mResults = new ArrayList<>();
-    private List<Result> mResultsCopy1= new ArrayList<>(); // Copy for sorting
-    private Place mPlace;
     private int sortValue;
     private RestaurantListAdapter mRestaurantListAdapter;
     @BindView(R.id.listView_recyclerView) RecyclerView listViewRecyclerView;
@@ -56,8 +54,6 @@ public class ListViewFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Set ViewModel Elements under onActivityCreated() to scope it to the lifeCycle of the Fragment
-//        mSharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         // get fetched Results
         mSharedViewModel.getResultsList().observe(getViewLifecycleOwner(), new Observer<List<Result>>() {
             @Override
@@ -84,7 +80,6 @@ public class ListViewFragment extends BaseFragment {
     // RecyclerView Config
     //-----------------
     protected void configureRecyclerView(){
-        Log.d(TAG, "ListView configureRecyclerView: ");
         // Set the recyclerView to fixed size in order to increase performances
         listViewRecyclerView.setHasFixedSize(true);
         mResults = new ArrayList<>();
@@ -131,7 +126,6 @@ public class ListViewFragment extends BaseFragment {
     //-----------------
     // Sorting results
     //-----------------
-
     public void sortResults(String sortType){
         // sort the data
         if(mResults.size() > 0){

@@ -126,7 +126,6 @@ public class SplashScreen extends BaseActivity {
         calculateAdditionalValues();
     }
 
-
     private void calculateAdditionalValues(){
         // Set Distance and Going workmates into List<Result>
         for (int i = 0 ; i<mResults.size(); i++){

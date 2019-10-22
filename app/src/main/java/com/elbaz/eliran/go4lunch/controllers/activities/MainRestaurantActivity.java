@@ -36,7 +36,6 @@ import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.elbaz.eliran.go4lunch.controllers.fragments.ListViewFragment;
 import com.elbaz.eliran.go4lunch.controllers.fragments.MapViewFragment;
 import com.elbaz.eliran.go4lunch.models.User;
-import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
@@ -70,8 +69,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // Identify each Http Request
     private static final int SIGN_OUT_TASK = 10;
     public Context mContext;
-    SharedViewModel mSharedViewModel;
-    private User mUser;
     // AutoComplete searchAction
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
     private String textForDialog;

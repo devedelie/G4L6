@@ -22,8 +22,6 @@ import com.elbaz.eliran.go4lunch.views.WorkmatesListAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
-import javax.annotation.Nullable;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -33,13 +31,7 @@ import butterknife.ButterKnife;
 public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdapter.Listener {
     @BindView(R.id.workmateView_recyclerView) RecyclerView workmatesRecyclerView;
     @BindView(R.id.workmates_recycler_view_empty) TextView emptyListText;
-
-    // FOR DATA
-    // Declaring Adapter and data
     private WorkmatesListAdapter mWorkmatesListAdapter;
-
-    @Nullable
-    private User modelCurrentUser;
 
     @Override
     protected int getFragmentLayout() {
