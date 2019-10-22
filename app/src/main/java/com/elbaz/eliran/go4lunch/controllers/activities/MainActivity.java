@@ -62,26 +62,27 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!this.isNetworkAvailable()){
-            displayMobileDataSettingsDialog(this, this);
-        }
+        // Verify all permissions and setups
+        this.verifyPlacesSDK();
+        this.isGpsEnabled();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "isCurrentUser: " + getCurrentUser() + " Logged? " + this.isCurrentUserLogged());
-        // Verify all permissions and setups
-        this.verifyPlacesSDK();
-        this.isGpsEnabled();
-
-        // Check if Data-Message has arrived from Firebase
-        if (isDataMessageArrived()){
-            this.startOnNotificationActivity();
-        }else {
-            // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
-            if (this.isCurrentUserLogged() && mLocationPermissionGranted) {
-                this.startSplashScreenActivity();
+        Log.d(TAG, "isCurrentUser: " + getCurrentUser() + " Logged? " + isCurrentUserLogged());
+        // Verify Network connectivity
+        if(!isNetworkAvailable()){
+            displayMobileDataSettingsDialog(this, this);
+        }else{
+            // Check if Data-Message has arrived from Firebase
+            if (isDataMessageArrived()){
+                startOnNotificationActivity();
+            }else {
+                // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
+                if (isCurrentUserLogged() && mLocationPermissionGranted) {
+                    startSplashScreenActivity();
+                }
             }
         }
     }
