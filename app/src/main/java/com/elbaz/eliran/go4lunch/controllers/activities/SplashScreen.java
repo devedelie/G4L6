@@ -122,7 +122,6 @@ public class SplashScreen extends BaseActivity {
         mResults = new ArrayList<>();
         mResults.clear();
         mResults.addAll(results);
-        Log.d(TAG, "onNext: " + mResults.get(0).getName());
         calculateAdditionalValues();
     }
 
