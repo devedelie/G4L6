@@ -2,6 +2,7 @@ package com.elbaz.eliran.go4lunch.auth;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,7 +23,7 @@ import com.elbaz.eliran.go4lunch.R;
 import com.elbaz.eliran.go4lunch.api.GoingUserHelper;
 import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
-import com.elbaz.eliran.go4lunch.controllers.activities.MainRestaurantActivity;
+import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
 import com.elbaz.eliran.go4lunch.models.User;
 import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
@@ -48,7 +49,7 @@ public class ProfileSettingsActivity extends BaseActivity {
     private static final int DELETE_USER_TASK = 20;
     private static final int UPDATE_USERNAME = 30;
     private SharedViewModel sharedViewModel;
-    private String restaurantToDelete = MainRestaurantActivity.textForDialog;
+    private String restaurantToDelete;
 
 
     @Override
@@ -92,6 +93,7 @@ public class ProfileSettingsActivity extends BaseActivity {
                     String username = TextUtils.isEmpty(currentUser.getUsername()) ? getString(R.string.info_no_username_found) : currentUser.getUsername();
                     Log.d(TAG, "onSuccess: "+ username);
                     userNameEditText.setText(username);
+                    restaurantToDelete =currentUser.getSelectedRestaurantName();
                 }
             });
         }
@@ -154,11 +156,15 @@ public class ProfileSettingsActivity extends BaseActivity {
     private void deleteUserFromFirebase(){
         Log.d(TAG, "deleteUserFromFirebase: ");
         if (this.getCurrentUser() != null) {
-            // Important: Delete user also from firestore storage
+            // Delete from goingUsers list if any value of the current user exist
+            if(restaurantToDelete != null && !restaurantToDelete.isEmpty()){
+                GoingUserHelper.deleteUserFromGoingListAfterAccountDelete(restaurantToDelete, getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener());
+            }
+            // Delete user from Firestore
             UserHelper.deleteUser(this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener());
-
+            // Delete user from Firebase
             AuthUI.getInstance()
-                    .delete(this)
+                    .delete(this).addOnFailureListener(this.onFailureListener())
                     .addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
         }
     }
@@ -173,11 +179,11 @@ public class ProfileSettingsActivity extends BaseActivity {
                         updateName();
                         break;
                     case SIGN_OUT_TASK:
-                        signOut();
+                        clearActivityBackStack();
                         break;
                     case DELETE_USER_TASK:
-                        deleteUser();
                         Log.d(TAG, "onSuccess: updateUIAfterRESTRequestsCompleted");
+                        clearActivityBackStack();
                         break;
                     default:
                         break;
@@ -192,16 +198,17 @@ public class ProfileSettingsActivity extends BaseActivity {
         toast.show();
     }
 
-    private void signOut(){
-        // Clear Activity BackStack and finish();
-        finishAffinity();
+    private void clearActivityBackStack(){
+        finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
-
-    private void deleteUser(){
-        Log.d(TAG, "deleteUser: ");
-        GoingUserHelper.deleteUserFromGoingListAfterAccountSelete(restaurantToDelete, getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener());
-        finishAffinity();
-    }
+//
+//    private void deleteUser(){
+//        Log.d(TAG, "deleteUser: ");
+//        finishAffinity();
+//    }
 
 }
 

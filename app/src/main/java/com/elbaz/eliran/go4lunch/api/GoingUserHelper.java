@@ -55,7 +55,7 @@ public class GoingUserHelper {
                 .delete();
     }
 
-    public static Task<Void> deleteUserFromGoingListAfterAccountSelete(String restaurantNameId, String userId){
+    public static Task<Void> deleteUserFromGoingListAfterAccountDelete(String restaurantNameId, String userId){
         // Delete user from isGoing Collection
         return RestaurantHelper.getRestaurantCollection()
                 .document(restaurantNameId)
