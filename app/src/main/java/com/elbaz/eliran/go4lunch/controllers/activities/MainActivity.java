@@ -23,12 +23,17 @@ import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -184,12 +189,28 @@ public class MainActivity extends BaseActivity {
     private void createUserInFirestore(){
 
         if (this.getCurrentUser() != null){
+            // Get user collection whereEqualsTo the current userID (if successful --> user exist in firestore)
+            UserHelper.getUsersCollection().whereEqualTo("uid", getCurrentUser().getUid())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                // Put Documents in a DocumentSnapshot List
+                                List<DocumentSnapshot> mListOfDocuments = task.getResult().getDocuments();
+                                if(mListOfDocuments.size()<=0){
+                                    Log.d(TAG, "onComplete: User doesn't exist in Firestore");
+                                    String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
+                                    String username = getCurrentUser().getDisplayName();
+                                    String uid = getCurrentUser().getUid();
 
-            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            String username = this.getCurrentUser().getDisplayName();
-            String uid = this.getCurrentUser().getUid();
-
-            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());
+                                    UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(onFailureListener());
+                                }else {
+                                    Log.d(TAG, "onComplete: Continue normally -> User exist in Firestore " +mListOfDocuments.size());
+                                }
+                            }
+                        }
+                    });
         }
     }
 
