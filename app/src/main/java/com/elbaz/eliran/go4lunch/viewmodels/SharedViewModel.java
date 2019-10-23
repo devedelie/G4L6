@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.elbaz.eliran.go4lunch.models.nearbyPlacesModel.Result;
 import com.elbaz.eliran.go4lunch.models.restaurantDetails.RestaurantDetails;
-import com.google.android.libraries.places.api.model.Place;
 
 import java.util.List;
 
@@ -18,25 +17,8 @@ import java.util.List;
 public class SharedViewModel extends ViewModel {
     private static final String TAG = "MapViewFragmentViewMode";
 
-
-//    /**
-//     * Get/Set current pager (of the visible fragment)
-//     */
-//    // Create an instance of Mutable live data
-//    private MutableLiveData<Integer> mPagerCurrentItem = new MutableLiveData<>();
-//
-//    public void setPagerCurrentItem(Integer searchRestaurantOnMap){
-//        mPagerCurrentItem.setValue(searchRestaurantOnMap);
-//        Log.d(TAG, "LiveDataTest setLocationOnMap: "+ mPagerCurrentItem);
-//    }
-//
-//    public LiveData<Integer> getPagerCurrentItem(){
-//        Log.d(TAG, "LiveDataTest getLocationFromMap was called: "+ mPagerCurrentItem);
-//        return mPagerCurrentItem;
-//    }
-
     /**
-     * Get/Set fetched results List (nearby markers)
+     * Get/Set fetched results List (nearbyPlaces)
      */
     private MutableLiveData<List<Result>> mResultsList = new MutableLiveData<>();
 
@@ -50,35 +32,6 @@ public class SharedViewModel extends ViewModel {
         return mResultsList;
     }
 
-
-//    /**
-//     * Get/Set User data in Firestore
-//     */
-//    private MutableLiveData<User> mUser = new MutableLiveData<>();
-//
-//    public void setUser(User user){
-//        mUser.setValue(user);
-//    }
-//
-//    public LiveData<User> getUser(){
-//        return mUser;
-//    }
-
-
-    /**
-     * Get/Set Search_Auto-complete objects
-     */
-    private MutableLiveData<Place> mAutoCompleteSearchObject = new MutableLiveData<>();
-
-    public void setSearchObject(Place searchObject){
-        mAutoCompleteSearchObject.setValue(searchObject);
-        Log.d(TAG, "setSearchObject: " + searchObject);
-    }
-
-    public LiveData<Place> getSearchObject(){
-        Log.d(TAG, "getSearchObject: " + mAutoCompleteSearchObject);
-        return mAutoCompleteSearchObject;
-    }
 
     /**
      * Get/Set BottomSheet fetched data (to avoid unnecessary Http Requests in cases when the we load the same restaurant)
