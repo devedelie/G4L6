@@ -81,7 +81,7 @@ public class NearByPlacesStreamTest {
         PlacesResults placesResults = nearbyPlacesTestObserver.values().get(0);
         Assert.assertTrue(placesResults.getResults().size() > 0);
         for(Result result: placesResults.getResults()){
-            // Add specific place types into a list and verify that it hasn't "restaurant" type in it
+            // Add specific place types into a list and verify that it HAS NOT "restaurant" type in it
             placeType.addAll(result.getTypes());
             Assert.assertThat(placeType, not(hasItem(NEARBY_TYPE)));
         }
