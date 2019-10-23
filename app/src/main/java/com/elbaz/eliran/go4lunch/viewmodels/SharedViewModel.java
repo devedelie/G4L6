@@ -34,7 +34,7 @@ public class SharedViewModel extends ViewModel {
 
 
     /**
-     * Get/Set BottomSheet fetched data (to avoid unnecessary Http Requests in cases when the we load the same restaurant)
+     * Get/Set BottomSheet fetched data (to avoid unnecessary Http Requests in cases when we load the same restaurant)
      */
     private MutableLiveData<RestaurantDetails> mBottomSheetRestaurantDetails = new MutableLiveData<>();
 

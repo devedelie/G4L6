@@ -10,7 +10,7 @@ public class Constants {
     public static final String URL_FOR_IMAGE = "maps/api/place/photo?maxwidth=400&photoreference=";
     public static final String URL_FOR_IMAGE_KEY = "&key=";
     public static final String NEARBY_TYPE="restaurant";
-    public static final int NEARBY_RADIUS= 700;
+    public static final int NEARBY_RADIUS= 500;
     public static final String SEARCH_FIELDS = "place_id,photo,name,vicinity,rating,formatted_phone_number,website,opening_hours,review";
     public static final String FIREBASE_DATA_MESSAGE_KEY = "BackgroundCall";
 }

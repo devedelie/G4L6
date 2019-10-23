@@ -16,7 +16,7 @@ import static com.elbaz.eliran.go4lunch.models.Constants.GOOGLE_MAPS_API_BASE_UR
  * Created by Eliran Elbaz on 26-Sep-19.
  */
 // URL to fetch nearby restaurants within 1500m around the location (return JSON)
-//Request example: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&key=API_KEY
+//Request example: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=48.831212,2.329754&radius=1500&type=restaurant&key=API_KEY
 
 public interface GoogleMapApiService {
     @GET("maps/api/place/nearbysearch/json")
