@@ -70,7 +70,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "isCurrentUser: " + getCurrentUser() + " Logged? " + isCurrentUserLogged());
         // Verify Network connectivity
         if(!isNetworkAvailable()){
             displayMobileDataSettingsDialog(this, this);
