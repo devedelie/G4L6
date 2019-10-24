@@ -100,13 +100,11 @@ public class NotificationsService extends FirebaseMessagingService {
     @Nullable
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
-    private void sendVisualNotification() {
 
+    private void sendVisualNotification() {
         // Create an Intent that will be shown when user will click on the Notification
         Intent intent = new Intent(this, OnNotificationClickActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, OnNotificationClickActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-
         // Create a Style for the Notification
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(getString(R.string.notification_title));
@@ -117,7 +115,6 @@ public class NotificationsService extends FirebaseMessagingService {
             for(int i = 0 ; i<workmates.size() ; i++) {
                 inboxStyle.addLine("- "+workmates.get(i));
             }
-
         }
 
         // Create a Channel (Android 8)
