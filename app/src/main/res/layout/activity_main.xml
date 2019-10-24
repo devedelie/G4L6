@@ -52,7 +52,20 @@
             android:orientation="vertical"
             android:layout_margin="@dimen/default_large_margin">
 
-            <!-- BUTTON LOGIN -->
+            <!-- BUTTON Email -->
+            <Button
+                android:id="@+id/main_activity_button_email"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="@string/login_email"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_email_color"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_marginBottom="@dimen/default_buttons_margin_bottom"
+                android:drawableStart="@drawable/ic_email_white_icon"/>
+
+            <!-- BUTTON Gmail -->
             <Button
                 android:id="@+id/main_activity_button_gmail"
                 android:layout_width="match_parent"
@@ -75,7 +88,20 @@
                 android:textSize="@dimen/default_text_size"
                 android:background="@drawable/button_radius_accent_color"
                 style="?android:attr/borderlessButtonStyle"
+                android:layout_marginBottom="@dimen/default_buttons_margin_bottom"
                 android:drawableStart="@drawable/ic_facebook_icon" />
+
+            <!-- BUTTON Twitter -->
+            <Button
+                android:id="@+id/main_activity_button_twitter"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="@string/login_twitter"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_twitter_color"
+                style="?android:attr/borderlessButtonStyle"
+                android:drawableStart="@drawable/ic_twitter_icon" />
 
         </LinearLayout>
 

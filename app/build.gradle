@@ -12,6 +12,8 @@ android {
         multiDexEnabled true
         buildConfigField("String", "GOOGLE_API_KEY", GOOGLE_API_KEY)
         buildConfigField("String", "GOOGLE_BROWSER_API_KEY", GOOGLE_BROWSER_API_KEY)
+        buildConfigField("String", "TWITTER_API_KEY", TWITTER_API_KEY)
+        buildConfigField("String", "TWITTER_API_SECRET", TWITTER_API_SECRET)
     }
 
     compileOptions {
@@ -25,8 +27,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
     repositories {
         mavenCentral()
+    }
+    allprojects {
+        repositories {
+            maven { url 'https://maven.fabric.io/public' }
+        }
     }
 }
 
@@ -56,11 +68,9 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:5.1.0'
     implementation 'com.firebaseui:firebase-ui-firestore:5.1.0'
     implementation 'com.google.firebase:firebase-messaging:20.0.0'
-    // Required only if Facebook login support is required!  Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
-    implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
-
     // Facebook login support
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
+    implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
 
     // CardView
     implementation 'androidx.cardview:cardview:1.0.0'

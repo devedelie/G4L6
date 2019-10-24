@@ -158,17 +158,15 @@ public class MainActivity extends BaseActivity {
     }
     //-----------------End Of User's Permissions -------------------------
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Handle SignIn Activity response on activity result
-        this.handleResponseAfterSignIn(requestCode, resultCode, data);
-    }
-
     // --------------------
     // ACTIONS
     // --------------------
+
+    @OnClick(R.id.main_activity_button_email)
+    public void onClickEmailLoginButton() {
+        //Start appropriate activity
+            this.startSignInActivityWithEmail();
+        }
 
     @OnClick(R.id.main_activity_button_gmail)
     public void onClickGmailLoginButton() {
@@ -180,6 +178,12 @@ public class MainActivity extends BaseActivity {
     public void onClickFacebookLoginButton() {
         //Start appropriate activity
         this.startSignInActivityWithFacebook();
+    }
+
+    @OnClick(R.id.main_activity_button_twitter)
+    public void onClickTwitterLoginButton() {
+        //Start appropriate activity
+        this.startSignInActivityWithTwitter();
     }
 
     // --------------------
@@ -250,6 +254,21 @@ public class MainActivity extends BaseActivity {
     // NAVIGATION
     // --------------------
 
+    // Launch Sign-In Activity with Email- Firebase UI
+    private void startSignInActivityWithEmail(){
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setTheme(R.style.LoginTheme)
+                        .setAvailableProviders(
+                                Arrays.asList(
+                                        new AuthUI.IdpConfig.EmailBuilder().build()))
+                        .setIsSmartLockEnabled(false, true)
+                        .setLogo(R.drawable.ic_logo)
+                        .build(),
+                RC_SIGN_IN);
+    }
+
     // Launch Sign-In Activity with Gmail- Firebase UI
     private void startSignInActivityWithGmail(){
         startActivityForResult(
@@ -278,6 +297,28 @@ public class MainActivity extends BaseActivity {
                         .setLogo(R.drawable.ic_logo)
                         .build(),
                 RC_SIGN_IN);
+    }
+
+    // Launch Sign-In Activity with Twitter- Firebase UI
+    private void startSignInActivityWithTwitter(){
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setTheme(R.style.LoginTheme)
+                        .setAvailableProviders(
+                                Arrays.asList(
+                                        new AuthUI.IdpConfig.TwitterBuilder().build()))
+                        .setIsSmartLockEnabled(false, true)
+                        .setLogo(R.drawable.ic_logo)
+                        .build(),
+                RC_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Handle SignIn Activity response on activity result
+        this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
     // Launching Restaurants Activity
