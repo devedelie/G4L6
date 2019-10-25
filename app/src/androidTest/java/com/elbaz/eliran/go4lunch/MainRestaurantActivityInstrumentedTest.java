@@ -43,11 +43,11 @@ public class MainRestaurantActivityInstrumentedTest {
         onView(withId(R.id.fragment_list_view)).check(matches(isCompletelyDisplayed())); // Verify ListView view elements
         onView(withId(R.id.listView_recyclerView)).check(matches(isCompletelyDisplayed())); // Verify ListView recyclerView
 
-        onView(anyOf(withId(R.id.action_workmates))).perform(click());
+        onView(anyOf(withId(R.id.action_workmates))).perform(click()); // Switch to Workmates Fragment
         onView(withId(R.id.fragment_workmates)).check(matches(isCompletelyDisplayed())); // Verify Workmates view elements
         onView(withId(R.id.workmateView_recyclerView)).check(matches(isCompletelyDisplayed())); // Verify Workmates recyclerView
 
-        onView(anyOf(withId(R.id.action_mapView))).perform(click());
+        onView(anyOf(withId(R.id.action_mapView))).perform(click()); // Switch back to MapView Fragment
 
         // Scroll fragments with ViewPager
         int maxAttempts=3;
