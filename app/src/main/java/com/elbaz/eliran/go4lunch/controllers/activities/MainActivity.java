@@ -264,6 +264,7 @@ public class MainActivity extends BaseActivity {
                                         new AuthUI.IdpConfig.EmailBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.ic_logo)
+                        .setIsSmartLockEnabled(false) //Disable SmartLock to enable Espresso testing on UI**
                         .build(),
                 RC_SIGN_IN);
     }
@@ -309,6 +310,7 @@ public class MainActivity extends BaseActivity {
                                         new AuthUI.IdpConfig.TwitterBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.ic_logo)
+                        .setIsSmartLockEnabled(false)
                         .build(),
                 RC_SIGN_IN);
     }
