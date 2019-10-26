@@ -116,7 +116,7 @@ public class MainRestaurantActivityInstrumentedTest {
             e.printStackTrace();
         }
         onView(anyOf(withId(R.id.action_listView))).perform(click()); // Switch to ListView Fragment
-        
+
         // Click on first item on RecyclerView (position 0)
         ViewInteraction cardView = onView(
                 Matchers.allOf(childAtPosition(

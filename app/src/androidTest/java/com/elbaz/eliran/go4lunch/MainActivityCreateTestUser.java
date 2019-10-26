@@ -73,13 +73,6 @@ public class MainActivityCreateTestUser {
 
     //---------------------------------------------------------------------------------------------
 
-//    @Test
-//    public void useAppContext() {
-//        // Context of the app under test.
-//        Assert.assertEquals("com.elbaz.eliran.go4lunch", appContext.getPackageName());
-//    }
-
-
     @Test
     public void mainActivityRegisterUserWithEmail_onSuccessToRegister_shouldDeleteTestAccount() throws Exception{
         // Verify view elements
