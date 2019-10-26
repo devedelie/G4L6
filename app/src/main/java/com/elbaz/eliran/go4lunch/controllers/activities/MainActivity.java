@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity {
             if (isDataMessageArrived()){
                 startOnNotificationActivity();
             }else {
-                // Avoid login-screen if the user is already authenticated (onResume is being called when Firebase login UI is being closed)
+                // Avoid login-screen if the user is already authenticated (onResume is being called also when Firebase Auth-UI is being closed)
                 if (isCurrentUserLogged() && mLocationPermissionGranted) {
                     startSplashScreenActivity();
                 }
