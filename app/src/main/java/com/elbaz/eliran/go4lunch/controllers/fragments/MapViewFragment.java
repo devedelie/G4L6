@@ -47,6 +47,8 @@ import io.reactivex.disposables.Disposable;
 import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.deviceLocation;
 import static com.elbaz.eliran.go4lunch.controllers.activities.SplashScreen.mSharedViewModel;
+import static com.elbaz.eliran.go4lunch.models.Constants.MAXIMUM_ZOOM_PREFERENCE;
+import static com.elbaz.eliran.go4lunch.models.Constants.MINIMUM_ZOOM_PREFERENCE;
 
 public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 //    @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
@@ -95,7 +97,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 mResults = new ArrayList<>();
                 mResults.clear();
                 mResults.addAll(results);
-                Log.d(TAG, "TESTFF-onChanged: "+ mResults.get(0).getName());
                 updateUI();
             }
         });
@@ -119,8 +120,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Marker click listener
         mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
         // Map-Zoom limitations
-        mMap.setMinZoomPreference(14.5f);
-        mMap.setMaxZoomPreference(18.0f);
+        mMap.setMinZoomPreference(MINIMUM_ZOOM_PREFERENCE);
+        mMap.setMaxZoomPreference(MAXIMUM_ZOOM_PREFERENCE);
         // Map configurations
         mMap.setBuildingsEnabled(true);
         mMap.setMyLocationEnabled(true);
@@ -138,8 +139,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
     // A method to move the camera(map) to specific location by passing LatLng and Zoom
-    public void moveCamera(LatLng latLng, float zoom){
-        Log.d(TAG, "moveCamera: moving the camera to lat: " + latLng.latitude + " lng: " + latLng.longitude + " " + zoom + " " + latLng );
+    private void moveCamera(LatLng latLng, float zoom){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
@@ -150,7 +150,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private void setNearbyRestaurantsWithMarkers(){
         for (int i= 0 ; i<mResults.size(); i++ ){
             LatLng latLng = new LatLng(mResults.get(i).getGeometry().getLocation().getLat(), mResults.get(i).getGeometry().getLocation().getLng());
-            Log.d(TAG, "updateUI: " + i + "----:" + latLng);
             // Create a detail object to fetch data
             mRestaurantDetailsFetch = new RestaurantDetailsFetch(mResults.get(i).getPlaceId(), mResults.get(i).getName(), i);
             setCustomMarker(latLng, i, mRestaurantDetailsFetch);
