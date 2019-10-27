@@ -71,7 +71,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     public Context mContext;
     // AutoComplete searchAction
     private List<Place.Field> mFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG); // Set the fields to specify which types of place data to return after the user has made a selection.
-    public static String textForDialog;
+    public static String dialogRestaurantName, dialogAddress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -246,11 +246,13 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // Set textViews
         TextView dialogContent = (TextView) dialogView.findViewById(R.id.dialog_content_text);
         TextView dialogRestaurantName = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_name);
+        TextView dialogRestaurantAddress = (TextView) dialogView.findViewById(R.id.dialog_content_restaurant_address);
         TextView dialogBottomText = (TextView) dialogView.findViewById(R.id.dialog_bottom_text);
         Button dialogButton = (Button) dialogView.findViewById(R.id.dialog_button);
-        if(textForDialog != null && !textForDialog.isEmpty()){
+        if(MainRestaurantActivity.dialogRestaurantName != null && !MainRestaurantActivity.dialogRestaurantName.isEmpty()){
             dialogContent.setText(getResources().getString(R.string.dialog_content));
-            dialogRestaurantName.setText(textForDialog);
+            dialogRestaurantName.setText(MainRestaurantActivity.dialogRestaurantName);
+            dialogRestaurantAddress.setText(dialogAddress);
             dialogRestaurantName.setPaintFlags(dialogRestaurantName.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
             dialogBottomText.setText(getResources().getString(R.string.dialog_bon_appetit));
         }else{
@@ -353,7 +355,8 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User currentUser = documentSnapshot.toObject(User.class);
-                textForDialog = currentUser.getSelectedRestaurantName();
+                dialogRestaurantName = currentUser.getSelectedRestaurantName();
+                dialogAddress = currentUser.getSelectedRestaurantAddress();
                 yourLunchDialog();
             }
         });
