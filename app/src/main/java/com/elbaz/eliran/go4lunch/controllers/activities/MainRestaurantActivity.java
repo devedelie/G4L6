@@ -103,8 +103,7 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         // Handle 'back' press to close menu
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-//            super.onBackPressed();
+        }else {
             this.moveTaskToBack(true);
         }
     }

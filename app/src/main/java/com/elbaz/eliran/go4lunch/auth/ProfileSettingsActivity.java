@@ -25,7 +25,6 @@ import com.elbaz.eliran.go4lunch.api.UserHelper;
 import com.elbaz.eliran.go4lunch.base.BaseActivity;
 import com.elbaz.eliran.go4lunch.controllers.activities.MainActivity;
 import com.elbaz.eliran.go4lunch.models.User;
-import com.elbaz.eliran.go4lunch.viewmodels.SharedViewModel;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
@@ -48,7 +47,6 @@ public class ProfileSettingsActivity extends BaseActivity {
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
     private static final int UPDATE_USERNAME = 30;
-    private SharedViewModel sharedViewModel;
     private String restaurantToDelete;
 
 
@@ -174,7 +172,6 @@ public class ProfileSettingsActivity extends BaseActivity {
             @Override
             public void onSuccess(Void aVoid) {
                 switch (origin){
-                    // 8 - Hiding Progress bar after request completed
                     case UPDATE_USERNAME:
                         updateName();
                         break;
@@ -204,12 +201,6 @@ public class ProfileSettingsActivity extends BaseActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |  Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
-//
-//    private void deleteUser(){
-//        Log.d(TAG, "deleteUser: ");
-//        finishAffinity();
-//    }
-
 }
 
 

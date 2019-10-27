@@ -26,7 +26,6 @@ public class OnNotificationClickActivity extends BaseActivity {
     private boolean mIsGoing = false;
     private String restaurantName;
     private String restaurantAddress;
-    private String message;
     private List<String> workmates = new ArrayList<>();
 
     @Override

@@ -25,15 +25,6 @@ public class GoingUserHelper {
         return RestaurantHelper.getRestaurantCollection().document(restaurantName).collection(COLLECTION_NAME).get();
     }
 
-
-//    public static Query getAllUsersForWorkmates(String restaurants){
-//        return RestaurantHelper.getRestaurantCollection()
-//                .document()
-//                .collection(COLLECTION_NAME)
-//                .orderBy("dateCreated")
-//                .limit(50);
-//    }
-
     public static Task<Void> createUserForGoingList(String restaurantID, String restaurantNameId, User userGoing){
         // Create userGoing object
         Restaurant restaurant = new Restaurant(restaurantID, restaurantNameId, userGoing);
