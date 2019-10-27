@@ -139,6 +139,20 @@ public class MainRestaurantActivityInstrumentedTest {
                                 1),
                         isDisplayed()));
         floatingActionButton.check(matches(isCompletelyDisplayed()));
+        floatingActionButton.perform(click());
+        floatingActionButton.perform(click());
+
+        ViewInteraction linearLayout = onView(
+                Matchers.allOf(withId(R.id.restaurant_details_like_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                1),
+                        isDisplayed()));
+        linearLayout.check(matches(isCompletelyDisplayed()));
+        linearLayout.perform(click());
+        linearLayout.perform(click());
     }
 
 
