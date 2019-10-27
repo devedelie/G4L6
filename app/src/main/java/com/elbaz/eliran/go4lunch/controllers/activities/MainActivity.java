@@ -72,17 +72,13 @@ public class MainActivity extends BaseActivity {
         super.onResume();
         // Verify Network connectivity
         if(!isNetworkAvailable()){
-            displayMobileDataSettingsDialog(this, this);
-        }else{
-            // Check if Data-Message has arrived from Firebase
-            if (isDataMessageArrived()){
-                startOnNotificationActivity();
-            }else {
-                // Avoid login-screen if the user is already authenticated (onResume is being called also when Firebase Auth-UI is being closed)
-                if (isCurrentUserLogged() && mLocationPermissionGranted) {
-                    startSplashScreenActivity();
-                }
-            }
+            displayMobileDataSettingsDialog(this, this);}
+        // Then, check if Data-Message has arrived from Firebase
+        else if (isDataMessageArrived()) {
+            startOnNotificationActivity();}
+        // Then, avoid login-screen if the user is already authenticated (onResume is being called also when Firebase Auth-UI is being closed)
+        else if (isCurrentUserLogged() && mLocationPermissionGranted){
+            startSplashScreenActivity();
         }
     }
 
