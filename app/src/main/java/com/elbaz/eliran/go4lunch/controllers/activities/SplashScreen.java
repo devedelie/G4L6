@@ -113,8 +113,7 @@ public class SplashScreen extends BaseActivity {
                         Log.e(TAG, "onErrorHTTP: "+ e );
                     }
                     @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete: "); }
+                    public void onComplete() { Log.d(TAG, "onComplete: "); }
                 });
     }
 
