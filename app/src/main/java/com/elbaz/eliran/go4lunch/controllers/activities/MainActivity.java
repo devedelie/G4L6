@@ -43,7 +43,7 @@ import static android.content.ContentValues.TAG;
 import static com.elbaz.eliran.go4lunch.models.Constants.FIREBASE_DATA_MESSAGE_KEY;
 import static com.elbaz.eliran.go4lunch.models.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks {
 
     // 1 - Identifier for Sign-In Activity
     private static final int RC_SIGN_IN = 100;
@@ -70,6 +70,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: isLogged? " +isCurrentUserLogged() + "  isNetworkAvailable? "+ isNetworkAvailable() + "  hasLocationPermission? " + mLocationPermissionGranted);
         // Verify Network connectivity
         if(!isNetworkAvailable()){
             displayMobileDataSettingsDialog(this, this);}
@@ -142,8 +143,10 @@ public class MainActivity extends BaseActivity {
         if (!EasyPermissions.hasPermissions(this, PERMS_FINE )) {
             EasyPermissions.requestPermissions(this, getString(R.string.popup_title_permission_location_access), RC_PERMISSION_CODE, PERMS_FINE);
             return;
+        }else{
+            mLocationPermissionGranted = true;
         }
-        mLocationPermissionGranted = true;
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -151,6 +154,16 @@ public class MainActivity extends BaseActivity {
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        mLocationPermissionGranted = true;
+    }
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        mLocationPermissionGranted = false;
+        askPermission();
+    }
+
     //-----------------End Of User's Permissions -------------------------
 
     // --------------------
@@ -158,28 +171,16 @@ public class MainActivity extends BaseActivity {
     // --------------------
 
     @OnClick(R.id.main_activity_button_email)
-    public void onClickEmailLoginButton() {
-        //Start appropriate activity
-            this.startSignInActivityWithEmail();
-        }
+    public void onClickEmailLoginButton() { this.startSignInActivityWithEmail(); }
 
     @OnClick(R.id.main_activity_button_gmail)
-    public void onClickGmailLoginButton() {
-        //Start appropriate activity
-            this.startSignInActivityWithGmail();
-        }
+    public void onClickGmailLoginButton() { this.startSignInActivityWithGmail(); }
 
     @OnClick(R.id.main_activity_button_facebook)
-    public void onClickFacebookLoginButton() {
-        //Start appropriate activity
-        this.startSignInActivityWithFacebook();
-    }
+    public void onClickFacebookLoginButton() { this.startSignInActivityWithFacebook(); }
 
     @OnClick(R.id.main_activity_button_twitter)
-    public void onClickTwitterLoginButton() {
-        //Start appropriate activity
-        this.startSignInActivityWithTwitter();
-    }
+    public void onClickTwitterLoginButton() { this.startSignInActivityWithTwitter(); }
 
     // --------------------
     // REST REQUEST

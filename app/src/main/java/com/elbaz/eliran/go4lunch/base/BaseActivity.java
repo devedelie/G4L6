@@ -86,6 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                finish();
                 Intent intent = new Intent(context, MainActivity.class);
                 context.startActivity(intent);
                 dialog.cancel();
