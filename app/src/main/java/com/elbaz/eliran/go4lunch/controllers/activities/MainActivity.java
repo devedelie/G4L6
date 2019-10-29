@@ -182,6 +182,12 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     @OnClick(R.id.main_activity_button_twitter)
     public void onClickTwitterLoginButton() { this.startSignInActivityWithTwitter(); }
 
+    // Launching Restaurants Activity
+    private void startOnNotificationActivity(){
+        Intent intent = new Intent(this, OnNotificationClickActivity.class);
+        startActivity(intent);
+    }
+
     // --------------------
     // REST REQUEST
     // --------------------
@@ -222,28 +228,6 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     // Show Snack Bar with a message
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
-    }
-
-
-    //  Method that handles response after SignIn Activity close
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) { // SUCCESS
-                // CREATE USER IN FIRESTORE
-                this.createUserInFirestore();
-                showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
-            } else { // ERRORS
-                if (response == null) {
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
-                } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
-                } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
-                }
-            }
-        }
     }
 
     // --------------------
@@ -312,11 +296,36 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
                 RC_SIGN_IN);
     }
 
+    // --------------------
+    // UTILS
+    // --------------------
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Handle SignIn Activity response on activity result
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
+    }
+
+    //  Method that handles response after SignIn Activity close
+    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
+        IdpResponse response = IdpResponse.fromResultIntent(data);
+
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_OK) { // SUCCESS
+                // CREATE USER IN FIRESTORE
+                this.createUserInFirestore();
+                showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
+            } else { // ERRORS
+                if (response == null) {
+                    showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
+                } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
+                    showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
+                } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+                    showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
+                }
+            }
+        }
     }
 
     // Launching Restaurants Activity
@@ -327,12 +336,6 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         }else {
             showSnackBar(this.coordinatorLayout, getString(R.string.need_to_authorise_location_services));
         }
-    }
-
-    // Launching Restaurants Activity
-    private void startOnNotificationActivity(){
-        Intent intent = new Intent(this, OnNotificationClickActivity.class);
-        startActivity(intent);
     }
 
     // --------------------
