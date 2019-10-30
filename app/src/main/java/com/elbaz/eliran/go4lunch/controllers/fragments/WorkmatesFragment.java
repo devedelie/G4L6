@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,9 +24,6 @@ import com.google.firebase.firestore.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class WorkmatesFragment extends BaseFragment implements WorkmatesListAdapter.Listener {
     @BindView(R.id.workmateView_recyclerView) RecyclerView workmatesRecyclerView;
     @BindView(R.id.workmates_recycler_view_empty) TextView emptyListText;
