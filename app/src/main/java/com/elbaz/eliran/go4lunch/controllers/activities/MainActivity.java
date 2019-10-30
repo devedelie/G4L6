@@ -189,39 +189,6 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     }
 
     // --------------------
-    // REST REQUEST
-    // --------------------
-
-    //  Http request that create user in firestore
-    private void createUserInFirestore(){
-
-        if (this.getCurrentUser() != null){
-            // Get user collection whereEqualsTo the current userID (if successful --> user exist in firestore)
-            UserHelper.getUsersCollection().whereEqualTo("uid", getCurrentUser().getUid())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                // Put Documents in a DocumentSnapshot List
-                                List<DocumentSnapshot> mListOfDocuments = task.getResult().getDocuments();
-                                if(mListOfDocuments.size()<=0){
-                                    Log.d(TAG, "onComplete: User doesn't exist in Firestore");
-                                    String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
-                                    String username = getCurrentUser().getDisplayName();
-                                    String uid = getCurrentUser().getUid();
-
-                                    UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(onFailureListener());
-                                }else {
-                                    Log.d(TAG, "onComplete: Continue normally -> User exist in Firestore " +mListOfDocuments.size());
-                                }
-                            }
-                        }
-                    });
-        }
-    }
-
-    // --------------------
     // UI
     // --------------------
 
@@ -335,6 +302,39 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
             startActivity(intent);
         }else {
             showSnackBar(this.coordinatorLayout, getString(R.string.need_to_authorise_location_services));
+        }
+    }
+
+    // --------------------
+    // REST REQUEST
+    // --------------------
+
+    //  Http request that create user in firestore
+    private void createUserInFirestore(){
+
+        if (this.getCurrentUser() != null){
+            // Get user collection whereEqualsTo the current userID (if successful --> user exist in firestore)
+            UserHelper.getUsersCollection().whereEqualTo("uid", getCurrentUser().getUid())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                // Put Documents in a DocumentSnapshot List
+                                List<DocumentSnapshot> mListOfDocuments = task.getResult().getDocuments();
+                                if(mListOfDocuments.size()<=0){
+                                    Log.d(TAG, "onComplete: User doesn't exist in Firestore");
+                                    String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
+                                    String username = getCurrentUser().getDisplayName();
+                                    String uid = getCurrentUser().getUid();
+
+                                    UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(onFailureListener());
+                                }else {
+                                    Log.d(TAG, "onComplete: Continue normally -> User exist in Firestore " +mListOfDocuments.size());
+                                }
+                            }
+                        }
+                    });
         }
     }
 

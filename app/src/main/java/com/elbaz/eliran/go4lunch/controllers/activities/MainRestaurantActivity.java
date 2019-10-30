@@ -112,11 +112,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
     // UI Configuration
     //-------------------
 
-    // Toolbar for Navigation Drawer and searchAction icon
-    protected void configureToolbarWithDrawer(){
-        setSupportActionBar(toolbar);
-    }
-
     //ViewPager configuration + BottomNavigation Layout
     protected void configureViewPager() {
         //Set Adapter PageAdapter and glue it together
@@ -146,6 +141,11 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
                 return true;
             }
         });
+    }
+
+    // Toolbar for Navigation Drawer and searchAction icon
+    protected void configureToolbarWithDrawer(){
+        setSupportActionBar(toolbar);
     }
 
      // Inflate the top-menu (menu with searchAction and parameters icons)
@@ -178,7 +178,6 @@ public class MainRestaurantActivity extends BaseActivity implements NavigationVi
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     // Navigation drawer config
     protected void configureDrawerLayoutAndNavigationView(){

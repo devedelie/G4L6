@@ -51,16 +51,12 @@ import static com.elbaz.eliran.go4lunch.models.Constants.MAXIMUM_ZOOM_PREFERENCE
 import static com.elbaz.eliran.go4lunch.models.Constants.MINIMUM_ZOOM_PREFERENCE;
 
 public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-//    @BindView(R.id.mapView_loading_animation) ProgressBar mapProgressBarAnimation;
-//    @BindView(R.id.mapView_loading_text) TextView mapLoadingText;
     private static final float DEFAULT_ZOOM = 15f ;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private int AUTO_COMPLETE_INDEX_CODE = 100;
     private Disposable mDisposable;
-    private String deviceLocationVariable;
-//    public static Location deviceLocation; // Used for distance calculation on other fragments.
     // Nearby Places
     private RestaurantDetailsFetch mRestaurantDetailsFetch;
     private List<Result> mResults;
