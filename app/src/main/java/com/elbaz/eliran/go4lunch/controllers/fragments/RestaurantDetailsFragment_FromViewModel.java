@@ -358,8 +358,7 @@ public class RestaurantDetailsFragment_FromViewModel extends BottomSheetDialogFr
             }
         });
     }
-
-
+    
     // --------------------
     // ERROR HANDLER
     // --------------------
